@@ -1,501 +1,474 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tremaine Weekend Hub</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-
-    <!-- Chosen Palette: Soft Rose & Slate -->
-    <!-- Application Structure Plan: 
-         1. Dashboard Header: Quick status and visual breakdown of Saturday's time allocation.
-         2. Tabbed Navigation: Splits the dense itinerary into manageable chunks (Friday, Sat AM, Sat PM, Sat Eve).
-         3. Interactive Timeline: Cards for each event that are easy to scan.
-         4. "Food & Fuel" Section: Interactive filter to toggle between 'Talia' (Salad) and 'Carly' (Pasta) options.
-         5. "Chill Zone" Checklist: Interactive checklist for packing/room prep.
-         6. Quick Reference Grid: Key addresses with visual emphasis.
-         This structure prioritizes mobile usability for "on-the-go" moms in NYC. -->
+<!-- Header / Dashboard -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold text-rose-500 tracking-tight">🩰 Tremaine Weekend</h1>
+            <p class="text-xs text-slate-500">NYC • Friday & Saturday</p>
+        </div>
+        <div id="clock" class="text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+            <!-- Clock injected via JS -->
+        </div>
+    </div>
     
-    <!-- Visualization & Content Choices:
-         1. Report Info: Saturday Schedule Duration -> Goal: Visualize balance -> Viz: Doughnut Chart -> Interaction: None (Visual Anchor) -> Justification: Shows the ratio of Walking vs. Chilling vs. Competing.
-         2. Report Info: Lunch Options -> Goal: Simplify choice -> Viz: Filterable Cards -> Interaction: Click 'Talia' or 'Carly' buttons -> Justification: Reduces cognitive load when ordering lunch.
-         3. Report Info: Packing List -> Goal: Organization -> Viz: Checkbox List -> Interaction: Toggle completed items -> Justification: Practical utility. 
-         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- Navigation Tabs -->
+    <nav class="max-w-2xl mx-auto px-2 flex space-x-1 overflow-x-auto no-scrollbar" id="nav-container">
+        <!-- Tabs injected via JS -->
+    </nav>
+</header>
 
-    <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #f8fafc; /* Slate 50 */
-            color: #334155; /* Slate 700 */
-        }
-        
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 250px;
-            max-height: 250px;
-        }
+<!-- Main Content Area -->
+<main class="flex-grow max-w-2xl mx-auto w-full p-4 space-y-6">
 
-        /* Custom Scrollbar for clean look */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-
-        .tab-active {
-            border-bottom: 2px solid #fb7185; /* Rose 400 */
-            color: #be123c; /* Rose 700 */
-            font-weight: 600;
-        }
-        
-        .tab-inactive {
-            color: #64748b; /* Slate 500 */
-        }
-        
-        .tab-inactive:hover {
-            color: #334155;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(4px);
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
-
-    <!-- Header / Dashboard -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-rose-500 tracking-tight">🩰 Tremaine Weekend</h1>
-                <p class="text-xs text-slate-500">NYC • Friday & Saturday</p>
-            </div>
-            <div id="clock" class="text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-                <!-- Clock injected via JS -->
-            </div>
-        </div>
-        
-        <!-- Navigation Tabs -->
-        <nav class="max-w-2xl mx-auto px-2 flex space-x-1 overflow-x-auto no-scrollbar" id="nav-container">
-            <!-- Tabs injected via JS -->
-        </nav>
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-2xl mx-auto w-full p-4 space-y-6">
-
-        <!-- Intro Section (Context) -->
-        <section id="intro-section" class="animate-fade-in">
-            <div class="bg-gradient-to-r from-rose-50 to-white p-4 rounded-xl border border-rose-100 mb-4">
-                <h2 class="text-lg font-semibold text-rose-800 mb-2">Welcome to the Weekend!</h2>
-                <p class="text-sm text-slate-600 leading-relaxed">
-                    This interactive guide breaks down the schedule for Becca and Aviva. 
-                    Use the tabs above to navigate between <strong>Friday Solo Night</strong>, the <strong>Saturday Mom Walk</strong>, and the <strong>Pre-Comp Chill Zone</strong>.
-                </p>
-            </div>
-
-            <!-- Chart: Saturday Balance -->
-            <div class="glass-card rounded-xl p-4">
-                <h3 class="text-sm font-semibold text-slate-700 mb-2 text-center">Saturday Time Breakdown</h3>
-                <div class="chart-container">
-                    <canvas id="weekendChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-400 mt-2">Estimated activity split for Saturday</p>
-            </div>
-        </section>
-
-        <!-- Dynamic Content Container -->
-        <div id="content-container">
-            <!-- Content injected via JS based on active tab -->
+    <!-- Intro Section (Context) -->
+    <section id="intro-section" class="animate-fade-in">
+        <div class="bg-gradient-to-r from-rose-50 to-white p-4 rounded-xl border border-rose-100 mb-4">
+            <h2 class="text-lg font-semibold text-rose-800 mb-2">Welcome to the Weekend!</h2>
+            <p class="text-sm text-slate-600 leading-relaxed">
+                This interactive guide breaks down the schedule for Becca and Aviva. 
+                Use the tabs above to navigate between <strong>Friday Solo Night</strong>, the <strong>Saturday Mom Walk</strong>, and the <strong>Pre-Comp Chill Zone</strong>.
+            </p>
         </div>
 
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-slate-50 border-t border-slate-200 py-6 mt-8">
-        <div class="max-w-2xl mx-auto px-4 text-center">
-            <p class="text-xs text-slate-400">Created for the Dance Moms 💃</p>
-            <p class="text-xs text-slate-300 mt-1">Don't forget the grilled chicken!</p>
+        <!-- Chart: Saturday Balance -->
+        <div class="glass-card rounded-xl p-4">
+            <h3 class="text-sm font-semibold text-slate-700 mb-2 text-center">Saturday Time Breakdown</h3>
+            <div class="chart-container">
+                <canvas id="weekendChart"></canvas>
+            </div>
+            <p class="text-xs text-center text-slate-400 mt-2">Estimated activity split for Saturday</p>
         </div>
-    </footer>
+    </section>
 
-    <!-- JavaScript Application Logic -->
-    <script>
-        // --- State Management ---
-        const state = {
-            currentTab: 'friday',
-            lunchFilter: 'all', // 'all', 'talia', 'carly'
-            checklist: {
-                'Snacks': false,
-                'Games': false,
-                'Spa': false
+    <!-- Dynamic Content Container -->
+    <div id="content-container">
+        <!-- Content injected via JS based on active tab -->
+    </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-slate-50 border-t border-slate-200 py-6 mt-8">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+        <p class="text-xs text-slate-400">Created for the Dance Moms 💃</p>
+        <p class="text-xs text-slate-300 mt-1">Don't forget the grilled chicken!</p>
+    </div>
+</footer>
+
+<!-- JavaScript Application Logic -->
+<script>
+    // --- State Management ---
+    const state = {
+        currentTab: 'friday',
+        lunchFilter: 'all', // 'all', 'talia', 'carly'
+        checklist: {
+            'Snacks': false,
+            'Games': false,
+            'Spa': false
+        }
+    };
+
+    // --- Data: Itinerary ---
+    const itineraryData = {
+        friday: {
+            title: "Friday: Solo Night 🌙",
+            desc: "Focus on supporting Talia's solo performance (8:30pm). Keep it light and calm.",
+            events: [
+                { time: "5:30 PM", title: "Early Light Dinner", icon: "🥗", details: "Order DoorDash: Sweetgreen or Just Salad. Add home-grilled chicken. Keep it light!" },
+                { time: "8:30 PM", title: "Talia's Solo", icon: "💃", details: "Performance time approx 8:30-8:40 PM." },
+                { time: "9:00 PM", title: "Post-Solo Snacks", icon: "🥨", details: "In-room recovery: Pretzels, fruit, cheese sticks. Bagel/toast if hungry." },
+                { time: "10:00 PM", title: "Lights Out", icon: "🛌", details: "Early rest for the big day tomorrow." }
+            ]
+        },
+        saturdayAM: {
+            title: "Saturday Morning: Moms' Walk ☕",
+            desc: "7:45 AM - 1:00 PM. While girls are in classes, explore Midtown & Bryant Park.",
+            events: [
+                { time: "7:45 AM", title: "Coffee & Planning", icon: "☕", details: "Joe Coffee (44th & 6th) or Bluestone Lane (45th). Plan the morning." },
+                { time: "8:15 AM", title: "Bryant Park Stroll", icon: "🌳", details: "Winter Village kiosks, heated seating. Calmer than Times Square." },
+                { time: "9:30 AM", title: "Warm-Up Stop", icon: "🏛️", details: "NY Public Library (Rose Reading Room) or Grand Central Terminal." },
+                { time: "10:30 AM", title: "5th Ave Window Shop", icon: "🛍️", details: "St. Patrick's Cathedral & 5th Ave stores." },
+                { time: "12:00 PM", title: "Lunch Pickup", icon: "🥡", details: "Gather food for the girls before heading back. See 'Lunch Finder' below." }
+            ]
+        },
+        saturdayPM: {
+            title: "Saturday Afternoon: Chill Zone 💆‍♀️",
+            desc: "1:00 PM - 5:00 PM. Downtime in the hotel room before the evening competition. Focus on Carly getting ready for her solo",
+            events: [
+                { time: "1:00 PM", title: "In-Room Picnic", icon: "🥪", details: "Eat the picked-up lunch. Relax." },
+                { time: "2:00 PM", title: "Games & Spa", icon: "💅", details: "Uno, Bananagrams, Face Masks, Movies." },
+                { time: "3:00 PM", title: "Sugar Distraction (Optional)", icon: "🍪", details: "If nerves hit: Walk to Schmackary's, Van Leeuwen, or Junior's." },
+                { time: "4:30 PM", title: "Pre-Comp Dinner Order", icon: "📱", details: "Order delivery now for 5pm arrival. Keep it safe/familiar." }
+            ]
+        },
+        saturdayEve: {
+            title: "Saturday Night: Competition 🏆",
+            desc: "Evening Session. Focus on getting them fed and ready.",
+            events: [
+                { time: "5:00 PM", title: "Dinner Time", icon: "🍝", details: "Eat early. Chipotle, Dig, or Plain Pasta from Joe's Pizza." },
+                { time: "Evening", title: "Competition", icon: "🎭", details: "Head to the venue. Good luck girls!" }
+            ]
+        }
+    };
+
+    // --- Persisted Data Key & Load Saved Data (localStorage) ---
+    const STORAGE_KEY = 'tremaine_itinerary_v1';
+    (function loadSavedItinerary() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // merge parsed into defaults so new keys in code are preserved
+                Object.keys(parsed).forEach(k => {
+                    itineraryData[k] = parsed[k];
+                });
             }
-        };
-
-        // --- Data: Itinerary ---
-        const itineraryData = {
-            friday: {
-                title: "Friday: Solo Night 🌙",
-                desc: "Focus on supporting Talia's solo performance (8:30pm). Keep it light and calm.",
-                events: [
-                    { time: "5:30 PM", title: "Early Light Dinner", icon: "🥗", details: "Order DoorDash: Sweetgreen or Just Salad. Add home-grilled chicken. Keep it light!" },
-                    { time: "8:30 PM", title: "Talia's Solo", icon: "💃", details: "Performance time approx 8:30-8:40 PM." },
-                    { time: "9:00 PM", title: "Post-Solo Snacks", icon: "🥨", details: "In-room recovery: Pretzels, fruit, cheese sticks. Bagel/toast if hungry." },
-                    { time: "10:00 PM", title: "Lights Out", icon: "🛌", details: "Early rest for the big day tomorrow." }
-                ]
-            },
-            saturdayAM: {
-                title: "Saturday Morning: Moms' Walk ☕",
-                desc: "7:45 AM - 1:00 PM. While girls are in classes, explore Midtown & Bryant Park.",
-                events: [
-                    { time: "7:45 AM", title: "Coffee & Planning", icon: "☕", details: "Joe Coffee (44th & 6th) or Bluestone Lane (45th). Plan the morning." },
-                    { time: "8:15 AM", title: "Bryant Park Stroll", icon: "🌳", details: "Winter Village kiosks, heated seating. Calmer than Times Square." },
-                    { time: "9:30 AM", title: "Warm-Up Stop", icon: "🏛️", details: "NY Public Library (Rose Reading Room) or Grand Central Terminal." },
-                    { time: "10:30 AM", title: "5th Ave Window Shop", icon: "🛍️", details: "St. Patrick's Cathedral & 5th Ave stores." },
-                    { time: "12:00 PM", title: "Lunch Pickup", icon: "🥡", details: "Gather food for the girls before heading back. See 'Lunch Finder' below." }
-                ]
-            },
-            saturdayPM: {
-                title: "Saturday Afternoon: Chill Zone 💆‍♀️",
-                desc: "1:00 PM - 5:00 PM. Downtime in the hotel room before the evening competition. Focus on Carly getting ready for her solo",
-                events: [
-                    { time: "1:00 PM", title: "In-Room Picnic", icon: "🥪", details: "Eat the picked-up lunch. Relax." },
-                    { time: "2:00 PM", title: "Games & Spa", icon: "💅", details: "Uno, Bananagrams, Face Masks, Movies." },
-                    { time: "3:00 PM", title: "Sugar Distraction (Optional)", icon: "🍪", details: "If nerves hit: Walk to Schmackary's, Van Leeuwen, or Junior's." },
-                    { time: "4:30 PM", title: "Pre-Comp Dinner Order", icon: "📱", details: "Order delivery now for 5pm arrival. Keep it safe/familiar." }
-                ]
-            },
-            saturdayEve: {
-                title: "Saturday Night: Competition 🏆",
-                desc: "Evening Session. Focus on getting them fed and ready.",
-                events: [
-                    { time: "5:00 PM", title: "Dinner Time", icon: "🍝", details: "Eat early. Chipotle, Dig, or Plain Pasta from Joe's Pizza." },
-                    { time: "Evening", title: "Competition", icon: "🎭", details: "Head to the venue. Good luck girls!" }
-                ]
-            }
-        };
-
-        // --- Data: Lunch Options ---
-        const lunchOptions = [
-            { name: "Sweetgreen", type: "Salad", for: "Talia", loc: "1450 Broadway" },
-            { name: "Dig", type: "Bowls", for: "Talia", loc: "W 45th St" },
-            { name: "Pret A Manger", type: "Sandwich/Salad", for: "Talia", loc: "Multiple" },
-            { name: "Vapiano", type: "Pasta", for: "Carly", loc: "W 42nd St" },
-            { name: "Pasta Lovers", type: "Pasta", for: "Carly", loc: "W 44th St" },
-            { name: "Dig (Pasta Option)", type: "Pasta", for: "Carly", loc: "W 45th St" }
-        ];
-
-        // --- Data: Addresses ---
-        const addresses = [
-            { name: "Joe Coffee", addr: "W 44th St & 6th Ave" },
-            { name: "Bryant Park", addr: "40th-42nd St & 6th Ave" },
-            { name: "Sweetgreen", addr: "1450 Broadway (at 41st)" },
-            { name: "Dig", addr: "1407 Broadway (W 45th)" },
-            { name: "Schmackary's", addr: "362 W 45th St" },
-            { name: "Van Leeuwen", addr: "204 W 48th St" }
-        ];
-
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderClock();
-            renderTabs();
-            renderChart(); // Initial chart render
-            
-            // Set initial tab content (Dashboard view is mostly static, let's load Friday by default or create a 'Summary' tab. 
-            // Given the design, we will just load Friday first.)
-            switchTab('friday'); 
-            
-            setInterval(renderClock, 60000); // Update clock every minute
-        });
-
-        // --- Functions ---
-
-        function renderClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('clock').textContent = timeString;
+        } catch (e) {
+            console.warn('Failed to load saved itinerary', e);
         }
+    })();
 
-        function renderChart() {
-            const ctx = document.getElementById('weekendChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Moms Walk', 'Chill Zone', 'Competition', 'Sleep/Other'],
-                    datasets: [{
-                        data: [5.25, 4, 4, 10.75], // Hours breakdown
-                        backgroundColor: [
-                            '#fb7185', // Rose 400 (Walk)
-                            '#94a3b8', // Slate 400 (Chill)
-                            '#fda4af', // Rose 300 (Comp)
-                            '#e2e8f0'  // Slate 200 (Other)
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: {
-                                    family: "'Outfit', sans-serif",
-                                    size: 11
-                                },
-                                boxWidth: 10,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.raw + ' hrs';
-                                }
-                            }
+    // --- Data: Lunch Options ---
+    const lunchOptions = [
+        { name: "Sweetgreen", type: "Salad", for: "Talia", loc: "1450 Broadway" },
+        { name: "Dig", type: "Bowls", for: "Talia", loc: "W 45th St" },
+        { name: "Pret A Manger", type: "Sandwich/Salad", for: "Talia", loc: "Multiple" },
+        { name: "Vapiano", type: "Pasta", for: "Carly", loc: "W 42nd St" },
+        { name: "Pasta Lovers", type: "Pasta", for: "Carly", loc: "W 44th St" },
+        { name: "Dig (Pasta Option)", type: "Pasta", for: "Carly", loc: "W 45th St" }
+    ];
+
+    // --- Data: Addresses ---
+    const addresses = [
+        { name: "Joe Coffee", addr: "W 44th St & 6th Ave" },
+        { name: "Bryant Park", addr: "40th-42nd St & 6th Ave" },
+        { name: "Sweetgreen", addr: "1450 Broadway (at 41st)" },
+        { name: "Dig", addr: "1407 Broadway (W 45th)" },
+        { name: "Schmackary's", addr: "362 W 45th St" },
+        { name: "Van Leeuwen", addr: "204 W 48th St" }
+    ];
+
+    // --- Helper: save itinerary to localStorage ---
+    function saveItinerary() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(itineraryData));
+        } catch (e) {
+            console.warn('Failed to save itinerary', e);
+        }
+    }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        renderClock();
+        renderTabs();
+        renderChart(); // Initial chart render
+        switchTab('friday'); 
+        setInterval(renderClock, 60000); // Update clock every minute
+    });
+
+    // --- Functions ---
+
+    function renderClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('clock').textContent = timeString;
+    }
+
+    function renderChart() {
+        const ctx = document.getElementById('weekendChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Moms Walk', 'Chill Zone', 'Competition', 'Sleep/Other'],
+                datasets: [{
+                    data: [5.25, 4, 4, 10.75], // Hours breakdown
+                    backgroundColor: [
+                        '#fb7185', // Rose 400 (Walk)
+                        '#94a3b8', // Slate 400 (Chill)
+                        '#fda4af', // Rose 300 (Comp)
+                        '#e2e8f0'  // Slate 200 (Other)
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: "'Outfit', sans-serif",
+                                size: 11
+                            },
+                            boxWidth: 10,
+                            usePointStyle: true
                         }
                     },
-                    cutout: '70%'
-                }
-            });
-        }
-
-        function renderTabs() {
-            const tabs = [
-                { id: 'friday', label: 'Fri Night' },
-                { id: 'saturdayAM', label: 'Sat AM' },
-                { id: 'saturdayPM', label: 'Sat PM' },
-                { id: 'saturdayEve', label: 'Sat Eve' },
-                { id: 'quickRef', label: '📍 Quick Ref' }
-            ];
-            
-            const nav = document.getElementById('nav-container');
-            nav.innerHTML = ''; // Clear
-
-            tabs.forEach(tab => {
-                const btn = document.createElement('button');
-                btn.className = `flex-shrink-0 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${state.currentTab === tab.id ? 'border-rose-400 text-rose-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`;
-                btn.textContent = tab.label;
-                btn.onclick = () => switchTab(tab.id);
-                nav.appendChild(btn);
-            });
-        }
-
-        function switchTab(tabId) {
-            state.currentTab = tabId;
-            renderTabs(); // Re-render to update active style
-            
-            const container = document.getElementById('content-container');
-            const intro = document.getElementById('intro-section');
-            
-            // Hide intro on non-timeline tabs to save space
-            if (tabId === 'quickRef') {
-                intro.style.display = 'none';
-            } else {
-                intro.style.display = 'block';
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + ' hrs';
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
             }
+        });
+    }
 
-            // Logic to render content based on tab
-            if (tabId === 'quickRef') {
-                renderQuickRef(container);
-            } else {
-                renderTimeline(container, itineraryData[tabId], tabId);
-            }
+    function renderTabs() {
+        const tabs = [
+            { id: 'friday', label: 'Fri Night' },
+            { id: 'saturdayAM', label: 'Sat AM' },
+            { id: 'saturdayPM', label: 'Sat PM' },
+            { id: 'saturdayEve', label: 'Sat Eve' },
+            { id: 'quickRef', label: '📍 Quick Ref' }
+        ];
+        
+        const nav = document.getElementById('nav-container');
+        nav.innerHTML = ''; // Clear
+
+        tabs.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.className = `flex-shrink-0 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${state.currentTab === tab.id ? 'border-rose-400 text-rose-600' : 'border-transparent text-slate-500'}`;
+            btn.textContent = tab.label;
+            btn.onclick = () => switchTab(tab.id);
+            nav.appendChild(btn);
+        });
+    }
+
+    function switchTab(tabId) {
+        state.currentTab = tabId;
+        renderTabs(); // Re-render to update active style
+        
+        const container = document.getElementById('content-container');
+        const intro = document.getElementById('intro-section');
+        
+        // Hide intro on non-timeline tabs to save space
+        if (tabId === 'quickRef') {
+            intro.style.display = 'none';
+        } else {
+            intro.style.display = 'block';
         }
 
-        function renderTimeline(container, data, tabId) {
-            let html = `
-                <div class="animate-fade-in space-y-4">
-                    <div class="mb-4">
-                        <h2 class="text-xl font-bold text-slate-800">${data.title}</h2>
-                        <p class="text-sm text-slate-500 mt-1">${data.desc}</p>
+        // Logic to render content based on tab
+        if (tabId === 'quickRef') {
+            renderQuickRef(container);
+        } else {
+            renderTimeline(container, itineraryData[tabId], tabId);
+        }
+    }
+
+    function renderTimeline(container, data, tabId) {
+        let html = `
+            <div class="animate-fade-in space-y-4">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-slate-800">${data.title}</h2>
+                    <p class="text-sm text-slate-500 mt-1">${data.desc}</p>
+                </div>
+                <div class="space-y-3">
+        `;
+
+        data.events.forEach((event, i) => {
+            html += `
+                <div class="glass-card rounded-lg p-4 flex items-start space-x-4 hover:bg-white transition-colors">
+                    <div class="flex-shrink-0 w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-xl">
+                        ${event.icon}
                     </div>
-                    <div class="space-y-3">
-            `;
-
-            data.events.forEach(event => {
-                html += `
-                    <div class="glass-card rounded-lg p-4 flex items-start space-x-4 hover:bg-white transition-colors">
-                        <div class="flex-shrink-0 w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-xl">
-                            ${event.icon}
-                        </div>
-                        <div>
-                            <span class="block text-xs font-bold text-rose-500 uppercase tracking-wide">${event.time}</span>
-                            <h3 class="text-base font-bold text-slate-700">${event.title}</h3>
-                            <p class="text-sm text-slate-500 mt-1">${event.details}</p>
-                        </div>
+                    <div class="flex-1">
+                        <span class="block text-xs font-bold text-rose-500 uppercase tracking-wide">${event.time}</span>
+                        <h3 class="text-base font-bold text-slate-700">${event.title}</h3>
+                        <p class="text-sm text-slate-500 mt-1">${event.details}</p>
                     </div>
-                `;
-            });
-
-            html += `</div>`;
-
-            // Special Injection for Saturday AM: Lunch Picker
-            if (tabId === 'saturdayAM') {
-                html += renderLunchPicker();
-            }
-
-            // Special Injection for Saturday PM: Chill Zone Checklist
-            if (tabId === 'saturdayPM') {
-                html += renderChillZone();
-            }
-
-            html += `</div>`;
-            container.innerHTML = html;
-
-            // Re-attach event listeners for dynamic elements
-            if (tabId === 'saturdayAM') setupLunchListeners();
-        }
-
-        // --- Sub-Component: Lunch Picker ---
-        function renderLunchPicker() {
-            return `
-                <div class="mt-8 pt-6 border-t border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">🥗 Lunch Finder</h3>
-                    <p class="text-sm text-slate-500 mb-4">Quickly filter options for each girl.</p>
-                    
-                    <div class="flex space-x-2 mb-4">
-                        <button id="btn-all" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600'}">All</button>
-                        <button id="btn-talia" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'talia' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}">🥗 Talia</button>
-                        <button id="btn-carly" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'carly' ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700'}">🍝 Carly</button>
-                    </div>
-
-                    <div id="lunch-list" class="grid grid-cols-1 gap-2">
-                        <!-- Items populated via JS -->
+                    <div class="ml-4 flex flex-col space-y-2">
+                        <button onclick="editEventByIndex('${tabId}', ${i})" class="text-sm text-slate-600 bg-slate-100 px-3 py-1 rounded">Edit</button>
+                        <button onclick="deleteEventByIndex('${tabId}', ${i})" class="text-sm text-rose-600 bg-rose-50 px-3 py-1 rounded">Delete</button>
                     </div>
                 </div>
             `;
+        });
+
+        html += `</div>`;
+
+        // Special Injection for Saturday AM: Lunch Picker
+        if (tabId === 'saturdayAM') {
+            html += renderLunchPicker();
         }
 
-        function setupLunchListeners() {
-            document.getElementById('btn-all').onclick = () => filterLunch('all');
-            document.getElementById('btn-talia').onclick = () => filterLunch('talia');
-            document.getElementById('btn-carly').onclick = () => filterLunch('carly');
-            updateLunchList();
+        // Special Injection for Saturday PM: Chill Zone Checklist
+        if (tabId === 'saturdayPM') {
+            html += renderChillZone();
         }
 
-        function filterLunch(filter) {
-            state.lunchFilter = filter;
-            // Update button styles (simple toggle logic re-render for simplicity in this SPA)
-            const btns = ['all', 'talia', 'carly'];
-            // Re-render whole section would be cleaner in React, but here we just call switchTab again or manually toggle classes. 
-            // Let's manually toggle classes for efficiency.
-            document.getElementById('btn-all').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600'}`;
-            document.getElementById('btn-talia').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'talia' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}`;
-            document.getElementById('btn-carly').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'carly' ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700'}`;
-            
-            updateLunchList();
+        // Add event button
+        html += `
+            <div class="mt-4">
+                <button onclick="addEventToTab('${tabId}')" class="bg-rose-500 text-white px-4 py-2 rounded-lg">+ Add Event</button>
+            </div>
+        `;
+
+        html += `</div>`;
+        container.innerHTML = html;
+
+        // Re-attach event listeners for dynamic elements
+        if (tabId === 'saturdayAM') setupLunchListeners();
+    }
+
+    // --- Sub-Component: Lunch Picker ---
+    function renderLunchPicker() {
+        return `
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                <h3 class="text-lg font-bold text-slate-800 mb-2">🥗 Lunch Finder</h3>
+                <p class="text-sm text-slate-500 mb-4">Quickly filter options for each girl.</p>
+                
+                <div class="flex space-x-2 mb-4">
+                    <button id="btn-all" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600'}">All</button>
+                    <button id="btn-talia" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'talia' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}">🥗 Talia</button>
+                    <button id="btn-carly" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'carly' ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700'}">🍝 Carly</button>
+                </div>
+
+                <div id="lunch-list" class="grid grid-cols-1 gap-2">
+                    <!-- Items populated via JS -->
+                </div>
+            </div>
+        `;
+    }
+
+    function setupLunchListeners() {
+        document.getElementById('btn-all').onclick = () => filterLunch('all');
+        document.getElementById('btn-talia').onclick = () => filterLunch('talia');
+        document.getElementById('btn-carly').onclick = () => filterLunch('carly');
+        updateLunchList();
+    }
+
+    function filterLunch(filter) {
+        state.lunchFilter = filter;
+        // Update button styles (simple toggle logic re-render for simplicity in this SPA)
+        document.getElementById('btn-all').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600'}`;
+        document.getElementById('btn-talia').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'talia' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}`;
+        document.getElementById('btn-carly').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'carly' ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700'}`;
+        
+        updateLunchList();
+    }
+
+    function updateLunchList() {
+        const list = document.getElementById('lunch-list');
+        list.innerHTML = '';
+        
+        const filtered = lunchOptions.filter(item => {
+            if (state.lunchFilter === 'all') return true;
+            return item.for.toLowerCase() === state.lunchFilter;
+        });
+
+        if (filtered.length === 0) {
+            list.innerHTML = '<div class="text-sm text-slate-400 text-center py-2">No options found.</div>';
+            return;
         }
 
-        function updateLunchList() {
-            const list = document.getElementById('lunch-list');
-            list.innerHTML = '';
-            
-            const filtered = lunchOptions.filter(item => {
-                if (state.lunchFilter === 'all') return true;
-                return item.for.toLowerCase() === state.lunchFilter;
-            });
+        filtered.forEach(item => {
+            const el = document.createElement('div');
+            el.className = "bg-white border border-slate-200 p-3 rounded-lg flex justify-between items-center";
+            el.innerHTML = `
+                <div>
+                    <div class="font-bold text-slate-700">${item.name}</div>
+                    <div class="text-xs text-slate-500">${item.type} • ${item.loc}</div>
+                </div>
+                <span class="text-xs font-semibold px-2 py-1 rounded ${item.for === 'Talia' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}">${item.for}</span>
+            `;
+            list.appendChild(el);
+        });
+    }
 
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="text-sm text-slate-400 text-center py-2">No options found.</div>';
-                return;
-            }
+    // --- Sub-Component: Chill Zone ---
+    function renderChillZone() {
+        // Checklists
+        const items = [
+            "Card Games (Uno, Phase 10)",
+            "Face Masks / Polish",
+            "Popcorn & Pretzels",
+            "Fruit & Veggies",
+            "Electrolytes (Liquid IV)"
+        ];
 
-            filtered.forEach(item => {
-                const el = document.createElement('div');
-                el.className = "bg-white border border-slate-200 p-3 rounded-lg flex justify-between items-center";
-                el.innerHTML = `
+        let html = `
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                <h3 class="text-lg font-bold text-slate-800 mb-2">🎒 Packing & Prep Checklist</h3>
+                <div class="space-y-2">
+        `;
+
+        items.forEach((item, idx) => {
+            html += `
+                <label class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-slate-200 cursor-pointer select-none">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-rose-500 rounded border-slate-300 focus:ring-rose-500" onclick="this.parentElement.classList.toggle('opacity-50')">
+                    <span class="text-sm text-slate-700">${item}</span>
+                </label>
+            `;
+        });
+
+        html += `</div></div>`;
+        return html;
+    }
+
+    // --- Component: Quick Ref ---
+    function renderQuickRef(container) {
+        let html = `
+            <div class="animate-fade-in">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-slate-800">📍 Addresses</h2>
+                    <p class="text-sm text-slate-500">Tap address to copy to clipboard (simulated).</p>
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+        `;
+
+        addresses.forEach(addr => {
+            html += `
+                <div class="glass-card p-4 rounded-lg flex items-center justify-between">
                     <div>
-                        <div class="font-bold text-slate-700">${item.name}</div>
-                        <div class="text-xs text-slate-500">${item.type} • ${item.loc}</div>
+                        <h4 class="font-bold text-slate-700">${addr.name}</h4>
+                        <p class="text-sm text-slate-500">${addr.addr}</p>
                     </div>
-                    <span class="text-xs font-semibold px-2 py-1 rounded ${item.for === 'Talia' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}">${item.for}</span>
-                `;
-                list.appendChild(el);
-            });
-        }
-
-        // --- Sub-Component: Chill Zone ---
-        function renderChillZone() {
-            // Checklists
-            const items = [
-                "Card Games (Uno, Phase 10)",
-                "Face Masks / Polish",
-                "Popcorn & Pretzels",
-                "Fruit & Veggies",
-                "Electrolytes (Liquid IV)"
-            ];
-
-            let html = `
-                <div class="mt-8 pt-6 border-t border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">🎒 Packing & Prep Checklist</h3>
-                    <div class="space-y-2">
+                    <button onclick="alert('Address copied: ${addr.addr}')" class="text-rose-500 bg-rose-50 p-2 rounded-full hover:bg-rose-100 transition">
+                        <span class="text-xl">📋</span>
+                    </button>
+                </div>
             `;
+        });
 
-            items.forEach((item, idx) => {
-                html += `
-                    <label class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-slate-200 cursor-pointer select-none">
-                        <input type="checkbox" class="form-checkbox h-5 w-5 text-rose-500 rounded border-slate-300 focus:ring-rose-500" onclick="this.parentElement.classList.toggle('opacity-50')">
-                        <span class="text-sm text-slate-700">${item}</span>
-                    </label>
-                `;
-            });
+        html += `</div></div>`;
+        container.innerHTML = html;
+    }
 
-            html += `</div></div>`;
-            return html;
-        }
+    // --- Editable timeline helpers: add / edit / delete ---
+    function editEventByIndex(tabId, idx) {
+        const ev = itineraryData[tabId].events[idx];
+        const title = prompt('Title', ev.title);
+        if (title === null) return;
+        const time = prompt('Time', ev.time);
+        if (time === null) return;
+        const details = prompt('Details', ev.details);
+        if (details === null) return;
+        itineraryData[tabId].events[idx] = {...ev, title, time, details};
+        saveItinerary();
+        switchTab(tabId);
+    }
 
-        // --- Component: Quick Ref ---
-        function renderQuickRef(container) {
-            let html = `
-                <div class="animate-fade-in">
-                    <div class="mb-4">
-                        <h2 class="text-xl font-bold text-slate-800">📍 Addresses</h2>
-                        <p class="text-sm text-slate-500">Tap address to copy to clipboard (simulated).</p>
-                    </div>
-                    <div class="grid grid-cols-1 gap-3">
-            `;
+    function deleteEventByIndex(tabId, idx) {
+        if (!confirm('Delete this event?')) return;
+        itineraryData[tabId].events.splice(idx, 1);
+        saveItinerary();
+        switchTab(tabId);
+    }
 
-            addresses.forEach(addr => {
-                html += `
-                    <div class="glass-card p-4 rounded-lg flex items-center justify-between">
-                        <div>
-                            <h4 class="font-bold text-slate-700">${addr.name}</h4>
-                            <p class="text-sm text-slate-500">${addr.addr}</p>
-                        </div>
-                        <button onclick="alert('Address copied: ${addr.addr}')" class="text-rose-500 bg-rose-50 p-2 rounded-full hover:bg-rose-100 transition">
-                            <span class="text-xl">📋</span>
-                        </button>
-                    </div>
-                `;
-            });
-
-            html += `</div></div>`;
-            container.innerHTML = html;
-        }
-
-    </script>
-</body>
-</html>
+    function addEventToTab(tabId) {
+        const title = prompt('New event title');
+        if (!title) return;
+        const time = prompt('Time (e.g. 2:00 PM)', 'TBD');
+        const details = prompt('Details', '');
+        itineraryData[tabId].events.push({ time, title, icon: '🕒', details });
+        saveItinerary();
+        switchTab(tabId);
+    }
+</script>
