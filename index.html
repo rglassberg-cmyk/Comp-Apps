@@ -290,16 +290,17 @@
             { num: null, time: "9:40 PM", name: "Awards 13+", dancer: "", division: "", style: "", type: "Awards", isAwards: true }
         ];
 
-        // --- Places to Eat (Near Hyatt Regency Dulles, Herndon VA) ---
+        // --- Places to Eat (Near Hyatt Regency Dulles, 2300 Dulles Corner Blvd, Herndon VA) ---
         const placesToEat = {
             walkable: [
-                { name: "Chili's Grill & Bar", type: "American", distance: "0.1 mi", address: "2250 Centreville Rd, Herndon", price: "$$", lat: 38.9575, lng: -77.4070, note: "Right next to hotel, kid-friendly", website: "https://www.chilis.com", menu: "https://www.chilis.com/menu" },
-                { name: "Olive Garden", type: "Italian", distance: "0.2 mi", address: "2285 Centreville Rd, Herndon", price: "$$", lat: 38.9580, lng: -77.4065, note: "Pasta, breadsticks, familiar favorites", website: "https://www.olivegarden.com", menu: "https://www.olivegarden.com/menu" },
-                { name: "Red Robin", type: "Burgers", distance: "0.3 mi", address: "2200 Centreville Rd, Herndon", price: "$$", lat: 38.9560, lng: -77.4075, note: "Great burgers, bottomless fries", website: "https://www.redrobin.com", menu: "https://www.redrobin.com/menu" },
-                { name: "Founding Farmers", type: "American Farm-to-Table", distance: "1.5 mi", address: "1800 Tysons Blvd, Tysons", price: "$$$", lat: 38.9180, lng: -77.2230, note: "Upscale, great brunch (short drive)", website: "https://www.wearefoundingfarmers.com/location/tysons", menu: "https://www.wearefoundingfarmers.com/location/tysons/menu" },
-                { name: "Pho 75", type: "Vietnamese", distance: "1.2 mi", address: "382 Elden St, Herndon", price: "$", lat: 38.9690, lng: -77.3920, note: "Authentic pho, quick & delicious", website: null, menu: null },
-                { name: "Paisano's Pizza", type: "Pizza/Italian", distance: "1.0 mi", address: "2456 Centreville Rd, Herndon", price: "$$", lat: 38.9620, lng: -77.4050, note: "Great pizza, delivers!", website: "https://www.paisanospizza.com", menu: "https://www.paisanospizza.com/menu" },
-                { name: "Jimmy John's", type: "Sandwiches", distance: "0.5 mi", address: "13324 Franklin Farm Rd, Herndon", price: "$", lat: 38.9550, lng: -77.4020, note: "Fast subs, good for quick lunch", website: "https://www.jimmyjohns.com", menu: "https://www.jimmyjohns.com/menu" }
+                { name: "Kabobi by The Helmand", type: "Afghan/Mediterranean", distance: "5 min", address: "2321A Dulles Station Blvd, Herndon", price: "$$", lat: 38.9555, lng: -77.4045, note: "Gourmet Afghan cuisine, craft beer, highly rated!", website: "https://www.thekabobi.com", menu: "https://www.thekabobi.com/menu" },
+                { name: "Chili's Grill & Bar", type: "American", distance: "5 min", address: "3063 Centreville Rd, Herndon", price: "$$", lat: 38.9575, lng: -77.4070, note: "Kid-friendly, familiar favorites", website: "https://www.chilis.com", menu: "https://www.chilis.com/menu" },
+                { name: "Red Robin", type: "Burgers", distance: "5 min", address: "21045 Dulles Town Cir, Sterling", price: "$$", lat: 38.9880, lng: -77.4190, note: "Great burgers, bottomless fries, at Dulles Town Center", website: "https://www.redrobin.com", menu: "https://www.redrobin.com/menu" },
+                { name: "Olive Garden", type: "Italian", distance: "8 min", address: "45970 Waterview Plz, Sterling", price: "$$", lat: 38.9920, lng: -77.4210, note: "Pasta, breadsticks, familiar favorites", website: "https://www.olivegarden.com", menu: "https://www.olivegarden.com/menu" },
+                { name: "Pho 75", type: "Vietnamese", distance: "10 min", address: "382 Elden St, Herndon", price: "$", lat: 38.9690, lng: -77.3920, note: "Authentic pho, cash only, quick & delicious", website: null, menu: null },
+                { name: "Hama Sushi", type: "Japanese/Sushi", distance: "10 min", address: "1302 Elden St, Herndon", price: "$$", lat: 38.9695, lng: -77.3880, note: "Best sushi in Herndon! Fresh & delicious", website: "https://www.hamasushirestaurant.com", menu: "https://www.hamasushirestaurant.com/menu" },
+                { name: "Paisano's Pizza", type: "Pizza/Italian", distance: "10 min", address: "1141 Elden St, Herndon", price: "$$", lat: 38.9688, lng: -77.3905, note: "NYC-style pizza, delivers! Voted #1 in DMV", website: "https://www.paisanospizza.com", menu: "https://www.paisanospizza.com/menu" },
+                { name: "Jimmy John's", type: "Sandwiches", distance: "10 min", address: "454 Elden St, Herndon", price: "$", lat: 38.9685, lng: -77.3890, note: "Fast subs, good for quick lunch", website: "https://www.jimmyjohns.com", menu: "https://www.jimmyjohns.com/menu" }
             ],
             delivery: [
                 { name: "Domino's Pizza", type: "Pizza", phone: "(703) 471-7400", apps: ["DoorDash", "UberEats", "Domino's App"], website: "https://www.dominos.com", menu: "https://www.dominos.com/en/pages/order" },
@@ -315,14 +316,15 @@
 
         // --- Nearby Activities ---
         const nearbyActivities = [
-            { name: "Udvar-Hazy Air & Space Museum", type: "Museum", distance: "3 mi", address: "14390 Air and Space Museum Pkwy, Chantilly", note: "FREE! Space Shuttle Discovery, SR-71 Blackbird, WWII planes. MUST SEE!", icon: "🚀", lat: 38.9114, lng: -77.4440, website: "https://airandspace.si.edu/udvar-hazy-center" },
-            { name: "Reston Town Center", type: "Shopping/Dining", distance: "4 mi", address: "11900 Market St, Reston", note: "Outdoor shopping, restaurants, ice skating rink, movie theater.", icon: "🛍️", lat: 38.9586, lng: -77.3590, website: "https://www.restontowncenter.com" },
-            { name: "Frying Pan Farm Park", type: "Farm/Nature", distance: "5 mi", address: "2709 West Ox Rd, Herndon", note: "FREE! Working farm, animals, playground. Great for younger kids.", icon: "🐄", lat: 38.9290, lng: -77.3510, website: "https://www.fairfaxcounty.gov/parks/frying-pan-park" },
-            { name: "Dulles Town Center", type: "Mall", distance: "2 mi", address: "21100 Dulles Town Cir, Dulles", note: "Large indoor mall with all the stores. Good rainy day option.", icon: "🏬", lat: 38.9880, lng: -77.4190, website: "https://www.dullestowncenter.com" },
-            { name: "TopGolf", type: "Entertainment", distance: "8 mi", address: "6625 S Van Dorn St, Alexandria", note: "Fun golf games, food, arcade. Great for teens!", icon: "⛳", lat: 38.7960, lng: -77.1290, website: "https://topgolf.com/us/alexandria" },
-            { name: "Dave & Buster's", type: "Entertainment", distance: "5 mi", address: "8300 Westpark Dr, Tysons", note: "Arcade games, food, prizes. Perfect for downtime!", icon: "🎮", lat: 38.9210, lng: -77.2320, website: "https://www.daveandbusters.com" },
-            { name: "Historic Downtown Herndon", type: "Town", distance: "3 mi", address: "Downtown Herndon", note: "Cute small town feel, local shops, W&OD Trail access.", icon: "🏘️", lat: 38.9696, lng: -77.3867, website: "https://www.herndon-va.gov" },
-            { name: "Great Falls Park", type: "Nature", distance: "12 mi", address: "9200 Old Dominion Dr, McLean", note: "Stunning waterfalls on the Potomac. $20/car entry. Worth the drive!", icon: "🌊", lat: 38.9985, lng: -77.2540, website: "https://www.nps.gov/grfa" }
+            { name: "Udvar-Hazy Air & Space Museum", type: "Museum", distance: "10 min", address: "14390 Air and Space Museum Pkwy, Chantilly", note: "FREE! Space Shuttle Discovery, SR-71 Blackbird, WWII planes. MUST SEE!", icon: "🚀", lat: 38.9114, lng: -77.4440, website: "https://airandspace.si.edu/udvar-hazy-center" },
+            { name: "Dulles Town Center", type: "Mall", distance: "5 min", address: "21100 Dulles Town Cir, Dulles", note: "Large indoor mall with all the stores. Good rainy day option.", icon: "🏬", lat: 38.9880, lng: -77.4190, website: "https://www.dullestowncenter.com" },
+            { name: "Reston Town Center", type: "Shopping/Dining", distance: "10 min", address: "11900 Market St, Reston", note: "Outdoor shopping, restaurants, ice skating rink, movie theater.", icon: "🛍️", lat: 38.9586, lng: -77.3590, website: "https://www.restontowncenter.com" },
+            { name: "TopGolf Loudoun", type: "Entertainment", distance: "15 min", address: "20356 Commonwealth Center Dr, Ashburn", note: "Fun golf games, food, sports bar. Great for teens! 50% off Mon-Thu.", icon: "⛳", lat: 39.0394, lng: -77.4631, website: "https://topgolf.com/us/loudoun" },
+            { name: "Monster Mini Golf", type: "Entertainment", distance: "10 min", address: "14130 Sullyfield Cir, Chantilly", note: "Glow-in-the-dark mini golf, laser tag, VR, arcade. Fun for all ages!", icon: "👾", lat: 38.8876, lng: -77.4419, website: "https://monsterminigolf.com/locations/us/va/chantilly" },
+            { name: "Escape Room Herndon", type: "Entertainment", distance: "8 min", address: "406 Elden St, Herndon", note: "4 unique themed escape rooms. Great for teens! Book ahead.", icon: "🔐", lat: 38.9693, lng: -77.3897, website: "https://escaperoomherndon.com" },
+            { name: "Ultrazone Laser Tag", type: "Entertainment", distance: "12 min", address: "23520 Overland Dr, Sterling", note: "State-of-the-art laser tag arena. Walk-ins welcome!", icon: "🔫", lat: 39.0064, lng: -77.4285, website: "https://ultrazoneloudoun.com" },
+            { name: "Frying Pan Farm Park", type: "Farm/Nature", distance: "12 min", address: "2709 West Ox Rd, Herndon", note: "FREE! Working farm, animals, playground. Great for younger kids.", icon: "🐄", lat: 38.9290, lng: -77.3510, website: "https://www.fairfaxcounty.gov/parks/frying-pan-park" },
+            { name: "Historic Downtown Herndon", type: "Town", distance: "8 min", address: "Downtown Herndon, VA", note: "Cute small town, local shops, cafes, W&OD Trail access.", icon: "🏘️", lat: 38.9696, lng: -77.3867, website: "https://www.herndon-va.gov" }
         ];
 
         // --- Initialization ---
@@ -1134,29 +1136,15 @@ END:VEVENT
 
                     <!-- Google Form Embed -->
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <img
-                            src="https://lh3.googleusercontent.com/d/12iM6RFyCZey12vl5R78q6RO5cnsT4VLa"
-                            alt="Feedback/Suggestions"
-                            class="w-full"
-                            style="display: block;"
-                        />
-                        <div class="p-4">
-                            <iframe
-                                src="https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true"
-                                width="100%"
-                                height="600"
-                                frameborder="0"
-                                marginheight="0"
-                                marginwidth="0"
-                                class="rounded-lg"
-                                style="min-height: 500px;">
-                                Loading form...
-                            </iframe>
-
-                            <div class="mt-4 p-3 bg-slate-50 rounded-lg text-xs text-slate-500">
-                                <strong>Note:</strong> Responses go directly to the team organizer. Your suggestions help keep everyone informed!
-                            </div>
-                        </div>
+                        <iframe
+                            src="https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true"
+                            width="100%"
+                            height="834"
+                            frameborder="0"
+                            marginheight="0"
+                            marginwidth="0">
+                            Loading…
+                        </iframe>
                     </div>
                 </div>
             `;
