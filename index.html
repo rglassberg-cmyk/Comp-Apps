@@ -262,13 +262,13 @@
             { num: 25, time: "10:08 AM", name: "Work Me", dancer: "", division: "", style: "", type: "Group" },
             { num: 30, time: "10:23 AM", name: "Just Like A River Does", dancer: "", division: "", style: "", type: "Group" },
             { num: 34, time: "10:37 AM", name: "Fly", dancer: "", division: "", style: "", type: "Group" },
-            { num: 41, time: "11:00 AM", name: "White Rabbit", dancer: "", division: "PreTeen", style: "Contemporary", type: "Group" },
+            { num: 41, time: "11:00 AM", name: "White Rabbit", dancer: "Teen Contemporary", division: "Teen", style: "Contemporary", type: "Group" },
             { num: 47, time: "11:19 AM", name: "Know About Me", dancer: "", division: "", style: "", type: "Group" },
-            { num: 48, time: "11:55 AM", name: "The Way", dancer: "", division: "PreTeen", style: "Jazz", type: "Group" },
-            { num: 53, time: "12:09 PM", name: "What The World Need Now", dancer: "", division: "Teen", style: "Lyrical", type: "Trio" },
-            { num: 59, time: "12:28 PM", name: "Hairspray", dancer: "", division: "Mini/Teen", style: "Jazz", type: "Group" },
+            { num: 48, time: "11:55 AM", name: "The Way", dancer: "Teen Jazz", division: "Teen", style: "Jazz", type: "Group" },
+            { num: 53, time: "12:09 PM", name: "What The World Need Now", dancer: "Teen Trio", division: "Teen", style: "Lyrical", type: "Trio" },
+            { num: 59, time: "12:28 PM", name: "Hairspray", dancer: "Mini/Teen Jazz", division: "Mini/Teen", style: "Jazz", type: "Group" },
             { num: null, time: "1:00 PM", name: "Awards 6-12", dancer: "", division: "", style: "", type: "Awards", isAwards: true },
-            { num: 64, time: "1:48 PM", name: "Corps", dancer: "", division: "", style: "", type: "Group" },
+            { num: 64, time: "1:48 PM", name: "Corps", dancer: "Camilla", division: "Teen", style: "", type: "Solo" },
             { num: 73, time: "2:16 PM", name: "Other Side", dancer: "Carly", division: "Teen", style: "Contemporary", type: "Solo" },
             { num: 74, time: "2:19 PM", name: "When I Go", dancer: "Robbie", division: "PreTeen", style: "Contemporary", type: "Solo" },
             { num: 82, time: "2:43 PM", name: "I Dreamed A Dream", dancer: "Zoe", division: "PreTeen", style: "Lyrical", type: "Solo" },
@@ -276,17 +276,17 @@
             { num: 108, time: "4:20 PM", name: "Winner Takes It All", dancer: "Lula", division: "Senior", style: "Contemporary", type: "Solo" },
             { num: 110, time: "4:26 PM", name: "These Arms Of Mine", dancer: "Chloe", division: "Senior", style: "Contemporary", type: "Solo" },
             { num: 115, time: "4:42 PM", name: "Out There", dancer: "Alina", division: "Senior", style: "Contemporary", type: "Solo" },
-            { num: 123, time: "5:08 PM", name: "Dead & Done", dancer: "", division: "Senior", style: "Contemporary", type: "Group" },
+            { num: 123, time: "5:08 PM", name: "Dead & Done", dancer: "Contemporary", division: "Senior", style: "Contemporary", type: "Group" },
             { num: 136, time: "5:57 PM", name: "Tennessee Whiskey", dancer: "Liam", division: "Senior", style: "Contemporary", type: "Solo" },
-            { num: 146, time: "6:34 PM", name: "Cry To Me", dancer: "", division: "Senior", style: "Jazz", type: "Group" },
-            { num: 150, time: "6:48 PM", name: "End Of Love", dancer: "", division: "Senior", style: "Lyrical", type: "Line" },
-            { num: 152, time: "7:30 PM", name: "Golden Years", dancer: "", division: "Teen", style: "Jazz", type: "Production" },
+            { num: 146, time: "6:34 PM", name: "Cry To Me", dancer: "Jazz", division: "Senior", style: "Jazz", type: "Group" },
+            { num: 150, time: "6:48 PM", name: "End Of Love", dancer: "Lyrical", division: "Senior", style: "Lyrical", type: "Line" },
+            { num: 152, time: "7:30 PM", name: "Golden Years", dancer: "Production", division: "Teen", style: "Jazz", type: "Production" },
             { num: 156, time: "7:48 PM", name: "Dreams", dancer: "Ella G.", division: "Senior", style: "Jazz", type: "Solo" },
             { num: 164, time: "8:16 PM", name: "Foolish Games", dancer: "Talia G.", division: "Senior", style: "Lyrical", type: "Solo" },
             { num: 166, time: "8:22 PM", name: "One More Second", dancer: "Talya B.", division: "Senior", style: "Lyrical", type: "Solo" },
             { num: 170, time: "8:35 PM", name: "Lose Yourself", dancer: "Riley", division: "Senior", style: "Hip Hop", type: "Solo" },
-            { num: 175, time: "8:50 PM", name: "Cellophane", dancer: "", division: "Senior", style: "Lyrical", type: "Group" },
-            { num: 179, time: "9:02 PM", name: "Kendrick", dancer: "", division: "Senior", style: "Hip Hop", type: "Group" },
+            { num: 175, time: "8:50 PM", name: "Cellophane", dancer: "Lyrical", division: "Senior", style: "Lyrical", type: "Group" },
+            { num: 179, time: "9:02 PM", name: "Kendrick", dancer: "Hip Hop", division: "Senior", style: "Hip Hop", type: "Group" },
             { num: null, time: "9:40 PM", name: "Awards 13+", dancer: "", division: "", style: "", type: "Awards", isAwards: true }
         ];
 
@@ -345,7 +345,8 @@
                 { id: 'schedule', label: '📅 Schedule' },
                 { id: 'dances', label: '🎭 Dance Order' },
                 { id: 'food', label: '🍽️ Places to Eat' },
-                { id: 'activities', label: '🗺️ Things to Do' }
+                { id: 'activities', label: '🗺️ Things to Do' },
+                { id: 'feedback', label: '💬 Suggest Updates' }
             ];
 
             const nav = document.getElementById('nav-container');
@@ -379,6 +380,9 @@
                 case 'activities':
                     renderActivities(container);
                     break;
+                case 'feedback':
+                    renderFeedback(container);
+                    break;
             }
         }
 
@@ -400,15 +404,14 @@
         function formatICSDate(dateStr, timeStr) {
             const t = parseTime(timeStr);
             if (!t) return '';
-            const d = new Date(dateStr);
-            d.setHours(t.hour, t.minute, 0, 0);
+            // Parse the date string manually to avoid timezone issues
+            const [year, month, day] = dateStr.split('-').map(Number);
             // Format: YYYYMMDDTHHMMSS
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            const hours = String(d.getHours()).padStart(2, '0');
-            const minutes = String(d.getMinutes()).padStart(2, '0');
-            return `${year}${month}${day}T${hours}${minutes}00`;
+            const monthStr = String(month).padStart(2, '0');
+            const dayStr = String(day).padStart(2, '0');
+            const hourStr = String(t.hour).padStart(2, '0');
+            const minStr = String(t.minute).padStart(2, '0');
+            return `${year}${monthStr}${dayStr}T${hourStr}${minStr}00`;
         }
 
         function generateUID() {
@@ -418,9 +421,14 @@
         function formatGoogleCalendarDate(dateStr, timeStr) {
             const t = parseTime(timeStr);
             if (!t) return '';
-            const d = new Date(dateStr);
-            d.setHours(t.hour, t.minute, 0, 0);
-            return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+            // Parse the date string manually to avoid timezone issues
+            const [year, month, day] = dateStr.split('-').map(Number);
+            // Format: YYYYMMDDTHHMMSS (local time, no Z suffix)
+            const monthStr = String(month).padStart(2, '0');
+            const dayStr = String(day).padStart(2, '0');
+            const hourStr = String(t.hour).padStart(2, '0');
+            const minStr = String(t.minute).padStart(2, '0');
+            return `${year}${monthStr}${dayStr}T${hourStr}${minStr}00`;
         }
 
         function generateGoogleCalendarLink(title, dateStr, startTime, endTime, room) {
@@ -755,38 +763,36 @@ END:VEVENT
         function renderDanceOrder(container) {
             let html = `
                 <div class="space-y-4">
-                    <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
-                        <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Competition Dance Order</h2>
-                        <p class="text-sm text-slate-600">Friday, February 13, 2026 - Performance Schedule</p>
-                    </div>
-
-                    <!-- Calendar Options -->
-                    <div class="glass-card rounded-xl p-4">
-                        <h3 class="font-bold text-slate-800 mb-3">📅 Add to Calendar</h3>
-
-                        <!-- Download All Option -->
-                        <div class="bg-slate-50 rounded-lg p-4 mb-4">
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                                <button onclick="generateDanceOrderICS()"
-                                    class="flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg font-semibold transition-colors hover:opacity-90" style="background: #d5164d;">
-                                    <span>📆</span>
-                                    <span>Download Full Schedule (.ics)</span>
-                                </button>
-                                <span class="text-sm text-slate-500">All ${danceOrder.filter(d => !d.isAwards).length} performances in one file</span>
-                            </div>
-                            <div class="mt-3 text-xs text-slate-600 bg-white rounded p-3 border border-slate-200">
-                                <strong>How to use the .ics file:</strong>
-                                <ol class="list-decimal list-inside mt-1 space-y-1">
-                                    <li><strong>iPhone/iPad:</strong> Tap the downloaded file, then tap "Add All"</li>
-                                    <li><strong>Android:</strong> Open the file and select your calendar app</li>
-                                    <li><strong>Google Calendar:</strong> Go to calendar.google.com → Settings (gear icon) → Import & Export → Import → Select the file</li>
-                                    <li><strong>Outlook:</strong> Double-click the file or drag it into your calendar</li>
-                                </ol>
-                            </div>
+                    <!-- Side by side header boxes -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-3 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
+                            <h2 class="text-lg font-bold" style="color: #d5164d;">Competition Dance Order</h2>
+                            <p class="text-xs text-slate-600">Friday, February 13, 2026</p>
                         </div>
 
-                        <p class="text-sm text-slate-600 mb-2">Or tap the <span class="add-cal-btn inline-flex items-center justify-center px-2 py-1 rounded text-xs font-medium">+ Cal</span> next to any dance to add just that one.</p>
+                        <div class="glass-card rounded-xl p-3">
+                            <h3 class="font-bold text-slate-800 text-sm mb-2">📅 Add to Calendar</h3>
+                            <button onclick="generateDanceOrderICS()"
+                                class="flex items-center justify-center gap-2 text-white px-3 py-2 rounded-lg font-semibold text-sm transition-colors hover:opacity-90 w-full" style="background: #d5164d;">
+                                <span>📆</span>
+                                <span>Download All (${danceOrder.filter(d => !d.isAwards).length} dances)</span>
+                            </button>
+                            <p class="text-xs text-slate-500 mt-2">Or tap <span class="add-cal-btn inline-flex items-center justify-center px-1 py-0.5 rounded text-xs font-medium">+ Cal</span> next to any dance</p>
+                        </div>
                     </div>
+
+                    <!-- ICS Instructions (collapsible) -->
+                    <details class="glass-card rounded-xl">
+                        <summary class="p-3 cursor-pointer text-sm font-medium text-slate-700 hover:bg-slate-50">
+                            ℹ️ How to use the .ics calendar file
+                        </summary>
+                        <div class="px-3 pb-3 text-xs text-slate-600 space-y-1">
+                            <p><strong>iPhone/iPad:</strong> Tap the downloaded file, then tap "Add All"</p>
+                            <p><strong>Android:</strong> Open the file and select your calendar app</p>
+                            <p><strong>Google Calendar:</strong> Go to calendar.google.com → Settings → Import & Export → Import</p>
+                            <p><strong>Outlook:</strong> Double-click the file or drag it into your calendar</p>
+                        </div>
+                    </details>
 
                     <div class="glass-card rounded-xl overflow-hidden">
                         <div class="overflow-x-auto">
@@ -1104,6 +1110,55 @@ END:VEVENT
                     .addTo(activitiesMapInstance)
                     .bindPopup(`<strong>${activity.name}</strong><br>${activity.note}<br><em>${activity.distance} from hotel</em>`);
             });
+        }
+
+        // --- Render Feedback/Suggestions ---
+        function renderFeedback(container) {
+            let html = `
+                <div class="space-y-6">
+                    <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
+                        <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Suggest Updates</h2>
+                        <p class="text-sm text-slate-600">Help us keep this info accurate! Submit corrections or suggestions below.</p>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-4">
+                        <h3 class="font-bold text-slate-800 mb-3">📝 What can you suggest?</h3>
+                        <ul class="text-sm text-slate-600 space-y-2 mb-4">
+                            <li>• <strong>Dance corrections:</strong> Wrong time, dancer name, or category</li>
+                            <li>• <strong>Restaurant recommendations:</strong> Great places to eat nearby</li>
+                            <li>• <strong>Activity suggestions:</strong> Fun things to do in the area</li>
+                            <li>• <strong>Schedule updates:</strong> Changes to convention times</li>
+                            <li>• <strong>Any other info</strong> that would help the team!</li>
+                        </ul>
+                    </div>
+
+                    <!-- Google Form Embed -->
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="p-4 border-b" style="background: #fce8ed; border-color: #f8c5d1;">
+                            <h3 class="font-bold" style="color: #d5164d;">Submit Your Suggestion</h3>
+                        </div>
+                        <div class="p-4">
+                            <!-- REPLACE THIS URL WITH YOUR GOOGLE FORM EMBED URL -->
+                            <iframe
+                                src="https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?embedded=true"
+                                width="100%"
+                                height="600"
+                                frameborder="0"
+                                marginheight="0"
+                                marginwidth="0"
+                                class="rounded-lg"
+                                style="min-height: 500px;">
+                                Loading form...
+                            </iframe>
+
+                            <div class="mt-4 p-3 bg-slate-50 rounded-lg text-xs text-slate-500">
+                                <strong>Note:</strong> Responses go directly to the team organizer. Your suggestions help keep everyone informed!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
         }
 
     </script>
