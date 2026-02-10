@@ -97,8 +97,25 @@
         // --- State Management ---
         const state = {
             currentTab: 'schedule',
-            ageFilter: 'all'
+            ageFilter: 'all',
+            expandedGroups: {} // Track which schedule groups are expanded
         };
+
+        // Toggle accordion section
+        function toggleScheduleGroup(groupKey) {
+            state.expandedGroups[groupKey] = !state.expandedGroups[groupKey];
+            const content = document.getElementById(`schedule-content-${groupKey}`);
+            const arrow = document.getElementById(`schedule-arrow-${groupKey}`);
+            if (content && arrow) {
+                if (state.expandedGroups[groupKey]) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    arrow.style.transform = 'rotate(180deg)';
+                } else {
+                    content.style.maxHeight = '0';
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
 
         // --- Event Information ---
         const eventInfo = {
@@ -252,23 +269,23 @@
         // --- Places to Eat (Near Hyatt Regency Dulles, Herndon VA) ---
         const placesToEat = {
             walkable: [
-                { name: "Chili's Grill & Bar", type: "American", distance: "0.1 mi", address: "2250 Centreville Rd, Herndon", price: "$$", lat: 38.9575, lng: -77.4070, note: "Right next to hotel, kid-friendly" },
-                { name: "Olive Garden", type: "Italian", distance: "0.2 mi", address: "2285 Centreville Rd, Herndon", price: "$$", lat: 38.9580, lng: -77.4065, note: "Pasta, breadsticks, familiar favorites" },
-                { name: "Red Robin", type: "Burgers", distance: "0.3 mi", address: "2200 Centreville Rd, Herndon", price: "$$", lat: 38.9560, lng: -77.4075, note: "Great burgers, bottomless fries" },
-                { name: "Founding Farmers", type: "American Farm-to-Table", distance: "1.5 mi", address: "1800 Tysons Blvd, Tysons", price: "$$$", lat: 38.9180, lng: -77.2230, note: "Upscale, great brunch (short drive)" },
-                { name: "Pho 75", type: "Vietnamese", distance: "1.2 mi", address: "382 Elden St, Herndon", price: "$", lat: 38.9690, lng: -77.3920, note: "Authentic pho, quick & delicious" },
-                { name: "Paisano's Pizza", type: "Pizza/Italian", distance: "1.0 mi", address: "2456 Centreville Rd, Herndon", price: "$$", lat: 38.9620, lng: -77.4050, note: "Great pizza, delivers!" },
-                { name: "Jimmy John's", type: "Sandwiches", distance: "0.5 mi", address: "13324 Franklin Farm Rd, Herndon", price: "$", lat: 38.9550, lng: -77.4020, note: "Fast subs, good for quick lunch" }
+                { name: "Chili's Grill & Bar", type: "American", distance: "0.1 mi", address: "2250 Centreville Rd, Herndon", price: "$$", lat: 38.9575, lng: -77.4070, note: "Right next to hotel, kid-friendly", website: "https://www.chilis.com", menu: "https://www.chilis.com/menu" },
+                { name: "Olive Garden", type: "Italian", distance: "0.2 mi", address: "2285 Centreville Rd, Herndon", price: "$$", lat: 38.9580, lng: -77.4065, note: "Pasta, breadsticks, familiar favorites", website: "https://www.olivegarden.com", menu: "https://www.olivegarden.com/menu" },
+                { name: "Red Robin", type: "Burgers", distance: "0.3 mi", address: "2200 Centreville Rd, Herndon", price: "$$", lat: 38.9560, lng: -77.4075, note: "Great burgers, bottomless fries", website: "https://www.redrobin.com", menu: "https://www.redrobin.com/menu" },
+                { name: "Founding Farmers", type: "American Farm-to-Table", distance: "1.5 mi", address: "1800 Tysons Blvd, Tysons", price: "$$$", lat: 38.9180, lng: -77.2230, note: "Upscale, great brunch (short drive)", website: "https://www.wearefoundingfarmers.com/location/tysons", menu: "https://www.wearefoundingfarmers.com/location/tysons/menu" },
+                { name: "Pho 75", type: "Vietnamese", distance: "1.2 mi", address: "382 Elden St, Herndon", price: "$", lat: 38.9690, lng: -77.3920, note: "Authentic pho, quick & delicious", website: null, menu: null },
+                { name: "Paisano's Pizza", type: "Pizza/Italian", distance: "1.0 mi", address: "2456 Centreville Rd, Herndon", price: "$$", lat: 38.9620, lng: -77.4050, note: "Great pizza, delivers!", website: "https://www.paisanospizza.com", menu: "https://www.paisanospizza.com/menu" },
+                { name: "Jimmy John's", type: "Sandwiches", distance: "0.5 mi", address: "13324 Franklin Farm Rd, Herndon", price: "$", lat: 38.9550, lng: -77.4020, note: "Fast subs, good for quick lunch", website: "https://www.jimmyjohns.com", menu: "https://www.jimmyjohns.com/menu" }
             ],
             delivery: [
-                { name: "Domino's Pizza", type: "Pizza", phone: "(703) 471-7400", apps: ["DoorDash", "UberEats", "Domino's App"] },
-                { name: "Chipotle", type: "Mexican", phone: "", apps: ["DoorDash", "UberEats", "Chipotle App"] },
-                { name: "Sweetgreen", type: "Salads/Bowls", phone: "", apps: ["DoorDash", "Sweetgreen App"] },
-                { name: "CAVA", type: "Mediterranean", phone: "", apps: ["DoorDash", "UberEats", "CAVA App"] },
-                { name: "Chick-fil-A", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats", "CFA App"] },
-                { name: "Panera Bread", type: "Bakery/Soup/Salad", phone: "", apps: ["DoorDash", "Panera App"] },
-                { name: "Jersey Mike's", type: "Subs", phone: "", apps: ["DoorDash", "UberEats", "Jersey Mike's App"] },
-                { name: "Nando's Peri-Peri", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats"] }
+                { name: "Domino's Pizza", type: "Pizza", phone: "(703) 471-7400", apps: ["DoorDash", "UberEats", "Domino's App"], website: "https://www.dominos.com", menu: "https://www.dominos.com/en/pages/order" },
+                { name: "Chipotle", type: "Mexican", phone: "", apps: ["DoorDash", "UberEats", "Chipotle App"], website: "https://www.chipotle.com", menu: "https://www.chipotle.com/order" },
+                { name: "Sweetgreen", type: "Salads/Bowls", phone: "", apps: ["DoorDash", "Sweetgreen App"], website: "https://www.sweetgreen.com", menu: "https://order.sweetgreen.com" },
+                { name: "CAVA", type: "Mediterranean", phone: "", apps: ["DoorDash", "UberEats", "CAVA App"], website: "https://www.cava.com", menu: "https://order.cava.com" },
+                { name: "Chick-fil-A", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats", "CFA App"], website: "https://www.chick-fil-a.com", menu: "https://www.chick-fil-a.com/menu" },
+                { name: "Panera Bread", type: "Bakery/Soup/Salad", phone: "", apps: ["DoorDash", "Panera App"], website: "https://www.panerabread.com", menu: "https://www.panerabread.com/en-us/menu.html" },
+                { name: "Jersey Mike's", type: "Subs", phone: "", apps: ["DoorDash", "UberEats", "Jersey Mike's App"], website: "https://www.jerseymikes.com", menu: "https://www.jerseymikes.com/menu" },
+                { name: "Nando's Peri-Peri", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats"], website: "https://www.nandosperiperi.com", menu: "https://www.nandosperiperi.com/food/menu" }
             ]
         };
 
@@ -356,55 +373,210 @@
             return { hour, minute };
         }
 
-        function formatGoogleCalendarDate(date, time) {
-            const t = parseTime(time);
+        function formatICSDate(dateStr, timeStr) {
+            const t = parseTime(timeStr);
             if (!t) return '';
-            const d = new Date(date);
+            const d = new Date(dateStr);
+            d.setHours(t.hour, t.minute, 0, 0);
+            // Format: YYYYMMDDTHHMMSS
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hours = String(d.getHours()).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            return `${year}${month}${day}T${hours}${minutes}00`;
+        }
+
+        function generateUID() {
+            return 'deviate-' + Math.random().toString(36).substr(2, 9) + '@tateacademy';
+        }
+
+        function formatGoogleCalendarDate(dateStr, timeStr) {
+            const t = parseTime(timeStr);
+            if (!t) return '';
+            const d = new Date(dateStr);
             d.setHours(t.hour, t.minute, 0, 0);
             return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
         }
 
-        function generateCalendarLink(title, dateStr, startTime, endTime, location, room) {
+        function generateGoogleCalendarLink(title, dateStr, startTime, endTime, room) {
             const eventTitle = encodeURIComponent(`Deviate: ${title}`);
-            const eventLocation = encodeURIComponent(location || `${room ? room + ', ' : ''}${eventInfo.venue}, ${eventInfo.venueAddress}`);
-            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) 2026\n${room || ''}`);
+            const location = encodeURIComponent(`${room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`);
+            const details = encodeURIComponent(`Tate Academy - Deviate Convention 2026`);
 
             const startDate = formatGoogleCalendarDate(dateStr, startTime);
             const endDate = formatGoogleCalendarDate(dateStr, endTime || startTime);
 
-            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-            return `${baseUrl}&text=${eventTitle}&dates=${startDate}/${endDate}&location=${eventLocation}&details=${details}`;
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startDate}/${endDate}&location=${location}&details=${details}`;
         }
 
-        function generateAllEventsCalendarLink(groupKey) {
+        function addSingleEventToCalendar(title, dateStr, startTime, endTime, room) {
+            const link = generateGoogleCalendarLink(title, dateStr, startTime, endTime, room);
+            window.open(link, '_blank');
+        }
+
+        function generateDanceOrderICS() {
+            let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Tate Academy//Deviate DC 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Deviate - Competition Friday
+X-WR-TIMEZONE:America/New_York
+`;
+
+            const location = `${eventInfo.venue}, ${eventInfo.venueAddress}`;
+
+            danceOrder.forEach(dance => {
+                if (dance.isAwards) return; // Skip awards for ICS
+
+                const startDate = formatICSDate('2026-02-13', dance.time);
+                // Estimate 3 minutes per performance
+                const t = parseTime(dance.time);
+                if (!t) return;
+                const endDate = formatICSDate('2026-02-13', addMinutesToTime(dance.time, 3));
+                const uid = generateUID();
+
+                const title = dance.dancer
+                    ? `${dance.name} - ${dance.dancer}`
+                    : dance.name;
+                const description = [
+                    `Tate Academy - Deviate Competition`,
+                    dance.dancer ? `Dancer: ${dance.dancer}` : '',
+                    dance.division ? `Division: ${dance.division}` : '',
+                    dance.style ? `Style: ${dance.style}` : '',
+                    dance.type ? `Type: ${dance.type}` : '',
+                    dance.num ? `Entry #${dance.num}` : ''
+                ].filter(Boolean).join('\\n');
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${title}
+LOCATION:${location}
+DESCRIPTION:${description}
+STATUS:CONFIRMED
+END:VEVENT
+`;
+            });
+
+            icsContent += `END:VCALENDAR`;
+
+            // Create and download the file
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Deviate_Competition_Friday.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function addMinutesToTime(timeStr, minutes) {
+            const t = parseTime(timeStr);
+            if (!t) return timeStr;
+            let hour = t.hour;
+            let minute = t.minute + minutes;
+            if (minute >= 60) {
+                hour += Math.floor(minute / 60);
+                minute = minute % 60;
+            }
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            return `${displayHour}:${String(minute).padStart(2, '0')} ${period}`;
+        }
+
+        function addDanceToCalendar(name, dancer, time, division, style, type, num) {
+            const title = dancer ? `${name} - ${dancer}` : name;
+            const eventTitle = encodeURIComponent(`Deviate: ${title}`);
+            const location = encodeURIComponent(`${eventInfo.venue}, ${eventInfo.venueAddress}`);
+
+            const descParts = [
+                `Tate Academy - Deviate Competition`,
+                dancer ? `Dancer: ${dancer}` : '',
+                division ? `Division: ${division}` : '',
+                style ? `Style: ${style}` : '',
+                type ? `Type: ${type}` : '',
+                num ? `Entry #${num}` : ''
+            ].filter(Boolean).join('\n');
+            const details = encodeURIComponent(descParts);
+
+            const startDate = formatGoogleCalendarDate('2026-02-13', time);
+            const endTime = addMinutesToTime(time, 3);
+            const endDate = formatGoogleCalendarDate('2026-02-13', endTime);
+
+            const link = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startDate}/${endDate}&location=${location}&details=${details}`;
+            window.open(link, '_blank');
+        }
+
+        function generateICSFile(groupKey) {
             const group = conventionByAgeGroup[groupKey];
-            if (!group) return '#';
+            if (!group) return;
 
-            // Create a summary event for the whole weekend
-            const title = `Deviate Convention - ${group.name} ${group.ages}`;
-            const location = `${group.room}, ${eventInfo.venue}`;
+            let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Tate Academy//Deviate DC 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Deviate - ${group.name}
+X-WR-TIMEZONE:America/New_York
+`;
 
-            // Saturday all-day event
-            const satStart = formatGoogleCalendarDate('2026-02-14', group.saturday[0]?.time || '7:15 AM');
-            const satEnd = formatGoogleCalendarDate('2026-02-14', group.saturday[group.saturday.length - 1]?.end || '8:00 PM');
+            const location = `${group.room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`;
 
-            const eventTitle = encodeURIComponent(title);
-            const eventLocation = encodeURIComponent(`${group.room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`);
-
-            // Build details with full schedule
-            let scheduleText = `SATURDAY (Feb 14):\\n`;
+            // Add Saturday events
             group.saturday.forEach(cls => {
-                scheduleText += `${cls.time} - ${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}\\n`;
+                if (cls.isBreak) return; // Skip lunch breaks
+
+                const startDate = formatICSDate('2026-02-14', cls.time);
+                const endDate = formatICSDate('2026-02-14', cls.end || cls.time);
+                const uid = generateUID();
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}
+LOCATION:${location}
+DESCRIPTION:Deviate Convention - ${group.name} ${group.ages}\\n${group.room}${cls.note ? '\\n' + cls.note : ''}
+STATUS:CONFIRMED
+END:VEVENT
+`;
             });
-            scheduleText += `\\nSUNDAY (Feb 15):\\n`;
+
+            // Add Sunday events
             group.sunday.forEach(cls => {
-                scheduleText += `${cls.time} - ${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}\\n`;
+                if (cls.isBreak) return; // Skip lunch breaks
+
+                const startDate = formatICSDate('2026-02-15', cls.time);
+                const endDate = formatICSDate('2026-02-15', cls.end || cls.time);
+                const uid = generateUID();
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}
+LOCATION:${location}
+DESCRIPTION:Deviate Convention - ${group.name} ${group.ages}\\n${group.room}${cls.note ? '\\n' + cls.note : ''}
+STATUS:CONFIRMED
+END:VEVENT
+`;
             });
 
-            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) 2026\nRoom: ${group.room}\n\n${scheduleText.replace(/\\n/g, '\n')}`);
+            icsContent += `END:VCALENDAR`;
 
-            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-            return `${baseUrl}&text=${eventTitle}&dates=${satStart}/${satEnd}&location=${eventLocation}&details=${details}`;
+            // Create and download the file
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Deviate_${group.name.replace(/[^a-zA-Z0-9]/g, '_')}_Schedule.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
         }
 
         // --- Render Schedule ---
@@ -429,56 +601,66 @@
 
                     <!-- Add to Calendar Buttons by Age Group -->
                     <div class="glass-card rounded-xl p-4">
-                        <h3 class="font-bold text-slate-800 mb-3">📅 Add Full Schedule to Google Calendar</h3>
+                        <h3 class="font-bold text-slate-800 mb-2">📅 Add Full Schedule to Calendar</h3>
+                        <p class="text-xs text-slate-500 mb-3">Downloads a calendar file with each class as a separate event. Import into Google Calendar, Apple Calendar, or Outlook.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <a href="${generateAllEventsCalendarLink('teensSeniors')}" target="_blank"
-                               class="flex items-center justify-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                            <button onclick="generateICSFile('teensSeniors')"
+                               class="flex items-center justify-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
                                 <span>📆</span>
                                 <span>Teens/Seniors<br><span class="text-xs font-normal opacity-90">Ages 13 & Up</span></span>
-                            </a>
-                            <a href="${generateAllEventsCalendarLink('juniors')}" target="_blank"
-                               class="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                            </button>
+                            <button onclick="generateICSFile('juniors')"
+                               class="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
                                 <span>📆</span>
                                 <span>Juniors<br><span class="text-xs font-normal opacity-90">Ages 9-12</span></span>
-                            </a>
-                            <a href="${generateAllEventsCalendarLink('minis')}" target="_blank"
-                               class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                            </button>
+                            <button onclick="generateICSFile('minis')"
+                               class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
                                 <span>📆</span>
                                 <span>Minis<br><span class="text-xs font-normal opacity-90">Ages 6-8</span></span>
-                            </a>
+                            </button>
                         </div>
-                        <a href="${generateAllEventsCalendarLink('parents')}" target="_blank"
-                           class="mt-3 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm">
+                        <button onclick="generateICSFile('parents')"
+                           class="mt-3 w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer">
                             <span>📆</span>
                             <span>Teachers & Parents Schedule</span>
-                        </a>
+                        </button>
                     </div>
             `;
 
-            // Render each age group
+            // Render each age group as collapsible accordion
             Object.entries(conventionByAgeGroup).forEach(([groupKey, group]) => {
                 const colors = colorMap[group.color] || colorMap.pink;
+                const isExpanded = state.expandedGroups[groupKey] || false;
 
                 html += `
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <div class="${colors.bg} text-white px-4 py-3">
+                        <button onclick="toggleScheduleGroup('${groupKey}')" class="${colors.bg} text-white px-4 py-3 w-full text-left cursor-pointer hover:opacity-95 transition-opacity">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <h3 class="font-bold text-lg">${group.name}</h3>
                                     <p class="text-sm opacity-90">${group.ages}${group.ages ? ' • ' : ''}${group.room}</p>
                                 </div>
+                                <svg id="schedule-arrow-${groupKey}" class="w-6 h-6 transition-transform duration-300" style="transform: rotate(${isExpanded ? '180' : '0'}deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </div>
-                        </div>
+                        </button>
 
-                        <!-- Saturday -->
-                        <div class="${colors.light} px-4 py-2 ${colors.border} border-b">
-                            <h4 class="font-semibold ${colors.text}">Saturday, Feb 14</h4>
-                        </div>
-                        <div class="divide-y divide-slate-100">
+                        <div id="schedule-content-${groupKey}" class="overflow-hidden transition-all duration-300" style="max-height: ${isExpanded ? 'none' : '0'}">
+                            <!-- Saturday -->
+                            <div class="${colors.light} px-4 py-2 ${colors.border} border-b">
+                                <h4 class="font-semibold ${colors.text}">Saturday, Feb 14</h4>
+                            </div>
+                            <div class="divide-y divide-slate-100">
                 `;
 
                 group.saturday.forEach(cls => {
                     const isBreak = cls.isBreak;
+                    const escapedName = cls.name.replace(/'/g, "\\'");
+                    const escapedNote = cls.note ? cls.note.replace(/'/g, "\\'") : '';
+                    const fullTitle = cls.note ? `${cls.name} (${cls.note})` : cls.name;
+                    const escapedFullTitle = fullTitle.replace(/'/g, "\\'");
                     html += `
                         <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
                             <div class="flex-grow">
@@ -488,22 +670,32 @@
                                 <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
                                 ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
+                            ${!isBreak ? `
+                            <button onclick="event.stopPropagation(); addSingleEventToCalendar('${escapedFullTitle}', '2026-02-14', '${cls.time}', '${cls.end}', '${group.room}')"
+                                class="ml-2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-lg transition-colors" title="Add to Google Calendar">
+                                +
+                            </button>
+                            ` : ''}
                         </div>
                     `;
                 });
 
                 html += `
-                        </div>
+                            </div>
 
-                        <!-- Sunday -->
-                        <div class="${colors.light} px-4 py-2 ${colors.border} border-b border-t">
-                            <h4 class="font-semibold ${colors.text}">Sunday, Feb 15</h4>
-                        </div>
-                        <div class="divide-y divide-slate-100">
+                            <!-- Sunday -->
+                            <div class="${colors.light} px-4 py-2 ${colors.border} border-b border-t">
+                                <h4 class="font-semibold ${colors.text}">Sunday, Feb 15</h4>
+                            </div>
+                            <div class="divide-y divide-slate-100">
                 `;
 
                 group.sunday.forEach(cls => {
                     const isBreak = cls.isBreak;
+                    const escapedName = cls.name.replace(/'/g, "\\'");
+                    const escapedNote = cls.note ? cls.note.replace(/'/g, "\\'") : '';
+                    const fullTitle = cls.note ? `${cls.name} (${cls.note})` : cls.name;
+                    const escapedFullTitle = fullTitle.replace(/'/g, "\\'");
                     html += `
                         <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
                             <div class="flex-grow">
@@ -513,11 +705,18 @@
                                 <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
                                 ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
+                            ${!isBreak ? `
+                            <button onclick="event.stopPropagation(); addSingleEventToCalendar('${escapedFullTitle}', '2026-02-15', '${cls.time}', '${cls.end}', '${group.room}')"
+                                class="ml-2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-lg transition-colors" title="Add to Google Calendar">
+                                +
+                            </button>
+                            ` : ''}
                         </div>
                     `;
                 });
 
                 html += `
+                            </div>
                         </div>
                     </div>
                 `;
@@ -536,17 +735,46 @@
                         <p class="text-sm text-slate-600">Friday, February 13, 2026 - Performance Schedule</p>
                     </div>
 
+                    <!-- Calendar Options -->
+                    <div class="glass-card rounded-xl p-4">
+                        <h3 class="font-bold text-slate-800 mb-3">📅 Add to Calendar</h3>
+
+                        <!-- Download All Option -->
+                        <div class="bg-slate-50 rounded-lg p-4 mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                <button onclick="generateDanceOrderICS()"
+                                    class="flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                    <span>📆</span>
+                                    <span>Download Full Schedule (.ics)</span>
+                                </button>
+                                <span class="text-sm text-slate-500">All ${danceOrder.filter(d => !d.isAwards).length} performances in one file</span>
+                            </div>
+                            <div class="mt-3 text-xs text-slate-600 bg-white rounded p-3 border border-slate-200">
+                                <strong>How to use the .ics file:</strong>
+                                <ol class="list-decimal list-inside mt-1 space-y-1">
+                                    <li><strong>iPhone/iPad:</strong> Tap the downloaded file, then tap "Add All"</li>
+                                    <li><strong>Android:</strong> Open the file and select your calendar app</li>
+                                    <li><strong>Google Calendar:</strong> Go to calendar.google.com → Settings (gear icon) → Import & Export → Import → Select the file</li>
+                                    <li><strong>Outlook:</strong> Double-click the file or drag it into your calendar</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-600 mb-2">Or tap the <span class="inline-flex items-center justify-center w-6 h-6 bg-slate-100 text-violet-600 rounded-full text-sm font-bold">+</span> next to any dance to add just that one.</p>
+                    </div>
+
                     <div class="glass-card rounded-xl overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead class="bg-slate-100">
                                     <tr>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">#</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Time</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Routine</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Dancer</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Division</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Type</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600 w-8"></th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">#</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">Time</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">Routine</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">Dancer</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600 hidden sm:table-cell">Division</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600 hidden sm:table-cell">Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -561,14 +789,28 @@
                 const divisionClass = dance.division ? `division-${dance.division.toLowerCase().replace('/', '-')}` : '';
                 const typeClass = dance.type ? `type-${dance.type.toLowerCase()}` : '';
 
+                const escapedName = dance.name.replace(/'/g, "\\'");
+                const escapedDancer = dance.dancer ? dance.dancer.replace(/'/g, "\\'") : '';
+                const escapedDivision = dance.division ? dance.division.replace(/'/g, "\\'") : '';
+                const escapedStyle = dance.style ? dance.style.replace(/'/g, "\\'") : '';
+                const escapedType = dance.type ? dance.type.replace(/'/g, "\\'") : '';
+
                 html += `
                     <tr class="${rowClass} border-b border-slate-100">
-                        <td class="px-3 py-3 text-slate-500 font-mono">${dance.num || '-'}</td>
-                        <td class="px-3 py-3 text-violet-600 font-mono font-semibold">${dance.time}</td>
-                        <td class="px-3 py-3 text-slate-800 font-medium">${dance.name}</td>
-                        <td class="px-3 py-3 ${dance.dancer ? 'text-slate-800 font-semibold' : 'text-slate-400'}">${dance.dancer || '-'}</td>
-                        <td class="px-3 py-3">${dance.division ? `<span class="text-xs px-2 py-1 rounded ${divisionClass}">${dance.division}</span>` : '-'}</td>
-                        <td class="px-3 py-3">${dance.type && !isAwards ? `<span class="text-xs px-2 py-1 rounded ${typeClass}">${dance.type}</span>` : isAwards ? '🏆' : '-'}</td>
+                        <td class="px-2 py-2">
+                            ${!isAwards ? `
+                            <button onclick="addDanceToCalendar('${escapedName}', '${escapedDancer}', '${dance.time}', '${escapedDivision}', '${escapedStyle}', '${escapedType}', ${dance.num || 'null'})"
+                                class="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-sm font-bold transition-colors" title="Add to Google Calendar">
+                                +
+                            </button>
+                            ` : ''}
+                        </td>
+                        <td class="px-2 py-2 text-slate-500 font-mono text-xs">${dance.num || '-'}</td>
+                        <td class="px-2 py-2 text-violet-600 font-mono font-semibold text-xs">${dance.time}</td>
+                        <td class="px-2 py-2 text-slate-800 font-medium">${dance.name}</td>
+                        <td class="px-2 py-2 ${dance.dancer ? 'text-slate-800 font-semibold' : 'text-slate-400'}">${dance.dancer || '-'}</td>
+                        <td class="px-2 py-2 hidden sm:table-cell">${dance.division ? `<span class="text-xs px-2 py-1 rounded ${divisionClass}">${dance.division}</span>` : '-'}</td>
+                        <td class="px-2 py-2 hidden sm:table-cell">${dance.type && !isAwards ? `<span class="text-xs px-2 py-1 rounded ${typeClass}">${dance.type}</span>` : isAwards ? '🏆' : '-'}</td>
                     </tr>
                 `;
             });
@@ -616,16 +858,31 @@
             `;
 
             placesToEat.walkable.forEach(place => {
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.address)}`;
                 html += `
                     <div class="p-4 hover:bg-slate-50">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="font-semibold text-slate-800">${place.name}</div>
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="flex-grow">
+                                <a href="${mapsUrl}" target="_blank" class="font-semibold text-slate-800 hover:text-violet-600 transition-colors">${place.name}</a>
                                 <div class="text-sm text-slate-500">${place.type} • ${place.price}</div>
                                 <div class="text-xs text-slate-400 mt-1">${place.address}</div>
                                 ${place.note ? `<div class="text-xs text-green-600 mt-1">${place.note}</div>` : ''}
+                                <div class="flex gap-2 mt-2">
+                                    <a href="${mapsUrl}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        Directions
+                                    </a>
+                                    ${place.menu ? `<a href="${place.menu}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                        Menu
+                                    </a>` : ''}
+                                    ${place.website ? `<a href="${place.website}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                                        Website
+                                    </a>` : ''}
+                                </div>
                             </div>
-                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${place.distance}</span>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full whitespace-nowrap">${place.distance}</span>
                         </div>
                     </div>
                 `;
@@ -646,10 +903,20 @@
             placesToEat.delivery.forEach(place => {
                 html += `
                     <div class="p-4 hover:bg-slate-50">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="font-semibold text-slate-800">${place.name}</div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start gap-2">
+                            <div class="flex-grow">
+                                ${place.website ? `<a href="${place.website}" target="_blank" class="font-semibold text-slate-800 hover:text-violet-600 transition-colors">${place.name}</a>` : `<div class="font-semibold text-slate-800">${place.name}</div>`}
                                 <div class="text-sm text-slate-500">${place.type}</div>
+                                <div class="flex gap-2 mt-2">
+                                    ${place.menu ? `<a href="${place.menu}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                        Menu / Order
+                                    </a>` : ''}
+                                    ${place.website && !place.menu ? `<a href="${place.website}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                                        Website
+                                    </a>` : ''}
+                                </div>
                             </div>
                             <div class="flex flex-wrap gap-1 justify-end">
                                 ${place.apps.map(app => `<span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">${app}</span>`).join('')}
