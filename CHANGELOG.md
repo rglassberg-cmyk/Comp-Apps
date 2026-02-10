@@ -1,110 +1,135 @@
 # Comp-Apps Changelog
 
-## 2026-02-10 - Dance Schedule Update
+## 2026-02-10 - Complete Site Rebuild for Deviate DC
 
-### Summary
-Updated the Tremaine Weekend Hub app with the official competition schedule, revised Saturday morning plans, and added an interactive walking map.
+### Overview
+Complete rebuild of the competition app for **Tate Academy Company** attending **Deviate (The Process)** in Washington DC, February 13-15, 2026.
 
 ---
 
-### Changes Made
+### New Features
 
-#### 1. Talia's Solo Time Updated
-- **Before:** 8:30 PM
-- **After:** 9:14 PM
-- **Details:** "Foolish Games" - Senior Lyrical Solo (9:14-9:17 PM)
+#### 1. Convention Schedule Tab
+- Full schedule for Thursday through Sunday
+- **Age group filtering** (Junior, PreTeen, Teen, Senior)
+- **Add to Calendar buttons** for each class
+- "Add All to Calendar" button for entire days
+- Color-coded age group labels
+- Room/location information
 
-#### 2. Carly's Solo Added to Saturday Evening
-- **Time:** 9:00 PM
-- **Details:** "Other Side" - Teen Contemporary Solo (9:00-9:03 PM)
-- Added all Saturday evening group dances to the schedule
+**Schedule Includes:**
+- Thursday: Travel/Check-in
+- Friday: Classes + Competition starts 9 AM
+- Saturday: Classes + Competition continues
+- Sunday: Workshops + Awards
 
-#### 3. New "Dance Order" Tab
-Complete competition schedule for both days:
+#### 2. Dance Order Tab
+Complete Friday competition schedule with 34 performances:
 
-**Friday 1/30/2026:**
-| # | Dance | Dancer | Style | Type | Time |
-|---|-------|--------|-------|------|------|
-| 1 | That's Life | Robbie | Jazz | Solo | 7:49 PM |
-| 2 | Tennessee Whiskey | Liam | Contemporary | Solo | 8:38 PM |
-| 3 | Out There | Alina | Contemporary | Solo | 8:41 PM |
-| 4 | Winner Takes It All | Lula | Contemporary | Solo | 8:44 PM |
-| 5 | These Arms of Mine | Chloe | Contemporary | Solo | 8:46 PM |
-| 6 | Lose Yourself | Riley | Hip Hop | Solo | 9:00 PM |
-| 7 | **Foolish Games** | **Talia** | Lyrical | Solo | **9:14 PM** |
-| 8 | One More Moment | Talya | Lyrical | Solo | 9:17 PM |
-| 9 | Dreams | Ella | Jazz | Solo | 9:22 PM |
+**Solos:**
+- Bella (Raspberry Beret) - Junior Jazz - 9:00 AM
+- Anaya (Le Freak) - Junior Jazz - 9:08 AM
+- Liana (Wings) - 9:16 AM
+- Ella B (Slow It Down) - 10:00 AM
+- Carly (Other Side) - Teen Contemporary - 2:16 PM
+- Robbie (When I Go) - PreTeen Contemporary - 2:19 PM
+- Zoe (I Dreamed A Dream) - PreTeen Lyrical - 2:43 PM
+- Eden (River) - PreTeen Lyrical - 2:46 PM
+- Lula (Winner Takes It All) - Senior Contemporary - 4:20 PM
+- Chloe (These Arms Of Mine) - Senior Contemporary - 4:26 PM
+- Alina (Out There) - Senior Contemporary - 4:42 PM
+- Liam (Tennessee Whiskey) - Senior Contemporary - 5:57 PM
+- Ella G. (Dreams) - Senior Jazz - 7:48 PM
+- Talia G. (Foolish Games) - Senior Lyrical - 8:16 PM
+- Talya B. (One More Second) - Senior Lyrical - 8:22 PM
+- Riley (Lose Yourself) - Senior Hip Hop - 8:35 PM
 
-**Saturday 1/31/2026:**
-| # | Dance | Dancer | Style | Type | Time |
-|---|-------|--------|-------|------|------|
-| 1 | Cry to Me | - | Jazz | Group | 8:15 PM |
-| 2 | End of Love | - | Lyrical | Line | 8:41 PM |
-| 3 | **Other Side** | **Carly** | Contemporary | Solo | **9:00 PM** |
-| 4 | Dead One | - | Contemporary | Group | 9:15 PM |
-| 5 | Kendrick | - | Hip Hop | Group | 9:29 PM |
-| 6 | Cellophane | - | Lyrical | Group | 9:54 PM |
-| 7 | Golden Years | - | Jazz | Production | 10:13 PM |
+**Groups/Lines/Productions:**
+- Work Me, Just Like A River Does, Fly, White Rabbit, Know About Me, The Way, What The World Need Now, Hairspray, Corps, Dead & Done, Cry To Me, End Of Love, Golden Years, Cellophane, Kendrick
 
-#### 4. Saturday Morning Schedule Updated
-Changed wake-up time from 7:45 AM to 9:00 AM for Becca and Aviva.
+**Awards:**
+- 1:00 PM - Awards 6-12
+- 9:40 PM - Awards 13+
 
-**New Schedule:**
-| Time | Activity |
-|------|----------|
-| 9:00 AM | Wake Up & Get Ready |
-| 9:30 AM | Coffee & Planning |
-| 10:00 AM | Bryant Park Stroll |
-| 10:45 AM | Warm-Up Stop (Library/Grand Central) |
-| 11:30 AM | 5th Ave Window Shop |
-| 12:30 PM | Lunch Pickup |
+#### 3. Places to Eat Tab
+**Walking Distance Restaurants (near Marriott Wardman Park):**
+| Restaurant | Type | Distance | Price |
+|------------|------|----------|-------|
+| Open City | American/Brunch | 0.1 mi | $$ |
+| Petits Plats | French | 0.2 mi | $$ |
+| Nanny O'Brien's | Irish Pub | 0.3 mi | $$ |
+| Bindaas | Indian Street Food | 0.3 mi | $$ |
+| Diner | American/Diner | 0.4 mi | $ |
+| Amsterdam Falafelshop | Middle Eastern | 0.4 mi | $ |
+| Mintwood Place | American | 0.5 mi | $$$ |
 
-#### 5. Interactive Walking Map Added
-Added a Leaflet-based interactive map to the Saturday AM tab showing the walking route:
+**Delivery Options:**
+- Domino's Pizza (DoorDash, UberEats)
+- Chipotle (DoorDash, UberEats, Chipotle App)
+- Sweetgreen (DoorDash, Sweetgreen App)
+- CAVA (DoorDash, UberEats, CAVA App)
+- Chick-fil-A (DoorDash, UberEats, CFA App)
+- Panera Bread (DoorDash, Panera App)
+- Wawa (DoorDash, Wawa App)
 
-**Stops:**
-1. Hotel (Start)
-2. Joe Coffee
-3. Bryant Park
-4. NY Public Library
-5. Grand Central
-6. St. Patrick's Cathedral
-7. 5th Ave Shops
-8. Sweetgreen (Lunch)
+**Interactive Map:**
+- Leaflet map showing hotel and all walkable restaurants
+- Clickable markers with details
 
-**Features:**
-- Numbered markers for each stop
-- Clickable popups with stop details
-- Dashed route line connecting all stops
-- Legend showing all stops with icons
+#### 4. Things to Do Tab
+**Nearby Activities:**
+| Attraction | Distance | Highlights |
+|------------|----------|------------|
+| National Zoo | 0.3 mi | FREE! Pandas, elephants |
+| Rock Creek Park | 0.2 mi | Walking trails |
+| Adams Morgan | 0.5 mi | Shops, murals, restaurants |
+| Smithsonian Museums | 2.5 mi | All FREE! Metro accessible |
+| Georgetown | 2 mi | Shopping, Georgetown Cupcake |
+| DC Monuments | 3 mi | Lincoln, Washington Monument |
+| Dupont Circle | 1.2 mi | Bookshops, farmers market |
+| National Cathedral | 1 mi | Gothic cathedral, gardens |
 
-#### 6. Saturday Time Chart Updated
-Adjusted the doughnut chart to reflect new timing:
-- Moms Walk: 4 hours (was 5.25)
-- Chill Zone: 4 hours
-- Competition: 5 hours (was 4)
-- Sleep/Other: 11 hours (was 10.75)
+**Interactive Map:**
+- Shows hotel and all attractions
+- Custom markers with activity icons
 
 ---
 
 ### Technical Details
 
-**Libraries Added:**
-- Leaflet v1.9.4 (CSS & JS) for interactive mapping
+**Venue Information:**
+- Hotel: Marriott Wardman Park
+- Address: 2660 Woodley Rd NW, Washington, DC 20008
+- Coordinates: 38.9296, -77.0536
+
+**Libraries Used:**
+- Tailwind CSS (via CDN)
+- Leaflet v1.9.4 (maps)
+- Google Fonts (Outfit)
+
+**Color Scheme:**
+- Primary: Violet/Purple gradient
+- Junior: Yellow
+- PreTeen: Blue
+- Teen: Green
+- Senior: Pink
 
 **New Data Structures:**
-- `walkingStops` - Array of map stop coordinates and details
-- `danceOrder` - Object containing Friday and Saturday dance schedules
-
-**New Functions:**
-- `renderWalkingMap()` - Generates the map container HTML
-- `initWalkingMap()` - Initializes the Leaflet map with markers and route
-- `renderDanceOrder()` - Renders the dance schedule tables
-
-**New Tab:**
-- "Dance Order" tab added to navigation
+- `eventInfo` - Venue and event details
+- `conventionSchedule` - Class schedule by day
+- `danceOrder` - Competition performance order
+- `placesToEat` - Walkable and delivery restaurants
+- `nearbyActivities` - Things to do nearby
 
 ---
 
 ### Files Modified
-- `index.html` - All changes in single file (HTML, CSS, JavaScript)
+- `index.html` - Complete rebuild
+- `CHANGELOG.md` - Updated documentation
+
+---
+
+## Previous Updates
+
+### 2026-02-10 - Tremaine NYC Updates (Archived)
+*Previous version was for Tremaine Weekend in NYC. See git history for details.*

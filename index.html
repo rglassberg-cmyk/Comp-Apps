@@ -3,76 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tremaine Weekend Hub</title>
+    <title>Tate Academy - Deviate DC 2026</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- Leaflet CSS & JS for Interactive Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Chosen Palette: Soft Rose & Slate -->
-    <!-- Application Structure Plan: 
-         1. Dashboard Header: Quick status and visual breakdown of Saturday's time allocation.
-         2. Tabbed Navigation: Splits the dense itinerary into manageable chunks (Friday, Sat AM, Sat PM, Sat Eve).
-         3. Interactive Timeline: Cards for each event that are easy to scan.
-         4. "Food & Fuel" Section: Interactive filter to toggle between 'Talia' (Salad) and 'Carly' (Pasta) options.
-         5. "Chill Zone" Checklist: Interactive checklist for packing/room prep.
-         6. Quick Reference Grid: Key addresses with visual emphasis.
-         This structure prioritizes mobile usability for "on-the-go" moms in NYC. -->
-    
-    <!-- Visualization & Content Choices:
-         1. Report Info: Saturday Schedule Duration -> Goal: Visualize balance -> Viz: Doughnut Chart -> Interaction: None (Visual Anchor) -> Justification: Shows the ratio of Walking vs. Chilling vs. Competing.
-         2. Report Info: Lunch Options -> Goal: Simplify choice -> Viz: Filterable Cards -> Interaction: Click 'Talia' or 'Carly' buttons -> Justification: Reduces cognitive load when ordering lunch.
-         3. Report Info: Packing List -> Goal: Organization -> Viz: Checkbox List -> Interaction: Toggle completed items -> Justification: Practical utility. 
-         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
     <style>
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #f8fafc; /* Slate 50 */
-            color: #334155; /* Slate 700 */
-        }
-        
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 250px;
-            max-height: 250px;
-        }
-
-        /* Custom Scrollbar for clean look */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-
-        .tab-active {
-            border-bottom: 2px solid #fb7185; /* Rose 400 */
-            color: #be123c; /* Rose 700 */
-            font-weight: 600;
-        }
-        
-        .tab-inactive {
-            color: #64748b; /* Slate 500 */
-        }
-        
-        .tab-inactive:hover {
+            background-color: #f8fafc;
             color: #334155;
         }
 
@@ -82,268 +25,234 @@
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+
+        .cal-btn {
+            transition: all 0.2s ease;
+        }
+
+        .cal-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .division-junior { background: #fef3c7; color: #92400e; }
+        .division-preteen { background: #dbeafe; color: #1e40af; }
+        .division-teen { background: #dcfce7; color: #166534; }
+        .division-senior { background: #fce7f3; color: #9d174d; }
+
+        .type-solo { background: #fecaca; color: #991b1b; }
+        .type-group { background: #bfdbfe; color: #1e40af; }
+        .type-line { background: #c7d2fe; color: #3730a3; }
+        .type-production { background: #ddd6fe; color: #5b21b6; }
+        .type-trio { background: #fbcfe8; color: #9d174d; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Header / Dashboard -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-rose-500 tracking-tight">🩰 Tremaine Weekend</h1>
-                <p class="text-xs text-slate-500">NYC • Friday & Saturday</p>
-            </div>
-            <div id="clock" class="text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-                <!-- Clock injected via JS -->
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-violet-600 to-purple-600 text-white sticky top-0 z-50 shadow-lg">
+        <div class="max-w-4xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">Tate Academy Company</h1>
+                    <p class="text-violet-200 text-sm">Deviate (The Process) - Washington DC</p>
+                    <p class="text-violet-300 text-xs mt-1">February 13-15, 2026</p>
+                </div>
+                <div id="clock" class="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full"></div>
             </div>
         </div>
-        
+
         <!-- Navigation Tabs -->
-        <nav class="max-w-2xl mx-auto px-2 flex space-x-1 overflow-x-auto no-scrollbar" id="nav-container">
-            <!-- Tabs injected via JS -->
-        </nav>
+        <nav class="max-w-4xl mx-auto px-2 pb-2 flex space-x-1 overflow-x-auto" id="nav-container"></nav>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow max-w-2xl mx-auto w-full p-4 space-y-6">
-
-        <!-- Intro Section (Context) -->
-        <section id="intro-section" class="animate-fade-in">
-            <div class="bg-gradient-to-r from-rose-50 to-white p-4 rounded-xl border border-rose-100 mb-4">
-                <h2 class="text-lg font-semibold text-rose-800 mb-2">Welcome to the Weekend!</h2>
-                <p class="text-sm text-slate-600 leading-relaxed">
-                    This interactive guide breaks down the schedule for Becca and Aviva. 
-                    Use the tabs above to navigate between <strong>Friday Solo Night</strong>, the <strong>Saturday Mom Walk</strong>, and the <strong>Pre-Comp Chill Zone</strong>.
-                </p>
-            </div>
-
-            <!-- Chart: Saturday Balance -->
-            <div class="glass-card rounded-xl p-4">
-                <h3 class="text-sm font-semibold text-slate-700 mb-2 text-center">Saturday Time Breakdown</h3>
-                <div class="chart-container">
-                    <canvas id="weekendChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-400 mt-2">Estimated activity split for Saturday</p>
-            </div>
-        </section>
-
-        <!-- Dynamic Content Container -->
-        <div id="content-container">
-            <!-- Content injected via JS based on active tab -->
-        </div>
-
+    <main class="flex-grow max-w-4xl mx-auto w-full p-4">
+        <div id="content-container"></div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-50 border-t border-slate-200 py-6 mt-8">
-        <div class="max-w-2xl mx-auto px-4 text-center">
-            <p class="text-xs text-slate-400">Created for the Dance Moms 💃</p>
-            <p class="text-xs text-slate-300 mt-1">Don't forget the grilled chicken!</p>
+    <footer class="bg-slate-100 border-t border-slate-200 py-4 mt-8">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="text-xs text-slate-400">Tate Academy Company - Deviate DC 2026</p>
+            <p class="text-xs text-slate-300 mt-1">Go Team!</p>
         </div>
     </footer>
 
-    <!-- JavaScript Application Logic -->
     <script>
         // --- State Management ---
         const state = {
-            currentTab: 'friday',
-            lunchFilter: 'all', // 'all', 'talia', 'carly'
-            checklist: {
-                'Snacks': false,
-                'Games': false,
-                'Spa': false
-            }
+            currentTab: 'schedule',
+            ageFilter: 'all'
         };
 
-        // --- Data: Itinerary ---
-        const itineraryData = {
+        // --- Event Information ---
+        const eventInfo = {
+            name: "Deviate (The Process)",
+            location: "Washington DC",
+            dates: "February 13-15, 2026",
+            venue: "Marriott Wardman Park",
+            venueAddress: "2660 Woodley Rd NW, Washington, DC 20008",
+            venueLat: 38.9296,
+            venueLng: -77.0536
+        };
+
+        // --- Convention Schedule ---
+        const conventionSchedule = {
+            thursday: {
+                date: "Thursday, Feb 12",
+                note: "Travel Day - Check-in",
+                classes: []
+            },
             friday: {
-                title: "Friday: Solo Night 🌙",
-                desc: "Focus on supporting Talia's solo performance (9:14pm). Keep it light and calm.",
-                events: [
-                    { time: "5:30 PM", title: "Early Light Dinner", icon: "🥗", details: "Order DoorDash: Sweetgreen or Just Salad. Add home-grilled chicken. Keep it light!" },
-                    { time: "9:14 PM", title: "Talia's Solo - Foolish Games", icon: "💃", details: "Senior Lyrical Solo. Performance time 9:14-9:17 PM." },
-                    { time: "9:30 PM", title: "Post-Solo Snacks", icon: "🥨", details: "In-room recovery: Pretzels, fruit, cheese sticks. Bagel/toast if hungry." },
-                    { time: "10:30 PM", title: "Lights Out", icon: "🛌", details: "Early rest for the big day tomorrow." }
+                date: "Friday, Feb 13",
+                classes: [
+                    { time: "8:00 AM - 9:30 AM", name: "Junior/PreTeen Technique", ages: ["junior", "preteen"], room: "Ballroom A" },
+                    { time: "9:45 AM - 11:15 AM", name: "Junior/PreTeen Jazz", ages: ["junior", "preteen"], room: "Ballroom A" },
+                    { time: "11:30 AM - 1:00 PM", name: "Junior/PreTeen Contemporary", ages: ["junior", "preteen"], room: "Ballroom A" },
+                    { time: "1:00 PM - 2:00 PM", name: "Lunch Break", ages: ["all"], room: "" },
+                    { time: "2:00 PM - 3:30 PM", name: "Teen/Senior Technique", ages: ["teen", "senior"], room: "Ballroom B" },
+                    { time: "3:45 PM - 5:15 PM", name: "Teen/Senior Jazz", ages: ["teen", "senior"], room: "Ballroom B" },
+                    { time: "5:30 PM - 7:00 PM", name: "Teen/Senior Contemporary", ages: ["teen", "senior"], room: "Ballroom B" }
                 ]
             },
-            saturdayAM: {
-                title: "Saturday Morning: Moms' Walk ☕",
-                desc: "9:00 AM - 1:00 PM. While girls are in classes, explore Midtown & Bryant Park.",
-                events: [
-                    { time: "9:00 AM", title: "Wake Up & Get Ready", icon: "☀️", details: "Take your time getting ready. No rush!" },
-                    { time: "9:30 AM", title: "Coffee & Planning", icon: "☕", details: "Joe Coffee (44th & 6th) or Bluestone Lane (45th). Plan the morning." },
-                    { time: "10:00 AM", title: "Bryant Park Stroll", icon: "🌳", details: "Winter Village kiosks, heated seating. Calmer than Times Square." },
-                    { time: "10:45 AM", title: "Warm-Up Stop", icon: "🏛️", details: "NY Public Library (Rose Reading Room) or Grand Central Terminal." },
-                    { time: "11:30 AM", title: "5th Ave Window Shop", icon: "🛍️", details: "St. Patrick's Cathedral & 5th Ave stores." },
-                    { time: "12:30 PM", title: "Lunch Pickup", icon: "🥡", details: "Gather food for the girls before heading back. See 'Lunch Finder' below." }
+            saturday: {
+                date: "Saturday, Feb 14",
+                classes: [
+                    { time: "8:00 AM - 9:30 AM", name: "Junior/PreTeen Hip Hop", ages: ["junior", "preteen"], room: "Ballroom A" },
+                    { time: "9:45 AM - 11:15 AM", name: "Junior/PreTeen Lyrical", ages: ["junior", "preteen"], room: "Ballroom A" },
+                    { time: "11:30 AM - 1:00 PM", name: "All Ages Master Class", ages: ["all"], room: "Grand Ballroom" },
+                    { time: "1:00 PM - 2:00 PM", name: "Lunch Break", ages: ["all"], room: "" },
+                    { time: "2:00 PM - 3:30 PM", name: "Teen/Senior Hip Hop", ages: ["teen", "senior"], room: "Ballroom B" },
+                    { time: "3:45 PM - 5:15 PM", name: "Teen/Senior Lyrical", ages: ["teen", "senior"], room: "Ballroom B" },
+                    { time: "6:00 PM", name: "Competition Begins", ages: ["all"], room: "Main Stage" }
                 ]
             },
-            saturdayPM: {
-                title: "Saturday Afternoon: Chill Zone 💆‍♀️",
-                desc: "1:00 PM - 5:00 PM. Downtime in the hotel room before the evening competition. Focus on Carly getting ready for her solo",
-                events: [
-                    { time: "1:00 PM", title: "In-Room Picnic", icon: "🥪", details: "Eat the picked-up lunch. Relax." },
-                    { time: "2:00 PM", title: "Games & Spa", icon: "💅", details: "Uno, Bananagrams, Face Masks, Movies." },
-                    { time: "3:00 PM", title: "Sugar Distraction (Optional)", icon: "🍪", details: "If nerves hit: Walk to Schmackary's, Van Leeuwen, or Junior's." },
-                    { time: "4:30 PM", title: "Pre-Comp Dinner Order", icon: "📱", details: "Order delivery now for 5pm arrival. Keep it safe/familiar." }
-                ]
-            },
-            saturdayEve: {
-                title: "Saturday Night: Competition 🏆",
-                desc: "Evening Session. Focus on getting them fed and ready. Carly's solo at 9:00 PM!",
-                events: [
-                    { time: "5:00 PM", title: "Dinner Time", icon: "🍝", details: "Eat early. Chipotle, Dig, or Plain Pasta from Joe's Pizza." },
-                    { time: "8:15 PM", title: "Cry to Me - Group", icon: "👯", details: "Senior Jazz Group. Performance 8:15-8:20 PM." },
-                    { time: "8:41 PM", title: "End of Love - Line", icon: "👯", details: "Senior Lyrical Line. Performance 8:41-8:46 PM." },
-                    { time: "9:00 PM", title: "⭐ Carly's Solo - Other Side", icon: "💃", details: "Teen Contemporary Solo. Performance 9:00-9:03 PM." },
-                    { time: "9:15 PM", title: "Dead One - Group", icon: "👯", details: "Senior Contemporary Group. Performance 9:15-9:20 PM." },
-                    { time: "9:29 PM", title: "Kendrick - Group", icon: "👯", details: "Senior Hip Hop Group. Performance 9:29-9:34 PM." },
-                    { time: "9:54 PM", title: "Cellophane - Group", icon: "👯", details: "Senior Lyrical Group. Performance 9:54-9:59 PM." },
-                    { time: "10:13 PM", title: "Golden Years - Production", icon: "🌟", details: "Teen Jazz Production. Performance 10:13-10:18 PM." }
+            sunday: {
+                date: "Sunday, Feb 15",
+                classes: [
+                    { time: "9:00 AM - 10:30 AM", name: "All Ages Improv Workshop", ages: ["all"], room: "Ballroom A" },
+                    { time: "11:00 AM - 12:30 PM", name: "Choreography Intensive", ages: ["teen", "senior"], room: "Ballroom B" },
+                    { time: "1:00 PM", name: "Awards Ceremony", ages: ["all"], room: "Grand Ballroom" },
+                    { time: "3:00 PM", name: "Departure", ages: ["all"], room: "" }
                 ]
             }
         };
 
-        // --- Data: Lunch Options ---
-        const lunchOptions = [
-            { name: "Sweetgreen", type: "Salad", for: "Talia", loc: "1450 Broadway" },
-            { name: "Dig", type: "Bowls", for: "Talia", loc: "W 45th St" },
-            { name: "Pret A Manger", type: "Sandwich/Salad", for: "Talia", loc: "Multiple" },
-            { name: "Vapiano", type: "Pasta", for: "Carly", loc: "W 42nd St" },
-            { name: "Pasta Lovers", type: "Pasta", for: "Carly", loc: "W 44th St" },
-            { name: "Dig (Pasta Option)", type: "Pasta", for: "Carly", loc: "W 45th St" }
+        // --- Competition Dance Order (Friday 2/13/26) ---
+        const danceOrder = [
+            { num: 1, time: "9:00 AM", name: "Raspberry Beret", dancer: "Bella", division: "Junior", style: "Jazz", type: "Solo" },
+            { num: 4, time: "9:08 AM", name: "Le Freak", dancer: "Anaya", division: "Junior", style: "Jazz", type: "Solo" },
+            { num: 7, time: "9:16 AM", name: "Wings", dancer: "Liana", division: "", style: "", type: "Solo" },
+            { num: 22, time: "10:00 AM", name: "Slow It Down", dancer: "Ella B", division: "", style: "", type: "Solo" },
+            { num: 25, time: "10:08 AM", name: "Work Me", dancer: "", division: "", style: "", type: "Group" },
+            { num: 30, time: "10:23 AM", name: "Just Like A River Does", dancer: "", division: "", style: "", type: "Group" },
+            { num: 34, time: "10:37 AM", name: "Fly", dancer: "", division: "", style: "", type: "Group" },
+            { num: 41, time: "11:00 AM", name: "White Rabbit", dancer: "", division: "PreTeen", style: "Contemporary", type: "Group" },
+            { num: 47, time: "11:19 AM", name: "Know About Me", dancer: "", division: "", style: "", type: "Group" },
+            { num: 48, time: "11:55 AM", name: "The Way", dancer: "", division: "PreTeen", style: "Jazz", type: "Group" },
+            { num: 53, time: "12:09 PM", name: "What The World Need Now", dancer: "", division: "Teen", style: "Lyrical", type: "Trio" },
+            { num: 59, time: "12:28 PM", name: "Hairspray", dancer: "", division: "Mini/Teen", style: "Jazz", type: "Group" },
+            { num: null, time: "1:00 PM", name: "Awards 6-12", dancer: "", division: "", style: "", type: "Awards", isAwards: true },
+            { num: 64, time: "1:48 PM", name: "Corps", dancer: "", division: "", style: "", type: "Group" },
+            { num: 73, time: "2:16 PM", name: "Other Side", dancer: "Carly", division: "Teen", style: "Contemporary", type: "Solo" },
+            { num: 74, time: "2:19 PM", name: "When I Go", dancer: "Robbie", division: "PreTeen", style: "Contemporary", type: "Solo" },
+            { num: 82, time: "2:43 PM", name: "I Dreamed A Dream", dancer: "Zoe", division: "PreTeen", style: "Lyrical", type: "Solo" },
+            { num: 83, time: "2:46 PM", name: "River", dancer: "Eden", division: "PreTeen", style: "Lyrical", type: "Solo" },
+            { num: 108, time: "4:20 PM", name: "Winner Takes It All", dancer: "Lula", division: "Senior", style: "Contemporary", type: "Solo" },
+            { num: 110, time: "4:26 PM", name: "These Arms Of Mine", dancer: "Chloe", division: "Senior", style: "Contemporary", type: "Solo" },
+            { num: 115, time: "4:42 PM", name: "Out There", dancer: "Alina", division: "Senior", style: "Contemporary", type: "Solo" },
+            { num: 123, time: "5:08 PM", name: "Dead & Done", dancer: "", division: "Senior", style: "Contemporary", type: "Group" },
+            { num: 136, time: "5:57 PM", name: "Tennessee Whiskey", dancer: "Liam", division: "Senior", style: "Contemporary", type: "Solo" },
+            { num: 146, time: "6:34 PM", name: "Cry To Me", dancer: "", division: "Senior", style: "Jazz", type: "Group" },
+            { num: 150, time: "6:48 PM", name: "End Of Love", dancer: "", division: "Senior", style: "Lyrical", type: "Line" },
+            { num: 152, time: "7:30 PM", name: "Golden Years", dancer: "", division: "Teen", style: "Jazz", type: "Production" },
+            { num: 156, time: "7:48 PM", name: "Dreams", dancer: "Ella G.", division: "Senior", style: "Jazz", type: "Solo" },
+            { num: 164, time: "8:16 PM", name: "Foolish Games", dancer: "Talia G.", division: "Senior", style: "Lyrical", type: "Solo" },
+            { num: 166, time: "8:22 PM", name: "One More Second", dancer: "Talya B.", division: "Senior", style: "Lyrical", type: "Solo" },
+            { num: 170, time: "8:35 PM", name: "Lose Yourself", dancer: "Riley", division: "Senior", style: "Hip Hop", type: "Solo" },
+            { num: 175, time: "8:50 PM", name: "Cellophane", dancer: "", division: "Senior", style: "Lyrical", type: "Group" },
+            { num: 179, time: "9:02 PM", name: "Kendrick", dancer: "", division: "Senior", style: "Hip Hop", type: "Group" },
+            { num: null, time: "9:40 PM", name: "Awards 13+", dancer: "", division: "", style: "", type: "Awards", isAwards: true }
         ];
 
-        // --- Data: Addresses ---
-        const addresses = [
-            { name: "Joe Coffee", addr: "W 44th St & 6th Ave" },
-            { name: "Bryant Park", addr: "40th-42nd St & 6th Ave" },
-            { name: "Sweetgreen", addr: "1450 Broadway (at 41st)" },
-            { name: "Dig", addr: "1407 Broadway (W 45th)" },
-            { name: "Schmackary's", addr: "362 W 45th St" },
-            { name: "Van Leeuwen", addr: "204 W 48th St" }
-        ];
-
-        // --- Data: Walking Map Stops ---
-        const walkingStops = [
-            { name: "Hotel (Start)", lat: 40.7580, lng: -73.9855, icon: "🏨", order: 1 },
-            { name: "Joe Coffee", lat: 40.7565, lng: -73.9850, icon: "☕", order: 2 },
-            { name: "Bryant Park", lat: 40.7536, lng: -73.9832, icon: "🌳", order: 3 },
-            { name: "NY Public Library", lat: 40.7532, lng: -73.9822, icon: "🏛️", order: 4 },
-            { name: "Grand Central", lat: 40.7527, lng: -73.9772, icon: "🚂", order: 5 },
-            { name: "St. Patrick's Cathedral", lat: 40.7585, lng: -73.9760, icon: "⛪", order: 6 },
-            { name: "5th Ave Shops", lat: 40.7614, lng: -73.9776, icon: "🛍️", order: 7 },
-            { name: "Sweetgreen (Lunch)", lat: 40.7560, lng: -73.9870, icon: "🥗", order: 8 }
-        ];
-
-        // --- Data: Dance Order ---
-        const danceOrder = {
-            friday: [
-                { order: 1, name: "That's Life", dancer: "Robbie", division: "PreTeen", style: "Jazz", type: "Solo", start: "7:49 PM", end: "7:52 PM" },
-                { order: 2, name: "Tennessee Whiskey", dancer: "Liam", division: "Senior", style: "Contemporary", type: "Solo", start: "8:38 PM", end: "8:41 PM" },
-                { order: 3, name: "Out There", dancer: "Alina", division: "Senior", style: "Contemporary", type: "Solo", start: "8:41 PM", end: "8:44 PM" },
-                { order: 4, name: "Winner Takes It All", dancer: "Lula", division: "Senior", style: "Contemporary", type: "Solo", start: "8:44 PM", end: "8:47 PM" },
-                { order: 5, name: "These Arms of Mine", dancer: "Chloe", division: "Senior", style: "Contemporary", type: "Solo", start: "8:46 PM", end: "8:49 PM" },
-                { order: 6, name: "Lose Yourself", dancer: "Riley", division: "Senior", style: "Hip Hop", type: "Solo", start: "9:00 PM", end: "9:03 PM" },
-                { order: 7, name: "Foolish Games", dancer: "Talia", division: "Senior", style: "Lyrical", type: "Solo", start: "9:14 PM", end: "9:17 PM", highlight: true },
-                { order: 8, name: "One More Moment", dancer: "Talya", division: "Senior", style: "Lyrical", type: "Solo", start: "9:17 PM", end: "9:20 PM" },
-                { order: 9, name: "Dreams", dancer: "Ella", division: "Senior", style: "Jazz", type: "Solo", start: "9:22 PM", end: "9:25 PM" }
+        // --- Places to Eat (Near Marriott Wardman Park, DC) ---
+        const placesToEat = {
+            walkable: [
+                { name: "Open City", type: "American/Brunch", distance: "0.1 mi", address: "2331 Calvert St NW", price: "$$", lat: 38.9216, lng: -77.0485, note: "Great for breakfast/brunch" },
+                { name: "Petits Plats", type: "French", distance: "0.2 mi", address: "2653 Connecticut Ave NW", price: "$$", lat: 38.9280, lng: -77.0510, note: "Cozy French bistro" },
+                { name: "Nanny O'Brien's", type: "Irish Pub", distance: "0.3 mi", address: "3319 Connecticut Ave NW", price: "$$", lat: 38.9350, lng: -77.0580, note: "Casual pub fare" },
+                { name: "Bindaas", type: "Indian Street Food", distance: "0.3 mi", address: "2000 18th St NW", price: "$$", lat: 38.9150, lng: -77.0420, note: "Fast-casual Indian" },
+                { name: "Diner", type: "American/Diner", distance: "0.4 mi", address: "2453 18th St NW", price: "$", lat: 38.9200, lng: -77.0430, note: "24-hour diner, great for late night" },
+                { name: "Amsterdam Falafelshop", type: "Middle Eastern", distance: "0.4 mi", address: "2425 18th St NW", price: "$", lat: 38.9195, lng: -77.0428, note: "Quick & delicious falafel" },
+                { name: "Mintwood Place", type: "American", distance: "0.5 mi", address: "1813 Columbia Rd NW", price: "$$$", lat: 38.9220, lng: -77.0400, note: "Upscale American" }
             ],
-            saturday: [
-                { order: 1, name: "Cry to Me", dancer: "", division: "Senior", style: "Jazz", type: "Group", start: "8:15 PM", end: "8:20 PM" },
-                { order: 2, name: "End of Love", dancer: "", division: "Senior", style: "Lyrical", type: "Line", start: "8:41 PM", end: "8:46 PM" },
-                { order: 3, name: "Other Side", dancer: "Carly", division: "Teen", style: "Contemporary", type: "Solo", start: "9:00 PM", end: "9:03 PM", highlight: true },
-                { order: 4, name: "Dead One", dancer: "", division: "Senior", style: "Contemporary", type: "Group", start: "9:15 PM", end: "9:20 PM" },
-                { order: 5, name: "Kendrick", dancer: "", division: "Senior", style: "Hip Hop", type: "Group", start: "9:29 PM", end: "9:34 PM" },
-                { order: 6, name: "Cellophane", dancer: "", division: "Senior", style: "Lyrical", type: "Group", start: "9:54 PM", end: "9:59 PM" },
-                { order: 7, name: "Golden Years", dancer: "", division: "Teen", style: "Jazz", type: "Production", start: "10:13 PM", end: "10:18 PM" }
+            delivery: [
+                { name: "Domino's Pizza", type: "Pizza", phone: "(202) 232-8400", apps: ["DoorDash", "UberEats"] },
+                { name: "Chipotle", type: "Mexican", phone: "", apps: ["DoorDash", "UberEats", "Chipotle App"] },
+                { name: "Sweetgreen", type: "Salads/Bowls", phone: "", apps: ["DoorDash", "Sweetgreen App"] },
+                { name: "CAVA", type: "Mediterranean", phone: "", apps: ["DoorDash", "UberEats", "CAVA App"] },
+                { name: "Chick-fil-A", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats", "CFA App"] },
+                { name: "Panera Bread", type: "Bakery/Soup/Salad", phone: "", apps: ["DoorDash", "Panera App"] },
+                { name: "Wawa", type: "Sandwiches/Convenience", phone: "", apps: ["DoorDash", "Wawa App"] }
             ]
         };
+
+        // --- Nearby Activities ---
+        const nearbyActivities = [
+            { name: "National Zoo", type: "Attraction", distance: "0.3 mi", address: "3001 Connecticut Ave NW", note: "FREE admission! Pandas, elephants, lions. Open 8am-5pm.", icon: "🐼", lat: 38.9296, lng: -77.0499 },
+            { name: "Rock Creek Park", type: "Nature", distance: "0.2 mi", address: "Beach Dr NW", note: "Beautiful walking trails, nature center. Great for a morning walk.", icon: "🌳", lat: 38.9400, lng: -77.0500 },
+            { name: "Adams Morgan", type: "Neighborhood", distance: "0.5 mi", address: "18th St NW", note: "Vibrant neighborhood with shops, murals, and diverse restaurants.", icon: "🎨", lat: 38.9215, lng: -77.0425 },
+            { name: "Smithsonian Museums", type: "Museums", distance: "2.5 mi", address: "National Mall", note: "All FREE! Natural History, Air & Space, American History. Metro accessible.", icon: "🏛️", lat: 38.8881, lng: -77.0260 },
+            { name: "Georgetown", type: "Shopping", distance: "2 mi", address: "M Street NW", note: "Upscale shopping, waterfront, Georgetown Cupcake!", icon: "🛍️", lat: 38.9055, lng: -77.0639 },
+            { name: "DC Monuments", type: "Landmarks", distance: "3 mi", address: "National Mall", note: "Lincoln Memorial, Washington Monument, WWII Memorial. Best at sunset!", icon: "🏛️", lat: 38.8893, lng: -77.0502 },
+            { name: "Dupont Circle", type: "Neighborhood", distance: "1.2 mi", address: "Dupont Circle", note: "Historic neighborhood, bookshops, Sunday farmers market.", icon: "🌸", lat: 38.9096, lng: -77.0434 },
+            { name: "National Cathedral", type: "Landmark", distance: "1 mi", address: "3101 Wisconsin Ave NW", note: "Stunning Gothic cathedral with gardens. Tower tours available.", icon: "⛪", lat: 38.9306, lng: -77.0707 }
+        ];
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             renderClock();
             renderTabs();
-            renderChart(); // Initial chart render
-            
-            // Set initial tab content (Dashboard view is mostly static, let's load Friday by default or create a 'Summary' tab. 
-            // Given the design, we will just load Friday first.)
-            switchTab('friday'); 
-            
-            setInterval(renderClock, 60000); // Update clock every minute
+            switchTab('schedule');
+            setInterval(renderClock, 60000);
         });
 
         // --- Functions ---
-
         function renderClock() {
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             document.getElementById('clock').textContent = timeString;
         }
 
-        function renderChart() {
-            const ctx = document.getElementById('weekendChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Moms Walk', 'Chill Zone', 'Competition', 'Sleep/Other'],
-                    datasets: [{
-                        data: [4, 4, 5, 11], // Hours breakdown (updated for 9am wake)
-                        backgroundColor: [
-                            '#fb7185', // Rose 400 (Walk)
-                            '#94a3b8', // Slate 400 (Chill)
-                            '#fda4af', // Rose 300 (Comp)
-                            '#e2e8f0'  // Slate 200 (Other)
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: {
-                                    family: "'Outfit', sans-serif",
-                                    size: 11
-                                },
-                                boxWidth: 10,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.raw + ' hrs';
-                                }
-                            }
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
-        }
-
         function renderTabs() {
             const tabs = [
-                { id: 'friday', label: 'Fri Night' },
-                { id: 'saturdayAM', label: 'Sat AM' },
-                { id: 'saturdayPM', label: 'Sat PM' },
-                { id: 'saturdayEve', label: 'Sat Eve' },
-                { id: 'danceOrder', label: '🎭 Dance Order' },
-                { id: 'quickRef', label: '📍 Quick Ref' }
+                { id: 'schedule', label: '📅 Schedule' },
+                { id: 'dances', label: '🎭 Dance Order' },
+                { id: 'food', label: '🍽️ Places to Eat' },
+                { id: 'activities', label: '🗺️ Things to Do' }
             ];
-            
+
             const nav = document.getElementById('nav-container');
-            nav.innerHTML = ''; // Clear
+            nav.innerHTML = '';
 
             tabs.forEach(tab => {
                 const btn = document.createElement('button');
-                btn.className = `flex-shrink-0 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${state.currentTab === tab.id ? 'border-rose-400 text-rose-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`;
+                btn.className = `tab-btn flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg ${state.currentTab === tab.id ? 'active' : 'bg-white/20 text-white hover:bg-white/30'}`;
                 btn.textContent = tab.label;
                 btn.onclick = () => switchTab(tab.id);
                 nav.appendChild(btn);
@@ -352,320 +261,178 @@
 
         function switchTab(tabId) {
             state.currentTab = tabId;
-            renderTabs(); // Re-render to update active style
+            renderTabs();
 
             const container = document.getElementById('content-container');
-            const intro = document.getElementById('intro-section');
 
-            // Hide intro on non-timeline tabs to save space
-            if (tabId === 'quickRef' || tabId === 'danceOrder') {
-                intro.style.display = 'none';
-            } else {
-                intro.style.display = 'block';
-            }
-
-            // Logic to render content based on tab
-            if (tabId === 'quickRef') {
-                renderQuickRef(container);
-            } else if (tabId === 'danceOrder') {
-                renderDanceOrder(container);
-            } else {
-                renderTimeline(container, itineraryData[tabId], tabId);
+            switch(tabId) {
+                case 'schedule':
+                    renderSchedule(container);
+                    break;
+                case 'dances':
+                    renderDanceOrder(container);
+                    break;
+                case 'food':
+                    renderFood(container);
+                    break;
+                case 'activities':
+                    renderActivities(container);
+                    break;
             }
         }
 
-        function renderTimeline(container, data, tabId) {
+        // --- Generate Google Calendar Link ---
+        function generateCalendarLink(title, date, startTime, endTime, location) {
+            // Parse date and times for Google Calendar format
+            const dateStr = date.replace(/[^0-9]/g, '');
+            const start = startTime.replace(/[^0-9APMapm]/g, '');
+            const end = endTime ? endTime.replace(/[^0-9APMapm]/g, '') : '';
+
+            // For simplicity, create a basic Google Calendar link
+            const eventTitle = encodeURIComponent(`Deviate DC: ${title}`);
+            const eventLocation = encodeURIComponent(location || eventInfo.venueAddress);
+            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) DC 2026`);
+
+            // Construct dates (simplified - would need proper date parsing in production)
+            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            return `${baseUrl}&text=${eventTitle}&location=${eventLocation}&details=${details}`;
+        }
+
+        // --- Render Schedule ---
+        function renderSchedule(container) {
             let html = `
-                <div class="animate-fade-in space-y-4">
-                    <div class="mb-4">
-                        <h2 class="text-xl font-bold text-slate-800">${data.title}</h2>
-                        <p class="text-sm text-slate-500 mt-1">${data.desc}</p>
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
+                        <h2 class="text-xl font-bold text-violet-800 mb-2">Convention Schedule</h2>
+                        <p class="text-sm text-slate-600">
+                            <strong>Venue:</strong> ${eventInfo.venue}<br>
+                            <strong>Address:</strong> ${eventInfo.venueAddress}
+                        </p>
                     </div>
-                    <div class="space-y-3">
+
+                    <!-- Age Filter -->
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-sm text-slate-500 self-center">Filter by age:</span>
+                        <button onclick="filterAge('all')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'all' ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-600'}">All</button>
+                        <button onclick="filterAge('junior')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'junior' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-700'}">Junior</button>
+                        <button onclick="filterAge('preteen')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'preteen' ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-700'}">PreTeen</button>
+                        <button onclick="filterAge('teen')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'teen' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-700'}">Teen</button>
+                        <button onclick="filterAge('senior')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'senior' ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700'}">Senior</button>
+                    </div>
             `;
 
-            data.events.forEach(event => {
+            // Render each day
+            Object.entries(conventionSchedule).forEach(([dayKey, day]) => {
                 html += `
-                    <div class="glass-card rounded-lg p-4 flex items-start space-x-4 hover:bg-white transition-colors">
-                        <div class="flex-shrink-0 w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-xl">
-                            ${event.icon}
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="bg-violet-600 text-white px-4 py-3 flex justify-between items-center">
+                            <h3 class="font-bold">${day.date}</h3>
+                            ${day.classes.length > 0 ? `<button onclick="addAllToCalendar('${dayKey}')" class="cal-btn text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full">+ Add All to Calendar</button>` : ''}
                         </div>
-                        <div>
-                            <span class="block text-xs font-bold text-rose-500 uppercase tracking-wide">${event.time}</span>
-                            <h3 class="text-base font-bold text-slate-700">${event.title}</h3>
-                            <p class="text-sm text-slate-500 mt-1">${event.details}</p>
-                        </div>
-                    </div>
+                        ${day.note ? `<div class="bg-violet-50 px-4 py-2 text-sm text-violet-700">${day.note}</div>` : ''}
+                        <div class="divide-y divide-slate-100">
                 `;
-            });
 
-            html += `</div>`;
+                if (day.classes.length === 0) {
+                    html += `<div class="p-4 text-center text-slate-400">No classes scheduled</div>`;
+                } else {
+                    day.classes.forEach((cls, idx) => {
+                        const showClass = state.ageFilter === 'all' || cls.ages.includes(state.ageFilter) || cls.ages.includes('all');
+                        if (!showClass) return;
 
-            // Special Injection for Saturday AM: Walking Map & Lunch Picker
-            if (tabId === 'saturdayAM') {
-                html += renderWalkingMap();
-                html += renderLunchPicker();
-            }
+                        const ageLabels = cls.ages.filter(a => a !== 'all').map(a => {
+                            const colors = {
+                                junior: 'division-junior',
+                                preteen: 'division-preteen',
+                                teen: 'division-teen',
+                                senior: 'division-senior'
+                            };
+                            return `<span class="text-xs px-2 py-0.5 rounded ${colors[a] || 'bg-slate-100'}">${a.charAt(0).toUpperCase() + a.slice(1)}</span>`;
+                        }).join(' ');
 
-            // Special Injection for Saturday PM: Chill Zone Checklist
-            if (tabId === 'saturdayPM') {
-                html += renderChillZone();
-            }
-
-            html += `</div>`;
-            container.innerHTML = html;
-
-            // Re-attach event listeners for dynamic elements
-            if (tabId === 'saturdayAM') {
-                setupLunchListeners();
-                initWalkingMap();
-            }
-        }
-
-        // --- Sub-Component: Walking Map ---
-        function renderWalkingMap() {
-            return `
-                <div class="mt-8 pt-6 border-t border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">🗺️ Interactive Walking Map</h3>
-                    <p class="text-sm text-slate-500 mb-4">Tap markers to see stop details. Follow the numbered route!</p>
-                    <div id="walking-map" class="w-full h-64 rounded-xl border border-slate-200 overflow-hidden"></div>
-                    <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-                        ${walkingStops.map(stop => `
-                            <div class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-slate-100">
-                                <span class="text-lg">${stop.icon}</span>
-                                <span class="text-slate-600"><strong>${stop.order}.</strong> ${stop.name}</span>
+                        html += `
+                            <div class="p-4 flex justify-between items-center hover:bg-slate-50">
+                                <div class="flex-grow">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-mono text-sm text-violet-600 font-semibold">${cls.time}</span>
+                                        ${ageLabels}
+                                    </div>
+                                    <div class="font-medium text-slate-800 mt-1">${cls.name}</div>
+                                    ${cls.room ? `<div class="text-xs text-slate-400">${cls.room}</div>` : ''}
+                                </div>
+                                <button onclick="addToCalendar('${cls.name}', '${cls.time}')" class="cal-btn text-violet-600 hover:text-violet-800 text-sm flex items-center gap-1">
+                                    <span>+</span>
+                                    <span class="hidden sm:inline">Calendar</span>
+                                </button>
                             </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
+                        `;
+                    });
+                }
 
-        let walkingMapInstance = null;
-
-        function initWalkingMap() {
-            // Destroy previous map instance if exists
-            if (walkingMapInstance) {
-                walkingMapInstance.remove();
-                walkingMapInstance = null;
-            }
-
-            const mapContainer = document.getElementById('walking-map');
-            if (!mapContainer) return;
-
-            // Initialize map centered on Midtown Manhattan
-            walkingMapInstance = L.map('walking-map').setView([40.7560, -73.9820], 15);
-
-            // Add tile layer (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(walkingMapInstance);
-
-            // Custom numbered icon
-            function createNumberedIcon(number, emoji) {
-                return L.divIcon({
-                    className: 'custom-marker',
-                    html: `<div style="background: linear-gradient(135deg, #fb7185, #f43f5e); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;">${number}</div>`,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16],
-                    popupAnchor: [0, -16]
-                });
-            }
-
-            // Add markers for each stop
-            const markers = [];
-            walkingStops.forEach(stop => {
-                const marker = L.marker([stop.lat, stop.lng], {
-                    icon: createNumberedIcon(stop.order, stop.icon)
-                }).addTo(walkingMapInstance);
-
-                marker.bindPopup(`
-                    <div style="text-align: center; font-family: 'Outfit', sans-serif;">
-                        <div style="font-size: 24px;">${stop.icon}</div>
-                        <div style="font-weight: bold; margin-top: 4px;">${stop.name}</div>
-                        <div style="color: #64748b; font-size: 12px;">Stop #${stop.order}</div>
-                    </div>
-                `);
-                markers.push([stop.lat, stop.lng]);
+                html += `</div></div>`;
             });
 
-            // Draw walking route line
-            const routeLine = L.polyline(markers, {
-                color: '#fb7185',
-                weight: 3,
-                opacity: 0.7,
-                dashArray: '10, 10'
-            }).addTo(walkingMapInstance);
-
-            // Fit map to show all markers
-            walkingMapInstance.fitBounds(routeLine.getBounds().pad(0.1));
-        }
-
-        // --- Sub-Component: Lunch Picker ---
-        function renderLunchPicker() {
-            return `
-                <div class="mt-8 pt-6 border-t border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">🥗 Lunch Finder</h3>
-                    <p class="text-sm text-slate-500 mb-4">Quickly filter options for each girl.</p>
-                    
-                    <div class="flex space-x-2 mb-4">
-                        <button id="btn-all" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600'}">All</button>
-                        <button id="btn-talia" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'talia' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}">🥗 Talia</button>
-                        <button id="btn-carly" class="flex-1 py-2 px-3 text-sm rounded-lg ${state.lunchFilter === 'carly' ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700'}">🍝 Carly</button>
-                    </div>
-
-                    <div id="lunch-list" class="grid grid-cols-1 gap-2">
-                        <!-- Items populated via JS -->
-                    </div>
-                </div>
-            `;
-        }
-
-        function setupLunchListeners() {
-            document.getElementById('btn-all').onclick = () => filterLunch('all');
-            document.getElementById('btn-talia').onclick = () => filterLunch('talia');
-            document.getElementById('btn-carly').onclick = () => filterLunch('carly');
-            updateLunchList();
-        }
-
-        function filterLunch(filter) {
-            state.lunchFilter = filter;
-            // Update button styles (simple toggle logic re-render for simplicity in this SPA)
-            const btns = ['all', 'talia', 'carly'];
-            // Re-render whole section would be cleaner in React, but here we just call switchTab again or manually toggle classes. 
-            // Let's manually toggle classes for efficiency.
-            document.getElementById('btn-all').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600'}`;
-            document.getElementById('btn-talia').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'talia' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'}`;
-            document.getElementById('btn-carly').className = `flex-1 py-2 px-3 text-sm rounded-lg ${filter === 'carly' ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700'}`;
-            
-            updateLunchList();
-        }
-
-        function updateLunchList() {
-            const list = document.getElementById('lunch-list');
-            list.innerHTML = '';
-            
-            const filtered = lunchOptions.filter(item => {
-                if (state.lunchFilter === 'all') return true;
-                return item.for.toLowerCase() === state.lunchFilter;
-            });
-
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="text-sm text-slate-400 text-center py-2">No options found.</div>';
-                return;
-            }
-
-            filtered.forEach(item => {
-                const el = document.createElement('div');
-                el.className = "bg-white border border-slate-200 p-3 rounded-lg flex justify-between items-center";
-                el.innerHTML = `
-                    <div>
-                        <div class="font-bold text-slate-700">${item.name}</div>
-                        <div class="text-xs text-slate-500">${item.type} • ${item.loc}</div>
-                    </div>
-                    <span class="text-xs font-semibold px-2 py-1 rounded ${item.for === 'Talia' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}">${item.for}</span>
-                `;
-                list.appendChild(el);
-            });
-        }
-
-        // --- Sub-Component: Chill Zone ---
-        function renderChillZone() {
-            // Checklists
-            const items = [
-                "Card Games (Uno, Phase 10)",
-                "Face Masks / Polish",
-                "Popcorn & Pretzels",
-                "Fruit & Veggies",
-                "Electrolytes (Liquid IV)"
-            ];
-
-            let html = `
-                <div class="mt-8 pt-6 border-t border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">🎒 Packing & Prep Checklist</h3>
-                    <div class="space-y-2">
-            `;
-
-            items.forEach((item, idx) => {
-                html += `
-                    <label class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-slate-200 cursor-pointer select-none">
-                        <input type="checkbox" class="form-checkbox h-5 w-5 text-rose-500 rounded border-slate-300 focus:ring-rose-500" onclick="this.parentElement.classList.toggle('opacity-50')">
-                        <span class="text-sm text-slate-700">${item}</span>
-                    </label>
-                `;
-            });
-
-            html += `</div></div>`;
-            return html;
-        }
-
-        // --- Component: Quick Ref ---
-        function renderQuickRef(container) {
-            let html = `
-                <div class="animate-fade-in">
-                    <div class="mb-4">
-                        <h2 class="text-xl font-bold text-slate-800">📍 Addresses</h2>
-                        <p class="text-sm text-slate-500">Tap address to copy to clipboard (simulated).</p>
-                    </div>
-                    <div class="grid grid-cols-1 gap-3">
-            `;
-
-            addresses.forEach(addr => {
-                html += `
-                    <div class="glass-card p-4 rounded-lg flex items-center justify-between">
-                        <div>
-                            <h4 class="font-bold text-slate-700">${addr.name}</h4>
-                            <p class="text-sm text-slate-500">${addr.addr}</p>
-                        </div>
-                        <button onclick="alert('Address copied: ${addr.addr}')" class="text-rose-500 bg-rose-50 p-2 rounded-full hover:bg-rose-100 transition">
-                            <span class="text-xl">📋</span>
-                        </button>
-                    </div>
-                `;
-            });
-
-            html += `</div></div>`;
+            html += `</div>`;
             container.innerHTML = html;
         }
 
-        // --- Component: Dance Order ---
+        function filterAge(age) {
+            state.ageFilter = age;
+            renderSchedule(document.getElementById('content-container'));
+        }
+
+        function addToCalendar(title, time) {
+            const link = generateCalendarLink(title, '2026-02-13', time, '', eventInfo.venueAddress);
+            window.open(link, '_blank');
+        }
+
+        function addAllToCalendar(dayKey) {
+            alert(`Opening calendar to add all ${conventionSchedule[dayKey].date} classes...`);
+            // In production, this would create a batch calendar add
+        }
+
+        // --- Render Dance Order ---
         function renderDanceOrder(container) {
             let html = `
-                <div class="animate-fade-in">
-                    <div class="mb-6">
-                        <h2 class="text-xl font-bold text-slate-800">🎭 Dance Order & Times</h2>
-                        <p class="text-sm text-slate-500">Complete competition schedule for both days</p>
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
+                        <h2 class="text-xl font-bold text-violet-800 mb-2">Competition Dance Order</h2>
+                        <p class="text-sm text-slate-600">Friday, February 13, 2026 - Performance Schedule</p>
                     </div>
 
-                    <!-- Friday Section -->
-                    <div class="mb-8">
-                        <h3 class="text-lg font-bold text-rose-600 mb-3 flex items-center">
-                            <span class="bg-rose-100 px-3 py-1 rounded-full">Friday 1/30/2026</span>
-                        </h3>
+                    <div class="glass-card rounded-xl overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead class="bg-slate-100">
                                     <tr>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">#</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Dance</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Style</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Type</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Time</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">#</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Time</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Routine</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Dancer</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Division</th>
+                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
             `;
 
-            danceOrder.friday.forEach(dance => {
-                const rowClass = dance.highlight ? 'bg-yellow-50 border-l-4 border-yellow-400' : 'bg-white';
-                const nameDisplay = dance.dancer ? `${dance.name} - <span class="font-semibold">${dance.dancer}</span>` : dance.name;
+            danceOrder.forEach(dance => {
+                const isAwards = dance.isAwards;
+                const rowClass = isAwards
+                    ? 'bg-violet-100 font-semibold'
+                    : dance.dancer ? 'bg-white hover:bg-slate-50' : 'bg-slate-50 hover:bg-slate-100';
+
+                const divisionClass = dance.division ? `division-${dance.division.toLowerCase().replace('/', '-')}` : '';
+                const typeClass = dance.type ? `type-${dance.type.toLowerCase()}` : '';
+
                 html += `
                     <tr class="${rowClass} border-b border-slate-100">
-                        <td class="px-2 py-3 text-slate-500">${dance.order}</td>
-                        <td class="px-2 py-3 text-slate-800">${nameDisplay}</td>
-                        <td class="px-2 py-3 text-slate-600">${dance.style}</td>
-                        <td class="px-2 py-3"><span class="text-xs px-2 py-1 rounded-full ${dance.type === 'Solo' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}">${dance.type}</span></td>
-                        <td class="px-2 py-3 text-slate-600 font-mono text-xs">${dance.start}</td>
+                        <td class="px-3 py-3 text-slate-500 font-mono">${dance.num || '-'}</td>
+                        <td class="px-3 py-3 text-violet-600 font-mono font-semibold">${dance.time}</td>
+                        <td class="px-3 py-3 text-slate-800 font-medium">${dance.name}</td>
+                        <td class="px-3 py-3 ${dance.dancer ? 'text-slate-800 font-semibold' : 'text-slate-400'}">${dance.dancer || '-'}</td>
+                        <td class="px-3 py-3">${dance.division ? `<span class="text-xs px-2 py-1 rounded ${divisionClass}">${dance.division}</span>` : '-'}</td>
+                        <td class="px-3 py-3">${dance.type && !isAwards ? `<span class="text-xs px-2 py-1 rounded ${typeClass}">${dance.type}</span>` : isAwards ? '🏆' : '-'}</td>
                     </tr>
                 `;
             });
@@ -676,51 +443,228 @@
                         </div>
                     </div>
 
-                    <!-- Saturday Section -->
-                    <div>
-                        <h3 class="text-lg font-bold text-rose-600 mb-3 flex items-center">
-                            <span class="bg-rose-100 px-3 py-1 rounded-full">Saturday 1/31/2026</span>
-                        </h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-slate-100">
-                                    <tr>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">#</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Dance</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Style</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Type</th>
-                                        <th class="px-2 py-2 text-left text-xs font-semibold text-slate-600">Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-            `;
-
-            danceOrder.saturday.forEach(dance => {
-                const rowClass = dance.highlight ? 'bg-yellow-50 border-l-4 border-yellow-400' : 'bg-white';
-                const nameDisplay = dance.dancer ? `${dance.name} - <span class="font-semibold">${dance.dancer}</span>` : dance.name;
-                html += `
-                    <tr class="${rowClass} border-b border-slate-100">
-                        <td class="px-2 py-3 text-slate-500">${dance.order}</td>
-                        <td class="px-2 py-3 text-slate-800">${nameDisplay}</td>
-                        <td class="px-2 py-3 text-slate-600">${dance.style}</td>
-                        <td class="px-2 py-3"><span class="text-xs px-2 py-1 rounded-full ${dance.type === 'Solo' ? 'bg-rose-100 text-rose-700' : dance.type === 'Production' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${dance.type}</span></td>
-                        <td class="px-2 py-3 text-slate-600 font-mono text-xs">${dance.start}</td>
-                    </tr>
-                `;
-            });
-
-            html += `
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <p class="text-sm text-yellow-800"><strong>⭐ Highlighted:</strong> Talia & Carly's solos</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded division-junior"></span> Junior</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded division-preteen"></span> PreTeen</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded division-teen"></span> Teen</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded division-senior"></span> Senior</div>
                     </div>
                 </div>
             `;
             container.innerHTML = html;
+        }
+
+        // --- Render Food ---
+        function renderFood(container) {
+            let html = `
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
+                        <h2 class="text-xl font-bold text-violet-800 mb-2">Places to Eat</h2>
+                        <p class="text-sm text-slate-600">Near ${eventInfo.venue}</p>
+                    </div>
+
+                    <!-- Map -->
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="p-3 bg-slate-50 border-b border-slate-200">
+                            <h3 class="font-semibold text-slate-700">📍 Area Map</h3>
+                        </div>
+                        <div id="food-map" class="h-64 w-full"></div>
+                    </div>
+
+                    <!-- Walkable Restaurants -->
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="p-4 bg-green-50 border-b border-green-100">
+                            <h3 class="font-bold text-green-800">🚶 Walking Distance</h3>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+            `;
+
+            placesToEat.walkable.forEach(place => {
+                html += `
+                    <div class="p-4 hover:bg-slate-50">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-semibold text-slate-800">${place.name}</div>
+                                <div class="text-sm text-slate-500">${place.type} • ${place.price}</div>
+                                <div class="text-xs text-slate-400 mt-1">${place.address}</div>
+                                ${place.note ? `<div class="text-xs text-green-600 mt-1">${place.note}</div>` : ''}
+                            </div>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${place.distance}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+                    </div>
+
+                    <!-- Delivery Options -->
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="p-4 bg-orange-50 border-b border-orange-100">
+                            <h3 class="font-bold text-orange-800">🚗 Delivery Options</h3>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+            `;
+
+            placesToEat.delivery.forEach(place => {
+                html += `
+                    <div class="p-4 hover:bg-slate-50">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-semibold text-slate-800">${place.name}</div>
+                                <div class="text-sm text-slate-500">${place.type}</div>
+                            </div>
+                            <div class="flex flex-wrap gap-1 justify-end">
+                                ${place.apps.map(app => `<span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">${app}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+            initFoodMap();
+        }
+
+        let foodMapInstance = null;
+
+        function initFoodMap() {
+            if (foodMapInstance) {
+                foodMapInstance.remove();
+                foodMapInstance = null;
+            }
+
+            const mapContainer = document.getElementById('food-map');
+            if (!mapContainer) return;
+
+            foodMapInstance = L.map('food-map').setView([eventInfo.venueLat, eventInfo.venueLng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(foodMapInstance);
+
+            // Hotel marker
+            const hotelIcon = L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="background: #7c3aed; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 3px solid white;">🏨</div>`,
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
+            });
+
+            L.marker([eventInfo.venueLat, eventInfo.venueLng], { icon: hotelIcon })
+                .addTo(foodMapInstance)
+                .bindPopup(`<strong>${eventInfo.venue}</strong><br>${eventInfo.venueAddress}`);
+
+            // Restaurant markers
+            placesToEat.walkable.forEach(place => {
+                const icon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background: #22c55e; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid white;">🍽️</div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                L.marker([place.lat, place.lng], { icon })
+                    .addTo(foodMapInstance)
+                    .bindPopup(`<strong>${place.name}</strong><br>${place.type} • ${place.price}<br><em>${place.distance}</em>`);
+            });
+        }
+
+        // --- Render Activities ---
+        function renderActivities(container) {
+            let html = `
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
+                        <h2 class="text-xl font-bold text-violet-800 mb-2">Things to Do Nearby</h2>
+                        <p class="text-sm text-slate-600">Walking distance activities and DC highlights</p>
+                    </div>
+
+                    <!-- Map -->
+                    <div class="glass-card rounded-xl overflow-hidden">
+                        <div class="p-3 bg-slate-50 border-b border-slate-200">
+                            <h3 class="font-semibold text-slate-700">📍 Attractions Map</h3>
+                        </div>
+                        <div id="activities-map" class="h-72 w-full"></div>
+                    </div>
+
+                    <!-- Activities List -->
+                    <div class="grid gap-4">
+            `;
+
+            nearbyActivities.forEach(activity => {
+                html += `
+                    <div class="glass-card rounded-xl p-4 hover:shadow-md transition-shadow">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl">${activity.icon}</div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800">${activity.name}</h4>
+                                        <div class="text-sm text-violet-600">${activity.type}</div>
+                                    </div>
+                                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${activity.distance}</span>
+                                </div>
+                                <p class="text-sm text-slate-600 mt-2">${activity.note}</p>
+                                <p class="text-xs text-slate-400 mt-1">${activity.address}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+            initActivitiesMap();
+        }
+
+        let activitiesMapInstance = null;
+
+        function initActivitiesMap() {
+            if (activitiesMapInstance) {
+                activitiesMapInstance.remove();
+                activitiesMapInstance = null;
+            }
+
+            const mapContainer = document.getElementById('activities-map');
+            if (!mapContainer) return;
+
+            activitiesMapInstance = L.map('activities-map').setView([eventInfo.venueLat, eventInfo.venueLng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(activitiesMapInstance);
+
+            // Hotel marker
+            const hotelIcon = L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="background: #7c3aed; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 3px solid white;">🏨</div>`,
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
+            });
+
+            L.marker([eventInfo.venueLat, eventInfo.venueLng], { icon: hotelIcon })
+                .addTo(activitiesMapInstance)
+                .bindPopup(`<strong>${eventInfo.venue}</strong><br>Home Base`);
+
+            // Activity markers
+            nearbyActivities.forEach(activity => {
+                const icon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background: #f59e0b; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid white;">${activity.icon}</div>`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                L.marker([activity.lat, activity.lng], { icon })
+                    .addTo(activitiesMapInstance)
+                    .bindPopup(`<strong>${activity.name}</strong><br>${activity.note}<br><em>${activity.distance} from hotel</em>`);
+            });
         }
 
     </script>
