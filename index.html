@@ -111,44 +111,103 @@
             venueLng: -77.4089
         };
 
-        // --- Convention Schedule ---
-        const conventionSchedule = {
-            thursday: {
-                date: "Thursday, Feb 12",
-                note: "Travel Day - Check-in",
-                classes: []
-            },
-            friday: {
-                date: "Friday, Feb 13",
-                classes: [
-                    { time: "8:00 AM - 9:30 AM", name: "Junior/PreTeen Technique", ages: ["junior", "preteen"], room: "Ballroom A" },
-                    { time: "9:45 AM - 11:15 AM", name: "Junior/PreTeen Jazz", ages: ["junior", "preteen"], room: "Ballroom A" },
-                    { time: "11:30 AM - 1:00 PM", name: "Junior/PreTeen Contemporary", ages: ["junior", "preteen"], room: "Ballroom A" },
-                    { time: "1:00 PM - 2:00 PM", name: "Lunch Break", ages: ["all"], room: "" },
-                    { time: "2:00 PM - 3:30 PM", name: "Teen/Senior Technique", ages: ["teen", "senior"], room: "Ballroom B" },
-                    { time: "3:45 PM - 5:15 PM", name: "Teen/Senior Jazz", ages: ["teen", "senior"], room: "Ballroom B" },
-                    { time: "5:30 PM - 7:00 PM", name: "Teen/Senior Contemporary", ages: ["teen", "senior"], room: "Ballroom B" }
+        // --- Convention Schedule by Age Group ---
+        const conventionByAgeGroup = {
+            teensSeniors: {
+                name: "Teens/Seniors",
+                ages: "Ages 13 & Up",
+                room: "Luray Ballroom",
+                color: "pink",
+                saturday: [
+                    { time: "7:15 AM", end: "7:45 AM", name: "Registration" },
+                    { time: "7:45 AM", end: "8:00 AM", name: "Welcome" },
+                    { time: "8:00 AM", end: "9:00 AM", name: "Musical Theatre" },
+                    { time: "9:05 AM", end: "10:05 AM", name: "Ballet" },
+                    { time: "10:10 AM", end: "11:10 AM", name: "Tap" },
+                    { time: "11:10 AM", end: "12:00 PM", name: "Lunch", isBreak: true },
+                    { time: "12:00 PM", end: "1:00 PM", name: "Hip Hop" },
+                    { time: "1:05 PM", end: "2:05 PM", name: "Lyrical" },
+                    { time: "2:30 PM", end: "6:30 PM", name: "Sr. Audition Lab (Ages 15 & Up)", note: "Ages 15+" },
+                    { time: "2:30 PM", end: "6:30 PM", name: "Teen Audition Lab (Ages 12-14)", note: "In Jr. Ballroom" },
+                    { time: "7:00 PM", end: "7:00 PM", name: "Standouts Announced", note: "In Sr. Ballroom" },
+                    { time: "7:00 PM", end: "8:00 PM", name: "Standout Rehearsal" }
+                ],
+                sunday: [
+                    { time: "7:30 AM", end: "9:30 AM", name: "Standout Rehearsal", note: "Sr. Ballroom" },
+                    { time: "9:35 AM", end: "10:35 AM", name: "Industry Class" },
+                    { time: "10:45 AM", end: "11:45 AM", name: "Jazz" },
+                    { time: "11:50 AM", end: "12:50 PM", name: "Contemporary" },
+                    { time: "12:50 PM", end: "1:50 PM", name: "Lunch", isBreak: true },
+                    { time: "1:50 PM", end: "3:10 PM", name: "Showcase Rehearsal" },
+                    { time: "3:15 PM", end: "3:15 PM", name: "Doors Open" },
+                    { time: "3:30 PM", end: "5:00 PM", name: "Showcase" }
                 ]
             },
-            saturday: {
-                date: "Saturday, Feb 14",
-                classes: [
-                    { time: "8:00 AM - 9:30 AM", name: "Junior/PreTeen Hip Hop", ages: ["junior", "preteen"], room: "Ballroom A" },
-                    { time: "9:45 AM - 11:15 AM", name: "Junior/PreTeen Lyrical", ages: ["junior", "preteen"], room: "Ballroom A" },
-                    { time: "11:30 AM - 1:00 PM", name: "All Ages Master Class", ages: ["all"], room: "Grand Ballroom" },
-                    { time: "1:00 PM - 2:00 PM", name: "Lunch Break", ages: ["all"], room: "" },
-                    { time: "2:00 PM - 3:30 PM", name: "Teen/Senior Hip Hop", ages: ["teen", "senior"], room: "Ballroom B" },
-                    { time: "3:45 PM - 5:15 PM", name: "Teen/Senior Lyrical", ages: ["teen", "senior"], room: "Ballroom B" },
-                    { time: "6:00 PM", name: "Competition Begins", ages: ["all"], room: "Main Stage" }
+            juniors: {
+                name: "Juniors",
+                ages: "Ages 9-12",
+                room: "Cirrus Ballroom",
+                color: "yellow",
+                saturday: [
+                    { time: "7:15 AM", end: "7:45 AM", name: "Registration" },
+                    { time: "7:45 AM", end: "8:00 AM", name: "Welcome", note: "In Sr. Ballroom" },
+                    { time: "8:00 AM", end: "9:00 AM", name: "Hip Hop" },
+                    { time: "9:05 AM", end: "10:05 AM", name: "Lyrical" },
+                    { time: "10:10 AM", end: "11:10 AM", name: "Ballet" },
+                    { time: "11:10 AM", end: "12:00 PM", name: "Lunch", isBreak: true },
+                    { time: "12:00 PM", end: "1:00 PM", name: "Jazz" },
+                    { time: "1:05 PM", end: "2:05 PM", name: "Contemporary" },
+                    { time: "2:30 PM", end: "6:30 PM", name: "Teen Audition Lab (Ages 12-14)", note: "In Jr. Ballroom" },
+                    { time: "7:00 PM", end: "7:00 PM", name: "Standouts Announced", note: "In Sr. Ballroom" },
+                    { time: "7:00 PM", end: "8:00 PM", name: "Standout Rehearsal", note: "Teens/Seniors - Sr. Ballroom" }
+                ],
+                sunday: [
+                    { time: "7:30 AM", end: "9:30 AM", name: "Standout Rehearsal", note: "Teens/Seniors - Sr. Ballroom" },
+                    { time: "8:00 AM", end: "10:30 AM", name: "Junior Audition Lab (Ages 9-11)", note: "In Jr. Ballroom" },
+                    { time: "10:45 AM", end: "11:45 AM", name: "Tap" },
+                    { time: "11:50 AM", end: "12:50 PM", name: "Musical Theatre" },
+                    { time: "12:50 PM", end: "1:50 PM", name: "Lunch", isBreak: true },
+                    { time: "1:50 PM", end: "3:10 PM", name: "Showcase Rehearsal" },
+                    { time: "3:15 PM", end: "3:15 PM", name: "Doors Open" },
+                    { time: "3:30 PM", end: "5:00 PM", name: "Showcase", note: "Sr. Ballroom" }
                 ]
             },
-            sunday: {
-                date: "Sunday, Feb 15",
-                classes: [
-                    { time: "9:00 AM - 10:30 AM", name: "All Ages Improv Workshop", ages: ["all"], room: "Ballroom A" },
-                    { time: "11:00 AM - 12:30 PM", name: "Choreography Intensive", ages: ["teen", "senior"], room: "Ballroom B" },
-                    { time: "1:00 PM", name: "Awards Ceremony", ages: ["all"], room: "Grand Ballroom" },
-                    { time: "3:00 PM", name: "Departure", ages: ["all"], room: "" }
+            minis: {
+                name: "Minis",
+                ages: "Ages 6-8",
+                room: "Layton",
+                color: "blue",
+                saturday: [
+                    { time: "7:15 AM", end: "7:45 AM", name: "Registration" },
+                    { time: "7:45 AM", end: "8:00 AM", name: "Welcome", note: "In Sr. Ballroom" },
+                    { time: "8:00 AM", end: "9:00 AM", name: "Jazz" },
+                    { time: "9:05 AM", end: "10:05 AM", name: "Musical Theatre" },
+                    { time: "10:10 AM", end: "11:10 AM", name: "Contemporary" },
+                    { time: "11:10 AM", end: "12:00 PM", name: "Lunch", isBreak: true },
+                    { time: "12:00 PM", end: "1:00 PM", name: "Mini Mania" }
+                ],
+                sunday: [
+                    { time: "9:30 AM", end: "10:30 AM", name: "Mini Mania" },
+                    { time: "10:45 AM", end: "11:45 AM", name: "Lyrical" },
+                    { time: "11:50 AM", end: "12:50 PM", name: "Hip Hop" },
+                    { time: "12:50 PM", end: "1:50 PM", name: "Lunch", isBreak: true },
+                    { time: "1:50 PM", end: "3:10 PM", name: "Showcase Rehearsal" },
+                    { time: "3:15 PM", end: "3:15 PM", name: "Doors Open" },
+                    { time: "3:30 PM", end: "5:00 PM", name: "Showcase", note: "Sr. Ballroom" }
+                ]
+            },
+            parents: {
+                name: "Teachers & Parents",
+                ages: "",
+                room: "Rockbridge Ballroom",
+                color: "green",
+                saturday: [
+                    { time: "8:00 AM", end: "1:00 PM", name: "Studio Director/Teacher Feedback Sessions", note: "*Sign Up On Site*" },
+                    { time: "1:05 PM", end: "2:05 PM", name: "Parent Teacher Jazz Class" }
+                ],
+                sunday: [
+                    { time: "8:30 AM", end: "9:30 AM", name: "Parent Teacher Theatre Jazz Class" },
+                    { time: "9:35 AM", end: "12:50 PM", name: "Studio Director/Teacher Feedback Sessions", note: "*Sign Up On Site*" }
                 ]
             }
         };
@@ -283,24 +342,80 @@
         }
 
         // --- Generate Google Calendar Link ---
-        function generateCalendarLink(title, date, startTime, endTime, location) {
-            // Parse date and times for Google Calendar format
-            const dateStr = date.replace(/[^0-9]/g, '');
-            const start = startTime.replace(/[^0-9APMapm]/g, '');
-            const end = endTime ? endTime.replace(/[^0-9APMapm]/g, '') : '';
+        function parseTime(timeStr) {
+            // Parse time like "7:15 AM" to { hour: 7, minute: 15 }
+            const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i);
+            if (!match) return null;
+            let hour = parseInt(match[1]);
+            const minute = parseInt(match[2] || '0');
+            const period = match[3]?.toUpperCase();
 
-            // For simplicity, create a basic Google Calendar link
-            const eventTitle = encodeURIComponent(`Deviate DC: ${title}`);
-            const eventLocation = encodeURIComponent(location || eventInfo.venueAddress);
-            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) DC 2026`);
+            if (period === 'PM' && hour !== 12) hour += 12;
+            if (period === 'AM' && hour === 12) hour = 0;
 
-            // Construct dates (simplified - would need proper date parsing in production)
+            return { hour, minute };
+        }
+
+        function formatGoogleCalendarDate(date, time) {
+            const t = parseTime(time);
+            if (!t) return '';
+            const d = new Date(date);
+            d.setHours(t.hour, t.minute, 0, 0);
+            return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+        }
+
+        function generateCalendarLink(title, dateStr, startTime, endTime, location, room) {
+            const eventTitle = encodeURIComponent(`Deviate: ${title}`);
+            const eventLocation = encodeURIComponent(location || `${room ? room + ', ' : ''}${eventInfo.venue}, ${eventInfo.venueAddress}`);
+            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) 2026\n${room || ''}`);
+
+            const startDate = formatGoogleCalendarDate(dateStr, startTime);
+            const endDate = formatGoogleCalendarDate(dateStr, endTime || startTime);
+
             const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-            return `${baseUrl}&text=${eventTitle}&location=${eventLocation}&details=${details}`;
+            return `${baseUrl}&text=${eventTitle}&dates=${startDate}/${endDate}&location=${eventLocation}&details=${details}`;
+        }
+
+        function generateAllEventsCalendarLink(groupKey) {
+            const group = conventionByAgeGroup[groupKey];
+            if (!group) return '#';
+
+            // Create a summary event for the whole weekend
+            const title = `Deviate Convention - ${group.name} ${group.ages}`;
+            const location = `${group.room}, ${eventInfo.venue}`;
+
+            // Saturday all-day event
+            const satStart = formatGoogleCalendarDate('2026-02-14', group.saturday[0]?.time || '7:15 AM');
+            const satEnd = formatGoogleCalendarDate('2026-02-14', group.saturday[group.saturday.length - 1]?.end || '8:00 PM');
+
+            const eventTitle = encodeURIComponent(title);
+            const eventLocation = encodeURIComponent(`${group.room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`);
+
+            // Build details with full schedule
+            let scheduleText = `SATURDAY (Feb 14):\\n`;
+            group.saturday.forEach(cls => {
+                scheduleText += `${cls.time} - ${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}\\n`;
+            });
+            scheduleText += `\\nSUNDAY (Feb 15):\\n`;
+            group.sunday.forEach(cls => {
+                scheduleText += `${cls.time} - ${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}\\n`;
+            });
+
+            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) 2026\nRoom: ${group.room}\n\n${scheduleText.replace(/\\n/g, '\n')}`);
+
+            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+            return `${baseUrl}&text=${eventTitle}&dates=${satStart}/${satEnd}&location=${eventLocation}&details=${details}`;
         }
 
         // --- Render Schedule ---
         function renderSchedule(container) {
+            const colorMap = {
+                pink: { bg: 'bg-pink-500', light: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-700' },
+                yellow: { bg: 'bg-yellow-500', light: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700' },
+                blue: { bg: 'bg-blue-500', light: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
+                green: { bg: 'bg-green-500', light: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' }
+            };
+
             let html = `
                 <div class="space-y-6">
                     <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
@@ -309,87 +424,107 @@
                             <strong>Venue:</strong> ${eventInfo.venue}<br>
                             <strong>Address:</strong> ${eventInfo.venueAddress}
                         </p>
+                        <p class="text-xs text-slate-500 mt-2">Saturday Feb 14 & Sunday Feb 15, 2026</p>
                     </div>
 
-                    <!-- Age Filter -->
-                    <div class="flex flex-wrap gap-2">
-                        <span class="text-sm text-slate-500 self-center">Filter by age:</span>
-                        <button onclick="filterAge('all')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'all' ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-600'}">All</button>
-                        <button onclick="filterAge('junior')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'junior' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-700'}">Junior</button>
-                        <button onclick="filterAge('preteen')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'preteen' ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-700'}">PreTeen</button>
-                        <button onclick="filterAge('teen')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'teen' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-700'}">Teen</button>
-                        <button onclick="filterAge('senior')" class="px-3 py-1 text-xs rounded-full ${state.ageFilter === 'senior' ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700'}">Senior</button>
+                    <!-- Add to Calendar Buttons by Age Group -->
+                    <div class="glass-card rounded-xl p-4">
+                        <h3 class="font-bold text-slate-800 mb-3">📅 Add Full Schedule to Google Calendar</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <a href="${generateAllEventsCalendarLink('teensSeniors')}" target="_blank"
+                               class="flex items-center justify-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                                <span>📆</span>
+                                <span>Teens/Seniors<br><span class="text-xs font-normal opacity-90">Ages 13 & Up</span></span>
+                            </a>
+                            <a href="${generateAllEventsCalendarLink('juniors')}" target="_blank"
+                               class="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                                <span>📆</span>
+                                <span>Juniors<br><span class="text-xs font-normal opacity-90">Ages 9-12</span></span>
+                            </a>
+                            <a href="${generateAllEventsCalendarLink('minis')}" target="_blank"
+                               class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                                <span>📆</span>
+                                <span>Minis<br><span class="text-xs font-normal opacity-90">Ages 6-8</span></span>
+                            </a>
+                        </div>
+                        <a href="${generateAllEventsCalendarLink('parents')}" target="_blank"
+                           class="mt-3 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm">
+                            <span>📆</span>
+                            <span>Teachers & Parents Schedule</span>
+                        </a>
                     </div>
             `;
 
-            // Render each day
-            Object.entries(conventionSchedule).forEach(([dayKey, day]) => {
+            // Render each age group
+            Object.entries(conventionByAgeGroup).forEach(([groupKey, group]) => {
+                const colors = colorMap[group.color] || colorMap.pink;
+
                 html += `
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <div class="bg-violet-600 text-white px-4 py-3 flex justify-between items-center">
-                            <h3 class="font-bold">${day.date}</h3>
-                            ${day.classes.length > 0 ? `<button onclick="addAllToCalendar('${dayKey}')" class="cal-btn text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full">+ Add All to Calendar</button>` : ''}
+                        <div class="${colors.bg} text-white px-4 py-3">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-lg">${group.name}</h3>
+                                    <p class="text-sm opacity-90">${group.ages}${group.ages ? ' • ' : ''}${group.room}</p>
+                                </div>
+                            </div>
                         </div>
-                        ${day.note ? `<div class="bg-violet-50 px-4 py-2 text-sm text-violet-700">${day.note}</div>` : ''}
+
+                        <!-- Saturday -->
+                        <div class="${colors.light} px-4 py-2 ${colors.border} border-b">
+                            <h4 class="font-semibold ${colors.text}">Saturday, Feb 14</h4>
+                        </div>
                         <div class="divide-y divide-slate-100">
                 `;
 
-                if (day.classes.length === 0) {
-                    html += `<div class="p-4 text-center text-slate-400">No classes scheduled</div>`;
-                } else {
-                    day.classes.forEach((cls, idx) => {
-                        const showClass = state.ageFilter === 'all' || cls.ages.includes(state.ageFilter) || cls.ages.includes('all');
-                        if (!showClass) return;
-
-                        const ageLabels = cls.ages.filter(a => a !== 'all').map(a => {
-                            const colors = {
-                                junior: 'division-junior',
-                                preteen: 'division-preteen',
-                                teen: 'division-teen',
-                                senior: 'division-senior'
-                            };
-                            return `<span class="text-xs px-2 py-0.5 rounded ${colors[a] || 'bg-slate-100'}">${a.charAt(0).toUpperCase() + a.slice(1)}</span>`;
-                        }).join(' ');
-
-                        html += `
-                            <div class="p-4 flex justify-between items-center hover:bg-slate-50">
-                                <div class="flex-grow">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="font-mono text-sm text-violet-600 font-semibold">${cls.time}</span>
-                                        ${ageLabels}
-                                    </div>
-                                    <div class="font-medium text-slate-800 mt-1">${cls.name}</div>
-                                    ${cls.room ? `<div class="text-xs text-slate-400">${cls.room}</div>` : ''}
+                group.saturday.forEach(cls => {
+                    const isBreak = cls.isBreak;
+                    html += `
+                        <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-sm ${colors.text} font-semibold">${cls.time}${cls.end && cls.end !== cls.time ? ' - ' + cls.end : ''}</span>
                                 </div>
-                                <button onclick="addToCalendar('${cls.name}', '${cls.time}')" class="cal-btn text-violet-600 hover:text-violet-800 text-sm flex items-center gap-1">
-                                    <span>+</span>
-                                    <span class="hidden sm:inline">Calendar</span>
-                                </button>
+                                <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
+                                ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
-                        `;
-                    });
-                }
+                        </div>
+                    `;
+                });
 
-                html += `</div></div>`;
+                html += `
+                        </div>
+
+                        <!-- Sunday -->
+                        <div class="${colors.light} px-4 py-2 ${colors.border} border-b border-t">
+                            <h4 class="font-semibold ${colors.text}">Sunday, Feb 15</h4>
+                        </div>
+                        <div class="divide-y divide-slate-100">
+                `;
+
+                group.sunday.forEach(cls => {
+                    const isBreak = cls.isBreak;
+                    html += `
+                        <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono text-sm ${colors.text} font-semibold">${cls.time}${cls.end && cls.end !== cls.time ? ' - ' + cls.end : ''}</span>
+                                </div>
+                                <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
+                                ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
             });
 
             html += `</div>`;
             container.innerHTML = html;
-        }
-
-        function filterAge(age) {
-            state.ageFilter = age;
-            renderSchedule(document.getElementById('content-container'));
-        }
-
-        function addToCalendar(title, time) {
-            const link = generateCalendarLink(title, '2026-02-13', time, '', eventInfo.venueAddress);
-            window.open(link, '_blank');
-        }
-
-        function addAllToCalendar(dayKey) {
-            alert(`Opening calendar to add all ${conventionSchedule[dayKey].date} classes...`);
-            // In production, this would create a batch calendar add
         }
 
         // --- Render Dance Order ---
