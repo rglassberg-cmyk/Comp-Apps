@@ -356,55 +356,90 @@
             return { hour, minute };
         }
 
-        function formatGoogleCalendarDate(date, time) {
-            const t = parseTime(time);
+        function formatICSDate(dateStr, timeStr) {
+            const t = parseTime(timeStr);
             if (!t) return '';
-            const d = new Date(date);
+            const d = new Date(dateStr);
             d.setHours(t.hour, t.minute, 0, 0);
-            return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+            // Format: YYYYMMDDTHHMMSS
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hours = String(d.getHours()).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            return `${year}${month}${day}T${hours}${minutes}00`;
         }
 
-        function generateCalendarLink(title, dateStr, startTime, endTime, location, room) {
-            const eventTitle = encodeURIComponent(`Deviate: ${title}`);
-            const eventLocation = encodeURIComponent(location || `${room ? room + ', ' : ''}${eventInfo.venue}, ${eventInfo.venueAddress}`);
-            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) 2026\n${room || ''}`);
-
-            const startDate = formatGoogleCalendarDate(dateStr, startTime);
-            const endDate = formatGoogleCalendarDate(dateStr, endTime || startTime);
-
-            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-            return `${baseUrl}&text=${eventTitle}&dates=${startDate}/${endDate}&location=${eventLocation}&details=${details}`;
+        function generateUID() {
+            return 'deviate-' + Math.random().toString(36).substr(2, 9) + '@tateacademy';
         }
 
-        function generateAllEventsCalendarLink(groupKey) {
+        function generateICSFile(groupKey) {
             const group = conventionByAgeGroup[groupKey];
-            if (!group) return '#';
+            if (!group) return;
 
-            // Create a summary event for the whole weekend
-            const title = `Deviate Convention - ${group.name} ${group.ages}`;
-            const location = `${group.room}, ${eventInfo.venue}`;
+            let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Tate Academy//Deviate DC 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Deviate - ${group.name}
+X-WR-TIMEZONE:America/New_York
+`;
 
-            // Saturday all-day event
-            const satStart = formatGoogleCalendarDate('2026-02-14', group.saturday[0]?.time || '7:15 AM');
-            const satEnd = formatGoogleCalendarDate('2026-02-14', group.saturday[group.saturday.length - 1]?.end || '8:00 PM');
+            const location = `${group.room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`;
 
-            const eventTitle = encodeURIComponent(title);
-            const eventLocation = encodeURIComponent(`${group.room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`);
-
-            // Build details with full schedule
-            let scheduleText = `SATURDAY (Feb 14):\\n`;
+            // Add Saturday events
             group.saturday.forEach(cls => {
-                scheduleText += `${cls.time} - ${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}\\n`;
+                if (cls.isBreak) return; // Skip lunch breaks
+
+                const startDate = formatICSDate('2026-02-14', cls.time);
+                const endDate = formatICSDate('2026-02-14', cls.end || cls.time);
+                const uid = generateUID();
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}
+LOCATION:${location}
+DESCRIPTION:Deviate Convention - ${group.name} ${group.ages}\\n${group.room}${cls.note ? '\\n' + cls.note : ''}
+STATUS:CONFIRMED
+END:VEVENT
+`;
             });
-            scheduleText += `\\nSUNDAY (Feb 15):\\n`;
+
+            // Add Sunday events
             group.sunday.forEach(cls => {
-                scheduleText += `${cls.time} - ${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}\\n`;
+                if (cls.isBreak) return; // Skip lunch breaks
+
+                const startDate = formatICSDate('2026-02-15', cls.time);
+                const endDate = formatICSDate('2026-02-15', cls.end || cls.time);
+                const uid = generateUID();
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${cls.name}${cls.note ? ' (' + cls.note + ')' : ''}
+LOCATION:${location}
+DESCRIPTION:Deviate Convention - ${group.name} ${group.ages}\\n${group.room}${cls.note ? '\\n' + cls.note : ''}
+STATUS:CONFIRMED
+END:VEVENT
+`;
             });
 
-            const details = encodeURIComponent(`Tate Academy Company - Deviate (The Process) 2026\nRoom: ${group.room}\n\n${scheduleText.replace(/\\n/g, '\n')}`);
+            icsContent += `END:VCALENDAR`;
 
-            const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
-            return `${baseUrl}&text=${eventTitle}&dates=${satStart}/${satEnd}&location=${eventLocation}&details=${details}`;
+            // Create and download the file
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Deviate_${group.name.replace(/[^a-zA-Z0-9]/g, '_')}_Schedule.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
         }
 
         // --- Render Schedule ---
@@ -429,29 +464,30 @@
 
                     <!-- Add to Calendar Buttons by Age Group -->
                     <div class="glass-card rounded-xl p-4">
-                        <h3 class="font-bold text-slate-800 mb-3">📅 Add Full Schedule to Google Calendar</h3>
+                        <h3 class="font-bold text-slate-800 mb-2">📅 Add Full Schedule to Calendar</h3>
+                        <p class="text-xs text-slate-500 mb-3">Downloads a calendar file with each class as a separate event. Import into Google Calendar, Apple Calendar, or Outlook.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <a href="${generateAllEventsCalendarLink('teensSeniors')}" target="_blank"
-                               class="flex items-center justify-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                            <button onclick="generateICSFile('teensSeniors')"
+                               class="flex items-center justify-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
                                 <span>📆</span>
                                 <span>Teens/Seniors<br><span class="text-xs font-normal opacity-90">Ages 13 & Up</span></span>
-                            </a>
-                            <a href="${generateAllEventsCalendarLink('juniors')}" target="_blank"
-                               class="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                            </button>
+                            <button onclick="generateICSFile('juniors')"
+                               class="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
                                 <span>📆</span>
                                 <span>Juniors<br><span class="text-xs font-normal opacity-90">Ages 9-12</span></span>
-                            </a>
-                            <a href="${generateAllEventsCalendarLink('minis')}" target="_blank"
-                               class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors">
+                            </button>
+                            <button onclick="generateICSFile('minis')"
+                               class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
                                 <span>📆</span>
                                 <span>Minis<br><span class="text-xs font-normal opacity-90">Ages 6-8</span></span>
-                            </a>
+                            </button>
                         </div>
-                        <a href="${generateAllEventsCalendarLink('parents')}" target="_blank"
-                           class="mt-3 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm">
+                        <button onclick="generateICSFile('parents')"
+                           class="mt-3 w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer">
                             <span>📆</span>
                             <span>Teachers & Parents Schedule</span>
-                        </a>
+                        </button>
                     </div>
             `;
 
