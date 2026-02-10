@@ -16,7 +16,21 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: #f8fafc;
-            color: #334155;
+            color: #1a1b1d;
+        }
+
+        /* Tate Academy Colors */
+        :root {
+            --tate-pink: #d5164d;
+            --tate-dark: #1a1b1d;
+            --tate-pink-light: #f9e0e6;
+            --tate-pink-100: #fce8ed;
+            --tate-pink-200: #f8c5d1;
+            --tate-pink-300: #f1a3b5;
+            --tate-pink-400: #e8708d;
+            --tate-pink-500: #d5164d;
+            --tate-pink-600: #b81343;
+            --tate-pink-700: #9a1039;
         }
 
         .glass-card {
@@ -31,7 +45,7 @@
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: var(--tate-pink);
             color: white;
         }
 
@@ -59,18 +73,28 @@
         .type-line { background: #c7d2fe; color: #3730a3; }
         .type-production { background: #ddd6fe; color: #5b21b6; }
         .type-trio { background: #fbcfe8; color: #9d174d; }
+
+        .add-cal-btn {
+            background: var(--tate-pink-100);
+            color: var(--tate-pink-600);
+            transition: all 0.2s ease;
+        }
+        .add-cal-btn:hover {
+            background: var(--tate-pink-200);
+            color: var(--tate-pink-700);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-gradient-to-r from-violet-600 to-purple-600 text-white sticky top-0 z-50 shadow-lg">
+    <header class="text-white sticky top-0 z-50 shadow-lg" style="background: linear-gradient(135deg, #d5164d, #9a1039);">
         <div class="max-w-4xl mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">Tate Academy Company</h1>
-                    <p class="text-violet-200 text-sm">Deviate (The Process) - Herndon, VA</p>
-                    <p class="text-violet-300 text-xs mt-1">February 13-15, 2026</p>
+                    <p class="text-pink-200 text-sm">Deviate (The Process) - Herndon, VA</p>
+                    <p class="text-pink-300 text-xs mt-1">February 13-15, 2026</p>
                 </div>
                 <div id="clock" class="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full"></div>
             </div>
@@ -86,10 +110,10 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-100 border-t border-slate-200 py-4 mt-8">
+    <footer class="py-4 mt-8" style="background: #1a1b1d;">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <p class="text-xs text-slate-400">Tate Academy Company - Deviate 2026 | Herndon, VA</p>
-            <p class="text-xs text-slate-300 mt-1">Go Team!</p>
+            <p class="text-xs text-gray-400">Tate Academy Company - Deviate 2026 | Herndon, VA</p>
+            <p class="text-xs mt-1" style="color: #d5164d;">Go Team!</p>
         </div>
     </footer>
 
@@ -581,17 +605,18 @@ END:VEVENT
 
         // --- Render Schedule ---
         function renderSchedule(container) {
+            // Tate Academy color shades for age groups
             const colorMap = {
-                pink: { bg: 'bg-pink-500', light: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-700' },
-                yellow: { bg: 'bg-yellow-500', light: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700' },
-                blue: { bg: 'bg-blue-500', light: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
-                green: { bg: 'bg-green-500', light: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' }
+                pink: { bgStyle: 'background:#d5164d', lightStyle: 'background:#fce8ed', borderStyle: 'border-color:#f8c5d1', textStyle: 'color:#d5164d' },
+                yellow: { bgStyle: 'background:#e8708d', lightStyle: 'background:#fce8ed', borderStyle: 'border-color:#f8c5d1', textStyle: 'color:#b81343' },
+                blue: { bgStyle: 'background:#f1a3b5', lightStyle: 'background:#fce8ed', borderStyle: 'border-color:#f8c5d1', textStyle: 'color:#9a1039' },
+                green: { bgStyle: 'background:#1a1b1d', lightStyle: 'background:#f3f4f6', borderStyle: 'border-color:#d1d5db', textStyle: 'color:#1a1b1d' }
             };
 
             let html = `
                 <div class="space-y-6">
-                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
-                        <h2 class="text-xl font-bold text-violet-800 mb-2">Convention Schedule</h2>
+                    <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
+                        <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Convention Schedule</h2>
                         <p class="text-sm text-slate-600">
                             <strong>Venue:</strong> ${eventInfo.venue}<br>
                             <strong>Address:</strong> ${eventInfo.venueAddress}
@@ -605,23 +630,23 @@ END:VEVENT
                         <p class="text-xs text-slate-500 mb-3">Downloads a calendar file with each class as a separate event. Import into Google Calendar, Apple Calendar, or Outlook.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button onclick="generateICSFile('teensSeniors')"
-                               class="flex items-center justify-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
+                               class="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer hover:opacity-90" style="background: #d5164d;">
                                 <span>📆</span>
                                 <span>Teens/Seniors<br><span class="text-xs font-normal opacity-90">Ages 13 & Up</span></span>
                             </button>
                             <button onclick="generateICSFile('juniors')"
-                               class="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
+                               class="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer hover:opacity-90" style="background: #e8708d;">
                                 <span>📆</span>
                                 <span>Juniors<br><span class="text-xs font-normal opacity-90">Ages 9-12</span></span>
                             </button>
                             <button onclick="generateICSFile('minis')"
-                               class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer">
+                               class="flex items-center justify-center gap-2 text-white px-4 py-3 rounded-lg font-semibold transition-colors cursor-pointer hover:opacity-90" style="background: #f1a3b5;">
                                 <span>📆</span>
                                 <span>Minis<br><span class="text-xs font-normal opacity-90">Ages 6-8</span></span>
                             </button>
                         </div>
                         <button onclick="generateICSFile('parents')"
-                           class="mt-3 w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer">
+                           class="mt-3 w-full flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm cursor-pointer hover:opacity-90" style="background: #1a1b1d;">
                             <span>📆</span>
                             <span>Teachers & Parents Schedule</span>
                         </button>
@@ -635,7 +660,7 @@ END:VEVENT
 
                 html += `
                     <div class="glass-card rounded-xl overflow-hidden">
-                        <button onclick="toggleScheduleGroup('${groupKey}')" class="${colors.bg} text-white px-4 py-3 w-full text-left cursor-pointer hover:opacity-95 transition-opacity">
+                        <button onclick="toggleScheduleGroup('${groupKey}')" class="text-white px-4 py-3 w-full text-left cursor-pointer hover:opacity-95 transition-opacity" style="${colors.bgStyle}">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <h3 class="font-bold text-lg">${group.name}</h3>
@@ -649,8 +674,8 @@ END:VEVENT
 
                         <div id="schedule-content-${groupKey}" class="overflow-hidden transition-all duration-300" style="max-height: ${isExpanded ? 'none' : '0'}">
                             <!-- Saturday -->
-                            <div class="${colors.light} px-4 py-2 ${colors.border} border-b">
-                                <h4 class="font-semibold ${colors.text}">Saturday, Feb 14</h4>
+                            <div class="px-4 py-2 border-b" style="${colors.lightStyle}; ${colors.borderStyle}">
+                                <h4 class="font-semibold" style="${colors.textStyle}">Saturday, Feb 14</h4>
                             </div>
                             <div class="divide-y divide-slate-100">
                 `;
@@ -665,15 +690,15 @@ END:VEVENT
                         <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
                             <div class="flex-grow">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono text-sm ${colors.text} font-semibold">${cls.time}${cls.end && cls.end !== cls.time ? ' - ' + cls.end : ''}</span>
+                                    <span class="font-mono text-sm font-semibold" style="${colors.textStyle}">${cls.time}${cls.end && cls.end !== cls.time ? ' - ' + cls.end : ''}</span>
                                 </div>
                                 <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
                                 ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
                             ${!isBreak ? `
                             <button onclick="event.stopPropagation(); addSingleEventToCalendar('${escapedFullTitle}', '2026-02-14', '${cls.time}', '${cls.end}', '${group.room}')"
-                                class="ml-2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-lg transition-colors" title="Add to Google Calendar">
-                                +
+                                class="add-cal-btn ml-2 px-2 py-1 flex items-center justify-center rounded text-xs font-medium whitespace-nowrap" title="Add to Google Calendar">
+                                + Add to Calendar
                             </button>
                             ` : ''}
                         </div>
@@ -684,8 +709,8 @@ END:VEVENT
                             </div>
 
                             <!-- Sunday -->
-                            <div class="${colors.light} px-4 py-2 ${colors.border} border-b border-t">
-                                <h4 class="font-semibold ${colors.text}">Sunday, Feb 15</h4>
+                            <div class="px-4 py-2 border-b border-t" style="${colors.lightStyle}; ${colors.borderStyle}">
+                                <h4 class="font-semibold" style="${colors.textStyle}">Sunday, Feb 15</h4>
                             </div>
                             <div class="divide-y divide-slate-100">
                 `;
@@ -700,15 +725,15 @@ END:VEVENT
                         <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
                             <div class="flex-grow">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono text-sm ${colors.text} font-semibold">${cls.time}${cls.end && cls.end !== cls.time ? ' - ' + cls.end : ''}</span>
+                                    <span class="font-mono text-sm font-semibold" style="${colors.textStyle}">${cls.time}${cls.end && cls.end !== cls.time ? ' - ' + cls.end : ''}</span>
                                 </div>
                                 <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
                                 ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
                             ${!isBreak ? `
                             <button onclick="event.stopPropagation(); addSingleEventToCalendar('${escapedFullTitle}', '2026-02-15', '${cls.time}', '${cls.end}', '${group.room}')"
-                                class="ml-2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-lg transition-colors" title="Add to Google Calendar">
-                                +
+                                class="add-cal-btn ml-2 px-2 py-1 flex items-center justify-center rounded text-xs font-medium whitespace-nowrap" title="Add to Google Calendar">
+                                + Add to Calendar
                             </button>
                             ` : ''}
                         </div>
@@ -730,8 +755,8 @@ END:VEVENT
         function renderDanceOrder(container) {
             let html = `
                 <div class="space-y-4">
-                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
-                        <h2 class="text-xl font-bold text-violet-800 mb-2">Competition Dance Order</h2>
+                    <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
+                        <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Competition Dance Order</h2>
                         <p class="text-sm text-slate-600">Friday, February 13, 2026 - Performance Schedule</p>
                     </div>
 
@@ -743,7 +768,7 @@ END:VEVENT
                         <div class="bg-slate-50 rounded-lg p-4 mb-4">
                             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <button onclick="generateDanceOrderICS()"
-                                    class="flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                    class="flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg font-semibold transition-colors hover:opacity-90" style="background: #d5164d;">
                                     <span>📆</span>
                                     <span>Download Full Schedule (.ics)</span>
                                 </button>
@@ -760,7 +785,7 @@ END:VEVENT
                             </div>
                         </div>
 
-                        <p class="text-sm text-slate-600 mb-2">Or tap the <span class="inline-flex items-center justify-center w-6 h-6 bg-slate-100 text-violet-600 rounded-full text-sm font-bold">+</span> next to any dance to add just that one.</p>
+                        <p class="text-sm text-slate-600 mb-2">Or tap the <span class="add-cal-btn inline-flex items-center justify-center px-2 py-1 rounded text-xs font-medium">+ Cal</span> next to any dance to add just that one.</p>
                     </div>
 
                     <div class="glass-card rounded-xl overflow-hidden">
@@ -800,8 +825,8 @@ END:VEVENT
                         <td class="px-2 py-2">
                             ${!isAwards ? `
                             <button onclick="addDanceToCalendar('${escapedName}', '${escapedDancer}', '${dance.time}', '${escapedDivision}', '${escapedStyle}', '${escapedType}', ${dance.num || 'null'})"
-                                class="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-sm font-bold transition-colors" title="Add to Google Calendar">
-                                +
+                                class="add-cal-btn px-2 py-1 flex items-center justify-center rounded text-xs font-medium whitespace-nowrap" title="Add to Google Calendar">
+                                + Cal
                             </button>
                             ` : ''}
                         </td>
@@ -836,8 +861,8 @@ END:VEVENT
         function renderFood(container) {
             let html = `
                 <div class="space-y-6">
-                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
-                        <h2 class="text-xl font-bold text-violet-800 mb-2">Places to Eat</h2>
+                    <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
+                        <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Places to Eat</h2>
                         <p class="text-sm text-slate-600">Near ${eventInfo.venue}</p>
                     </div>
 
@@ -983,8 +1008,8 @@ END:VEVENT
         function renderActivities(container) {
             let html = `
                 <div class="space-y-6">
-                    <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-xl border border-violet-100">
-                        <h2 class="text-xl font-bold text-violet-800 mb-2">Things to Do Nearby</h2>
+                    <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
+                        <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Things to Do Nearby</h2>
                         <p class="text-sm text-slate-600">Walking distance activities and DC highlights</p>
                     </div>
 
