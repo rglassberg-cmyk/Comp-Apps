@@ -398,6 +398,102 @@
             window.open(link, '_blank');
         }
 
+        function generateDanceOrderICS() {
+            let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Tate Academy//Deviate DC 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Deviate - Competition Friday
+X-WR-TIMEZONE:America/New_York
+`;
+
+            const location = `${eventInfo.venue}, ${eventInfo.venueAddress}`;
+
+            danceOrder.forEach(dance => {
+                if (dance.isAwards) return; // Skip awards for ICS
+
+                const startDate = formatICSDate('2026-02-13', dance.time);
+                // Estimate 3 minutes per performance
+                const t = parseTime(dance.time);
+                if (!t) return;
+                const endDate = formatICSDate('2026-02-13', addMinutesToTime(dance.time, 3));
+                const uid = generateUID();
+
+                const title = dance.dancer
+                    ? `${dance.name} - ${dance.dancer}`
+                    : dance.name;
+                const description = [
+                    `Tate Academy - Deviate Competition`,
+                    dance.dancer ? `Dancer: ${dance.dancer}` : '',
+                    dance.division ? `Division: ${dance.division}` : '',
+                    dance.style ? `Style: ${dance.style}` : '',
+                    dance.type ? `Type: ${dance.type}` : '',
+                    dance.num ? `Entry #${dance.num}` : ''
+                ].filter(Boolean).join('\\n');
+
+                icsContent += `BEGIN:VEVENT
+UID:${uid}
+DTSTART:${startDate}
+DTEND:${endDate}
+SUMMARY:${title}
+LOCATION:${location}
+DESCRIPTION:${description}
+STATUS:CONFIRMED
+END:VEVENT
+`;
+            });
+
+            icsContent += `END:VCALENDAR`;
+
+            // Create and download the file
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Deviate_Competition_Friday.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function addMinutesToTime(timeStr, minutes) {
+            const t = parseTime(timeStr);
+            if (!t) return timeStr;
+            let hour = t.hour;
+            let minute = t.minute + minutes;
+            if (minute >= 60) {
+                hour += Math.floor(minute / 60);
+                minute = minute % 60;
+            }
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            return `${displayHour}:${String(minute).padStart(2, '0')} ${period}`;
+        }
+
+        function addDanceToCalendar(name, dancer, time, division, style, type, num) {
+            const title = dancer ? `${name} - ${dancer}` : name;
+            const eventTitle = encodeURIComponent(`Deviate: ${title}`);
+            const location = encodeURIComponent(`${eventInfo.venue}, ${eventInfo.venueAddress}`);
+
+            const descParts = [
+                `Tate Academy - Deviate Competition`,
+                dancer ? `Dancer: ${dancer}` : '',
+                division ? `Division: ${division}` : '',
+                style ? `Style: ${style}` : '',
+                type ? `Type: ${type}` : '',
+                num ? `Entry #${num}` : ''
+            ].filter(Boolean).join('\n');
+            const details = encodeURIComponent(descParts);
+
+            const startDate = formatGoogleCalendarDate('2026-02-13', time);
+            const endTime = addMinutesToTime(time, 3);
+            const endDate = formatGoogleCalendarDate('2026-02-13', endTime);
+
+            const link = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startDate}/${endDate}&location=${location}&details=${details}`;
+            window.open(link, '_blank');
+        }
+
         function generateICSFile(groupKey) {
             const group = conventionByAgeGroup[groupKey];
             if (!group) return;
@@ -616,17 +712,46 @@ END:VEVENT
                         <p class="text-sm text-slate-600">Friday, February 13, 2026 - Performance Schedule</p>
                     </div>
 
+                    <!-- Calendar Options -->
+                    <div class="glass-card rounded-xl p-4">
+                        <h3 class="font-bold text-slate-800 mb-3">📅 Add to Calendar</h3>
+
+                        <!-- Download All Option -->
+                        <div class="bg-slate-50 rounded-lg p-4 mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                                <button onclick="generateDanceOrderICS()"
+                                    class="flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                    <span>📆</span>
+                                    <span>Download Full Schedule (.ics)</span>
+                                </button>
+                                <span class="text-sm text-slate-500">All ${danceOrder.filter(d => !d.isAwards).length} performances in one file</span>
+                            </div>
+                            <div class="mt-3 text-xs text-slate-600 bg-white rounded p-3 border border-slate-200">
+                                <strong>How to use the .ics file:</strong>
+                                <ol class="list-decimal list-inside mt-1 space-y-1">
+                                    <li><strong>iPhone/iPad:</strong> Tap the downloaded file, then tap "Add All"</li>
+                                    <li><strong>Android:</strong> Open the file and select your calendar app</li>
+                                    <li><strong>Google Calendar:</strong> Go to calendar.google.com → Settings (gear icon) → Import & Export → Import → Select the file</li>
+                                    <li><strong>Outlook:</strong> Double-click the file or drag it into your calendar</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-600 mb-2">Or tap the <span class="inline-flex items-center justify-center w-6 h-6 bg-slate-100 text-violet-600 rounded-full text-sm font-bold">+</span> next to any dance to add just that one.</p>
+                    </div>
+
                     <div class="glass-card rounded-xl overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead class="bg-slate-100">
                                     <tr>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">#</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Time</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Routine</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Dancer</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Division</th>
-                                        <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600">Type</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600 w-8"></th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">#</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">Time</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">Routine</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600">Dancer</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600 hidden sm:table-cell">Division</th>
+                                        <th class="px-2 py-3 text-left text-xs font-semibold text-slate-600 hidden sm:table-cell">Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -641,14 +766,28 @@ END:VEVENT
                 const divisionClass = dance.division ? `division-${dance.division.toLowerCase().replace('/', '-')}` : '';
                 const typeClass = dance.type ? `type-${dance.type.toLowerCase()}` : '';
 
+                const escapedName = dance.name.replace(/'/g, "\\'");
+                const escapedDancer = dance.dancer ? dance.dancer.replace(/'/g, "\\'") : '';
+                const escapedDivision = dance.division ? dance.division.replace(/'/g, "\\'") : '';
+                const escapedStyle = dance.style ? dance.style.replace(/'/g, "\\'") : '';
+                const escapedType = dance.type ? dance.type.replace(/'/g, "\\'") : '';
+
                 html += `
                     <tr class="${rowClass} border-b border-slate-100">
-                        <td class="px-3 py-3 text-slate-500 font-mono">${dance.num || '-'}</td>
-                        <td class="px-3 py-3 text-violet-600 font-mono font-semibold">${dance.time}</td>
-                        <td class="px-3 py-3 text-slate-800 font-medium">${dance.name}</td>
-                        <td class="px-3 py-3 ${dance.dancer ? 'text-slate-800 font-semibold' : 'text-slate-400'}">${dance.dancer || '-'}</td>
-                        <td class="px-3 py-3">${dance.division ? `<span class="text-xs px-2 py-1 rounded ${divisionClass}">${dance.division}</span>` : '-'}</td>
-                        <td class="px-3 py-3">${dance.type && !isAwards ? `<span class="text-xs px-2 py-1 rounded ${typeClass}">${dance.type}</span>` : isAwards ? '🏆' : '-'}</td>
+                        <td class="px-2 py-2">
+                            ${!isAwards ? `
+                            <button onclick="addDanceToCalendar('${escapedName}', '${escapedDancer}', '${dance.time}', '${escapedDivision}', '${escapedStyle}', '${escapedType}', ${dance.num || 'null'})"
+                                class="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-sm font-bold transition-colors" title="Add to Google Calendar">
+                                +
+                            </button>
+                            ` : ''}
+                        </td>
+                        <td class="px-2 py-2 text-slate-500 font-mono text-xs">${dance.num || '-'}</td>
+                        <td class="px-2 py-2 text-violet-600 font-mono font-semibold text-xs">${dance.time}</td>
+                        <td class="px-2 py-2 text-slate-800 font-medium">${dance.name}</td>
+                        <td class="px-2 py-2 ${dance.dancer ? 'text-slate-800 font-semibold' : 'text-slate-400'}">${dance.dancer || '-'}</td>
+                        <td class="px-2 py-2 hidden sm:table-cell">${dance.division ? `<span class="text-xs px-2 py-1 rounded ${divisionClass}">${dance.division}</span>` : '-'}</td>
+                        <td class="px-2 py-2 hidden sm:table-cell">${dance.type && !isAwards ? `<span class="text-xs px-2 py-1 rounded ${typeClass}">${dance.type}</span>` : isAwards ? '🏆' : '-'}</td>
                     </tr>
                 `;
             });
