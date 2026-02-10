@@ -315,14 +315,14 @@
 
         // --- Nearby Activities ---
         const nearbyActivities = [
-            { name: "Udvar-Hazy Air & Space Museum", type: "Museum", distance: "3 mi", address: "14390 Air and Space Museum Pkwy, Chantilly", note: "FREE! Space Shuttle Discovery, SR-71 Blackbird, WWII planes. MUST SEE!", icon: "🚀", lat: 38.9114, lng: -77.4440 },
-            { name: "Reston Town Center", type: "Shopping/Dining", distance: "4 mi", address: "11900 Market St, Reston", note: "Outdoor shopping, restaurants, ice skating rink, movie theater.", icon: "🛍️", lat: 38.9586, lng: -77.3590 },
-            { name: "Frying Pan Farm Park", type: "Farm/Nature", distance: "5 mi", address: "2709 West Ox Rd, Herndon", note: "FREE! Working farm, animals, playground. Great for younger kids.", icon: "🐄", lat: 38.9290, lng: -77.3510 },
-            { name: "Dulles Town Center", type: "Mall", distance: "2 mi", address: "21100 Dulles Town Cir, Dulles", note: "Large indoor mall with all the stores. Good rainy day option.", icon: "🏬", lat: 38.9880, lng: -77.4190 },
-            { name: "TopGolf", type: "Entertainment", distance: "8 mi", address: "6625 S Van Dorn St, Alexandria", note: "Fun golf games, food, arcade. Great for teens!", icon: "⛳", lat: 38.7960, lng: -77.1290 },
-            { name: "Dave & Buster's", type: "Entertainment", distance: "5 mi", address: "8300 Westpark Dr, Tysons", note: "Arcade games, food, prizes. Perfect for downtime!", icon: "🎮", lat: 38.9210, lng: -77.2320 },
-            { name: "Historic Downtown Herndon", type: "Town", distance: "3 mi", address: "Downtown Herndon", note: "Cute small town feel, local shops, W&OD Trail access.", icon: "🏘️", lat: 38.9696, lng: -77.3867 },
-            { name: "Great Falls Park", type: "Nature", distance: "12 mi", address: "9200 Old Dominion Dr, McLean", note: "Stunning waterfalls on the Potomac. $20/car entry. Worth the drive!", icon: "🌊", lat: 38.9985, lng: -77.2540 }
+            { name: "Udvar-Hazy Air & Space Museum", type: "Museum", distance: "3 mi", address: "14390 Air and Space Museum Pkwy, Chantilly", note: "FREE! Space Shuttle Discovery, SR-71 Blackbird, WWII planes. MUST SEE!", icon: "🚀", lat: 38.9114, lng: -77.4440, website: "https://airandspace.si.edu/udvar-hazy-center" },
+            { name: "Reston Town Center", type: "Shopping/Dining", distance: "4 mi", address: "11900 Market St, Reston", note: "Outdoor shopping, restaurants, ice skating rink, movie theater.", icon: "🛍️", lat: 38.9586, lng: -77.3590, website: "https://www.restontowncenter.com" },
+            { name: "Frying Pan Farm Park", type: "Farm/Nature", distance: "5 mi", address: "2709 West Ox Rd, Herndon", note: "FREE! Working farm, animals, playground. Great for younger kids.", icon: "🐄", lat: 38.9290, lng: -77.3510, website: "https://www.fairfaxcounty.gov/parks/frying-pan-park" },
+            { name: "Dulles Town Center", type: "Mall", distance: "2 mi", address: "21100 Dulles Town Cir, Dulles", note: "Large indoor mall with all the stores. Good rainy day option.", icon: "🏬", lat: 38.9880, lng: -77.4190, website: "https://www.dullestowncenter.com" },
+            { name: "TopGolf", type: "Entertainment", distance: "8 mi", address: "6625 S Van Dorn St, Alexandria", note: "Fun golf games, food, arcade. Great for teens!", icon: "⛳", lat: 38.7960, lng: -77.1290, website: "https://topgolf.com/us/alexandria" },
+            { name: "Dave & Buster's", type: "Entertainment", distance: "5 mi", address: "8300 Westpark Dr, Tysons", note: "Arcade games, food, prizes. Perfect for downtime!", icon: "🎮", lat: 38.9210, lng: -77.2320, website: "https://www.daveandbusters.com" },
+            { name: "Historic Downtown Herndon", type: "Town", distance: "3 mi", address: "Downtown Herndon", note: "Cute small town feel, local shops, W&OD Trail access.", icon: "🏘️", lat: 38.9696, lng: -77.3867, website: "https://www.herndon-va.gov" },
+            { name: "Great Falls Park", type: "Nature", distance: "12 mi", address: "9200 Old Dominion Dr, McLean", note: "Stunning waterfalls on the Potomac. $20/car entry. Worth the drive!", icon: "🌊", lat: 38.9985, lng: -77.2540, website: "https://www.nps.gov/grfa" }
         ];
 
         // --- Initialization ---
@@ -1010,7 +1010,7 @@ END:VEVENT
                 <div class="space-y-6">
                     <div class="p-4 rounded-xl border" style="background: linear-gradient(135deg, #fce8ed, #fff); border-color: #f8c5d1;">
                         <h2 class="text-xl font-bold mb-2" style="color: #d5164d;">Things to Do Nearby</h2>
-                        <p class="text-sm text-slate-600">Walking distance activities and DC highlights</p>
+                        <p class="text-sm text-slate-600">Attractions and activities near the hotel</p>
                     </div>
 
                     <!-- Map -->
@@ -1026,6 +1026,7 @@ END:VEVENT
             `;
 
             nearbyActivities.forEach(activity => {
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.name + ' ' + activity.address)}`;
                 html += `
                     <div class="glass-card rounded-xl p-4 hover:shadow-md transition-shadow">
                         <div class="flex items-start gap-4">
@@ -1033,13 +1034,23 @@ END:VEVENT
                             <div class="flex-grow">
                                 <div class="flex justify-between items-start">
                                     <div>
-                                        <h4 class="font-bold text-slate-800">${activity.name}</h4>
-                                        <div class="text-sm text-violet-600">${activity.type}</div>
+                                        <a href="${mapsUrl}" target="_blank" class="font-bold text-slate-800 hover:text-pink-600 transition-colors">${activity.name}</a>
+                                        <div class="text-sm" style="color: #d5164d;">${activity.type}</div>
                                     </div>
-                                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${activity.distance}</span>
+                                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full whitespace-nowrap">${activity.distance}</span>
                                 </div>
                                 <p class="text-sm text-slate-600 mt-2">${activity.note}</p>
                                 <p class="text-xs text-slate-400 mt-1">${activity.address}</p>
+                                <div class="flex gap-2 mt-3">
+                                    <a href="${mapsUrl}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        Directions
+                                    </a>
+                                    ${activity.website ? `<a href="${activity.website}" target="_blank" class="inline-flex items-center gap-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                                        Website
+                                    </a>` : ''}
+                                </div>
                             </div>
                         </div>
                     </div>
