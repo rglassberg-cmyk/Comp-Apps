@@ -374,6 +374,30 @@
             return 'deviate-' + Math.random().toString(36).substr(2, 9) + '@tateacademy';
         }
 
+        function formatGoogleCalendarDate(dateStr, timeStr) {
+            const t = parseTime(timeStr);
+            if (!t) return '';
+            const d = new Date(dateStr);
+            d.setHours(t.hour, t.minute, 0, 0);
+            return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+        }
+
+        function generateGoogleCalendarLink(title, dateStr, startTime, endTime, room) {
+            const eventTitle = encodeURIComponent(`Deviate: ${title}`);
+            const location = encodeURIComponent(`${room}, ${eventInfo.venue}, ${eventInfo.venueAddress}`);
+            const details = encodeURIComponent(`Tate Academy - Deviate Convention 2026`);
+
+            const startDate = formatGoogleCalendarDate(dateStr, startTime);
+            const endDate = formatGoogleCalendarDate(dateStr, endTime || startTime);
+
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startDate}/${endDate}&location=${location}&details=${details}`;
+        }
+
+        function addSingleEventToCalendar(title, dateStr, startTime, endTime, room) {
+            const link = generateGoogleCalendarLink(title, dateStr, startTime, endTime, room);
+            window.open(link, '_blank');
+        }
+
         function generateICSFile(groupKey) {
             const group = conventionByAgeGroup[groupKey];
             if (!group) return;
@@ -515,6 +539,10 @@ END:VEVENT
 
                 group.saturday.forEach(cls => {
                     const isBreak = cls.isBreak;
+                    const escapedName = cls.name.replace(/'/g, "\\'");
+                    const escapedNote = cls.note ? cls.note.replace(/'/g, "\\'") : '';
+                    const fullTitle = cls.note ? `${cls.name} (${cls.note})` : cls.name;
+                    const escapedFullTitle = fullTitle.replace(/'/g, "\\'");
                     html += `
                         <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
                             <div class="flex-grow">
@@ -524,6 +552,12 @@ END:VEVENT
                                 <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
                                 ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
+                            ${!isBreak ? `
+                            <button onclick="addSingleEventToCalendar('${escapedFullTitle}', '2026-02-14', '${cls.time}', '${cls.end}', '${group.room}')"
+                                class="ml-2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-lg transition-colors" title="Add to Google Calendar">
+                                +
+                            </button>
+                            ` : ''}
                         </div>
                     `;
                 });
@@ -540,6 +574,10 @@ END:VEVENT
 
                 group.sunday.forEach(cls => {
                     const isBreak = cls.isBreak;
+                    const escapedName = cls.name.replace(/'/g, "\\'");
+                    const escapedNote = cls.note ? cls.note.replace(/'/g, "\\'") : '';
+                    const fullTitle = cls.note ? `${cls.name} (${cls.note})` : cls.name;
+                    const escapedFullTitle = fullTitle.replace(/'/g, "\\'");
                     html += `
                         <div class="p-3 flex items-center hover:bg-slate-50 ${isBreak ? 'bg-slate-50' : ''}">
                             <div class="flex-grow">
@@ -549,6 +587,12 @@ END:VEVENT
                                 <div class="font-medium text-slate-800 ${isBreak ? 'text-slate-500 italic' : ''}">${cls.name}</div>
                                 ${cls.note ? `<div class="text-xs text-slate-500">${cls.note}</div>` : ''}
                             </div>
+                            ${!isBreak ? `
+                            <button onclick="addSingleEventToCalendar('${escapedFullTitle}', '2026-02-15', '${cls.time}', '${cls.end}', '${group.room}')"
+                                class="ml-2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-violet-100 text-violet-600 rounded-full text-lg transition-colors" title="Add to Google Calendar">
+                                +
+                            </button>
+                            ` : ''}
                         </div>
                     `;
                 });
