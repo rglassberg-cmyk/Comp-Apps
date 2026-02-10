@@ -69,7 +69,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">Tate Academy Company</h1>
-                    <p class="text-violet-200 text-sm">Deviate (The Process) - Washington DC</p>
+                    <p class="text-violet-200 text-sm">Deviate (The Process) - Herndon, VA</p>
                     <p class="text-violet-300 text-xs mt-1">February 13-15, 2026</p>
                 </div>
                 <div id="clock" class="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full"></div>
@@ -88,7 +88,7 @@
     <!-- Footer -->
     <footer class="bg-slate-100 border-t border-slate-200 py-4 mt-8">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <p class="text-xs text-slate-400">Tate Academy Company - Deviate DC 2026</p>
+            <p class="text-xs text-slate-400">Tate Academy Company - Deviate 2026 | Herndon, VA</p>
             <p class="text-xs text-slate-300 mt-1">Go Team!</p>
         </div>
     </footer>
@@ -103,12 +103,12 @@
         // --- Event Information ---
         const eventInfo = {
             name: "Deviate (The Process)",
-            location: "Washington DC",
+            location: "Herndon, VA",
             dates: "February 13-15, 2026",
-            venue: "Marriott Wardman Park",
-            venueAddress: "2660 Woodley Rd NW, Washington, DC 20008",
-            venueLat: 38.9296,
-            venueLng: -77.0536
+            venue: "Hyatt Regency Dulles",
+            venueAddress: "2300 Dulles Corner Blvd, Herndon, VA 20171",
+            venueLat: 38.9565,
+            venueLng: -77.4089
         };
 
         // --- Convention Schedule ---
@@ -190,38 +190,39 @@
             { num: null, time: "9:40 PM", name: "Awards 13+", dancer: "", division: "", style: "", type: "Awards", isAwards: true }
         ];
 
-        // --- Places to Eat (Near Marriott Wardman Park, DC) ---
+        // --- Places to Eat (Near Hyatt Regency Dulles, Herndon VA) ---
         const placesToEat = {
             walkable: [
-                { name: "Open City", type: "American/Brunch", distance: "0.1 mi", address: "2331 Calvert St NW", price: "$$", lat: 38.9216, lng: -77.0485, note: "Great for breakfast/brunch" },
-                { name: "Petits Plats", type: "French", distance: "0.2 mi", address: "2653 Connecticut Ave NW", price: "$$", lat: 38.9280, lng: -77.0510, note: "Cozy French bistro" },
-                { name: "Nanny O'Brien's", type: "Irish Pub", distance: "0.3 mi", address: "3319 Connecticut Ave NW", price: "$$", lat: 38.9350, lng: -77.0580, note: "Casual pub fare" },
-                { name: "Bindaas", type: "Indian Street Food", distance: "0.3 mi", address: "2000 18th St NW", price: "$$", lat: 38.9150, lng: -77.0420, note: "Fast-casual Indian" },
-                { name: "Diner", type: "American/Diner", distance: "0.4 mi", address: "2453 18th St NW", price: "$", lat: 38.9200, lng: -77.0430, note: "24-hour diner, great for late night" },
-                { name: "Amsterdam Falafelshop", type: "Middle Eastern", distance: "0.4 mi", address: "2425 18th St NW", price: "$", lat: 38.9195, lng: -77.0428, note: "Quick & delicious falafel" },
-                { name: "Mintwood Place", type: "American", distance: "0.5 mi", address: "1813 Columbia Rd NW", price: "$$$", lat: 38.9220, lng: -77.0400, note: "Upscale American" }
+                { name: "Chili's Grill & Bar", type: "American", distance: "0.1 mi", address: "2250 Centreville Rd, Herndon", price: "$$", lat: 38.9575, lng: -77.4070, note: "Right next to hotel, kid-friendly" },
+                { name: "Olive Garden", type: "Italian", distance: "0.2 mi", address: "2285 Centreville Rd, Herndon", price: "$$", lat: 38.9580, lng: -77.4065, note: "Pasta, breadsticks, familiar favorites" },
+                { name: "Red Robin", type: "Burgers", distance: "0.3 mi", address: "2200 Centreville Rd, Herndon", price: "$$", lat: 38.9560, lng: -77.4075, note: "Great burgers, bottomless fries" },
+                { name: "Founding Farmers", type: "American Farm-to-Table", distance: "1.5 mi", address: "1800 Tysons Blvd, Tysons", price: "$$$", lat: 38.9180, lng: -77.2230, note: "Upscale, great brunch (short drive)" },
+                { name: "Pho 75", type: "Vietnamese", distance: "1.2 mi", address: "382 Elden St, Herndon", price: "$", lat: 38.9690, lng: -77.3920, note: "Authentic pho, quick & delicious" },
+                { name: "Paisano's Pizza", type: "Pizza/Italian", distance: "1.0 mi", address: "2456 Centreville Rd, Herndon", price: "$$", lat: 38.9620, lng: -77.4050, note: "Great pizza, delivers!" },
+                { name: "Jimmy John's", type: "Sandwiches", distance: "0.5 mi", address: "13324 Franklin Farm Rd, Herndon", price: "$", lat: 38.9550, lng: -77.4020, note: "Fast subs, good for quick lunch" }
             ],
             delivery: [
-                { name: "Domino's Pizza", type: "Pizza", phone: "(202) 232-8400", apps: ["DoorDash", "UberEats"] },
+                { name: "Domino's Pizza", type: "Pizza", phone: "(703) 471-7400", apps: ["DoorDash", "UberEats", "Domino's App"] },
                 { name: "Chipotle", type: "Mexican", phone: "", apps: ["DoorDash", "UberEats", "Chipotle App"] },
                 { name: "Sweetgreen", type: "Salads/Bowls", phone: "", apps: ["DoorDash", "Sweetgreen App"] },
                 { name: "CAVA", type: "Mediterranean", phone: "", apps: ["DoorDash", "UberEats", "CAVA App"] },
                 { name: "Chick-fil-A", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats", "CFA App"] },
                 { name: "Panera Bread", type: "Bakery/Soup/Salad", phone: "", apps: ["DoorDash", "Panera App"] },
-                { name: "Wawa", type: "Sandwiches/Convenience", phone: "", apps: ["DoorDash", "Wawa App"] }
+                { name: "Jersey Mike's", type: "Subs", phone: "", apps: ["DoorDash", "UberEats", "Jersey Mike's App"] },
+                { name: "Nando's Peri-Peri", type: "Chicken", phone: "", apps: ["DoorDash", "UberEats"] }
             ]
         };
 
         // --- Nearby Activities ---
         const nearbyActivities = [
-            { name: "National Zoo", type: "Attraction", distance: "0.3 mi", address: "3001 Connecticut Ave NW", note: "FREE admission! Pandas, elephants, lions. Open 8am-5pm.", icon: "🐼", lat: 38.9296, lng: -77.0499 },
-            { name: "Rock Creek Park", type: "Nature", distance: "0.2 mi", address: "Beach Dr NW", note: "Beautiful walking trails, nature center. Great for a morning walk.", icon: "🌳", lat: 38.9400, lng: -77.0500 },
-            { name: "Adams Morgan", type: "Neighborhood", distance: "0.5 mi", address: "18th St NW", note: "Vibrant neighborhood with shops, murals, and diverse restaurants.", icon: "🎨", lat: 38.9215, lng: -77.0425 },
-            { name: "Smithsonian Museums", type: "Museums", distance: "2.5 mi", address: "National Mall", note: "All FREE! Natural History, Air & Space, American History. Metro accessible.", icon: "🏛️", lat: 38.8881, lng: -77.0260 },
-            { name: "Georgetown", type: "Shopping", distance: "2 mi", address: "M Street NW", note: "Upscale shopping, waterfront, Georgetown Cupcake!", icon: "🛍️", lat: 38.9055, lng: -77.0639 },
-            { name: "DC Monuments", type: "Landmarks", distance: "3 mi", address: "National Mall", note: "Lincoln Memorial, Washington Monument, WWII Memorial. Best at sunset!", icon: "🏛️", lat: 38.8893, lng: -77.0502 },
-            { name: "Dupont Circle", type: "Neighborhood", distance: "1.2 mi", address: "Dupont Circle", note: "Historic neighborhood, bookshops, Sunday farmers market.", icon: "🌸", lat: 38.9096, lng: -77.0434 },
-            { name: "National Cathedral", type: "Landmark", distance: "1 mi", address: "3101 Wisconsin Ave NW", note: "Stunning Gothic cathedral with gardens. Tower tours available.", icon: "⛪", lat: 38.9306, lng: -77.0707 }
+            { name: "Udvar-Hazy Air & Space Museum", type: "Museum", distance: "3 mi", address: "14390 Air and Space Museum Pkwy, Chantilly", note: "FREE! Space Shuttle Discovery, SR-71 Blackbird, WWII planes. MUST SEE!", icon: "🚀", lat: 38.9114, lng: -77.4440 },
+            { name: "Reston Town Center", type: "Shopping/Dining", distance: "4 mi", address: "11900 Market St, Reston", note: "Outdoor shopping, restaurants, ice skating rink, movie theater.", icon: "🛍️", lat: 38.9586, lng: -77.3590 },
+            { name: "Frying Pan Farm Park", type: "Farm/Nature", distance: "5 mi", address: "2709 West Ox Rd, Herndon", note: "FREE! Working farm, animals, playground. Great for younger kids.", icon: "🐄", lat: 38.9290, lng: -77.3510 },
+            { name: "Dulles Town Center", type: "Mall", distance: "2 mi", address: "21100 Dulles Town Cir, Dulles", note: "Large indoor mall with all the stores. Good rainy day option.", icon: "🏬", lat: 38.9880, lng: -77.4190 },
+            { name: "TopGolf", type: "Entertainment", distance: "8 mi", address: "6625 S Van Dorn St, Alexandria", note: "Fun golf games, food, arcade. Great for teens!", icon: "⛳", lat: 38.7960, lng: -77.1290 },
+            { name: "Dave & Buster's", type: "Entertainment", distance: "5 mi", address: "8300 Westpark Dr, Tysons", note: "Arcade games, food, prizes. Perfect for downtime!", icon: "🎮", lat: 38.9210, lng: -77.2320 },
+            { name: "Historic Downtown Herndon", type: "Town", distance: "3 mi", address: "Downtown Herndon", note: "Cute small town feel, local shops, W&OD Trail access.", icon: "🏘️", lat: 38.9696, lng: -77.3867 },
+            { name: "Great Falls Park", type: "Nature", distance: "12 mi", address: "9200 Old Dominion Dr, McLean", note: "Stunning waterfalls on the Potomac. $20/car entry. Worth the drive!", icon: "🌊", lat: 38.9985, lng: -77.2540 }
         ];
 
         // --- Initialization ---
