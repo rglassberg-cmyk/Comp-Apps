@@ -756,13 +756,12 @@ function generateICS() {
   let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Tate Academy//Believe 2026//EN\r\n';
   let uid = 0;
   dances.forEach(d => {
-    if (d.type === 'awards') return;
     const s = new Date(d.d.year, d.d.month, d.d.day, d.sh, d.sm);
     const e = new Date(d.d.year, d.d.month, d.d.day, d.eh, d.em);
     ics += `BEGIN:VEVENT\r\n`;
     ics += `UID:believe-2026-${uid++}@tateacademy.com\r\n`;
     ics += `DTSTART:${icsDate(s)}\r\nDTEND:${icsDate(e)}\r\n`;
-    ics += `SUMMARY:${d.title} - Tate Academy (Believe)\r\n`;
+    ics += `SUMMARY:${d.type === 'awards' ? `🏆 ${d.title} - ${d.division}` : `${d.title} - (${d.type === 'solo' ? d.dancer.split(' ')[0] : 'Tate Academy'})`}\r\n`;
     ics += `LOCATION:${VENUE}\r\n`;
     ics += `DESCRIPTION:${d.division} - ${d.style}${d.dancer ? ' - ' + d.dancer : ''}\r\n`;
     ics += `END:VEVENT\r\n`;
