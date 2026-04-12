@@ -744,7 +744,7 @@ function addToCalendar(idx) {
   const desc  = `${item.division} · ${item.style}${item.dancer ? ' · ' + item.dancer : ''}`;
   const p = new URLSearchParams({
     action:'TEMPLATE',
-    text:`${item.title} — Tate Academy (Believe)`,
+    text:`${item.title} — (${item.type === 'solo' ? item.dancer.split(' ')[0] : 'Tate Academy'})`,
     dates:`${gcDate(start)}/${gcDate(end)}`,
     location: VENUE,
     details: desc
@@ -785,8 +785,7 @@ function renderDances() {
       html += `<div class="day-header">📅 ${d.day}</div>`;
     }
     const cls = d.type === 'awards' ? 'awards' : `${d.age}${d.type === 'solo' ? ' solo' : ''}`;
-    const btn = d.type !== 'awards'
-      ? `<button class="cal-btn" onclick="addToCalendar(${i})">+ Add to Calendar</button>` : '';
+    const btn = `<button class="cal-btn" onclick="addToCalendar(${i})">+ Add to Calendar</button>`;
     const extra = d.dancers
       ? `<div class="dance-dancers">${d.dancers}</div>` : '';
     html += `
