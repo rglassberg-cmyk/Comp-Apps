@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tate Academy - Believe Poughkeepsie 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #1a1b1d; color: #f0f0f0; min-height: 100vh; }
+
+    header {
+      background: linear-gradient(135deg, #d5164d, #9a1039);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 6px; }
+    header p { color: rgba(255,255,255,0.85); font-size: 1rem; }
+    header .sub { font-size: 0.85rem; margin-top: 4px; opacity: 0.75; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 12px 16px;
+      background: #111213;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #2a2b2d;
+    }
+    .tab-btn {
+      padding: 8px 14px;
+      border: none;
+      background: #2a2b2d;
+      color: #ccc;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn.active { background: #d5164d; color: white; }
+    .tab-btn:hover:not(.active) { background: #3a3b3d; color: white; }
+
+    .tab-content { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+    .tab-content.active { display: block; }
+
+    .section-header {
+      background: linear-gradient(135deg, #d5164d, #9a1039);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .section-subheader {
+      background: #2a2b2d;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin: 16px 0 10px 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* ICS Section */
+    .ics-section {
+      background: #2a2b2d;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .ics-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .ics-instructions { display: none; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
+    .ics-instructions.open { display: block; }
+    .ics-instructions ol { padding-left: 20px; }
+    .ics-instructions li { margin: 6px 0; font-size: 0.85rem; color: #ccc; line-height: 1.5; }
+    .ics-toggle { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 0.8rem; font-family: 'Outfit', sans-serif; }
+
+    /* Dance Order */
+    .day-header {
+      background: #1e1f21;
+      border-left: 4px solid #d5164d;
+      padding: 10px 14px;
+      margin: 16px 0 8px 0;
+      border-radius: 0 8px 8px 0;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .dance-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .dance-row.age-5-6   { background: rgba(213,22,77,0.08);  border-left: 3px solid #e8a0b4; }
+    .dance-row.age-9-11  { background: rgba(213,22,77,0.14);  border-left: 3px solid #c4527a; }
+    .dance-row.age-12-14 { background: rgba(176,16,64,0.20);  border-left: 3px solid #b01040; }
+    .dance-row.age-15-16 { background: rgba(213,22,77,0.24);  border-left: 3px solid #d5164d; }
+    .dance-row.age-17-19 { background: rgba(154,16,57,0.30);  border-left: 3px solid #9a1039; }
+    .dance-row.solo      { box-shadow: inset 0 0 0 1px rgba(213,22,77,0.4); }
+    .dance-row.awards    { background: #1e1f21; border-left: 3px solid #555; }
+
+    .dance-time { min-width: 76px; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.65); padding-top: 3px; flex-shrink: 0; }
+    .dance-info { flex: 1; min-width: 0; }
+    .dance-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+    .dance-meta  { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+    .dance-dancers { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; line-height: 1.4; }
+
+    .cal-btn {
+      flex-shrink: 0;
+      padding: 5px 10px;
+      background: #d5164d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cal-btn:hover { background: #b01040; }
+
+    /* Cards */
+    .card {
+      background: #2a2b2d;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .card-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e87ba0;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .card-name:hover { color: #d5164d; }
+    .card-meta  { font-size: 0.82rem; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+    .card-desc  { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px; line-height: 1.5; }
+    .card-notes { font-size: 0.78rem; color: #f0a0b0; margin: 6px 0; }
+    .free-badge { color: #80e080; font-size: 0.72rem; font-weight: 700; margin-left: 6px; letter-spacing: 0.03em; }
+    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+    .action-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      border: none;
+      transition: opacity 0.15s;
+    }
+    .action-btn:hover { opacity: 0.8; }
+    .action-btn.directions { background: #d5164d; color: white; }
+    .action-btn.menu    { background: #1e2d3d; color: #90c0e0; border: 1px solid #90c0e0; }
+    .action-btn.website { background: #1e1e35; color: #a090e0; border: 1px solid #a090e0; }
+
+    .map-container { height: 300px; border-radius: 10px; overflow: hidden; margin: 16px 0; }
+
+    /* Weekend Info */
+    .info-card {
+      background: #2a2b2d;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 4px solid #d5164d;
+    }
+    .info-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #e87ba0; }
+    .info-row { display: flex; gap: 10px; margin-bottom: 7px; font-size: 0.88rem; }
+    .info-label { min-width: 110px; color: rgba(255,255,255,0.45); font-weight: 500; flex-shrink: 0; }
+    .info-value { color: #f0f0f0; }
+
+    /* Route */
+    .route-stop {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .route-stop:last-child { border-bottom: none; }
+    .stop-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: #d5164d;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .stop-dot.rest-stop { background: #1e2e1e; border: 2px solid #60a060; font-size: 0.9rem; }
+    .stop-dot.finish    { background: #2d1a2d; border: 2px solid #d5164d; font-size: 0.9rem; }
+    .stop-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 3px; }
+    .stop-desc  { font-size: 0.8rem; color: rgba(255,255,255,0.55); line-height: 1.4; }
+
+    /* Buttons */
+    .btn-primary {
+      padding: 9px 16px;
+      background: #d5164d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #b01040; }
+
+    footer {
+      background: #111213;
+      text-align: center;
+      padding: 18px;
+      margin-top: 40px;
+      color: rgba(255,255,255,0.35);
+      font-size: 0.8rem;
+      border-top: 1px solid #2a2b2d;
+    }
+    footer a { color: #d5164d; text-decoration: none; }
+
+    @media (max-width: 560px) {
+      header h1 { font-size: 1.5rem; }
+      .dance-row { flex-wrap: wrap; }
+      .cal-btn { font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Tate Academy Company</h1>
+  <p>Believe — Poughkeepsie, NY</p>
+  <p class="sub">April 18–19, 2026</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active"  onclick="switchTab('danceOrder', this)">🎭 Dance Order</button>
+  <button class="tab-btn"         onclick="switchTab('eat', this)">🍽️ Places to Eat</button>
+  <button class="tab-btn"         onclick="switchTab('todo', this)">🗺️ Things to Do</button>
+  <button class="tab-btn"         onclick="switchTab('weekend', this)">📋 Weekend Info</button>
+  <button class="tab-btn"         onclick="switchTab('suggest', this)">💬 Suggest Updates</button>
+</nav>
+
+<main>
+
+<!-- ===== DANCE ORDER ===== -->
+<div id="danceOrder" class="tab-content active">
+  <div class="section-header">🎭 Competition Dance Order</div>
+
+  <div class="ics-section">
+    <div class="ics-top">
+      <div>
+        <div style="font-weight:600; margin-bottom:2px;">📅 Add Full Schedule to Calendar</div>
+        <button class="ics-toggle" onclick="toggleICS()">▸ How to import the .ics file</button>
+      </div>
+      <button class="btn-primary" onclick="generateICS()">⬇ Download .ics File</button>
+    </div>
+    <div id="icsInstructions" class="ics-instructions">
+      <ol>
+        <li><strong>iPhone / iPad:</strong> Tap the downloaded file → tap "Add All" → Done</li>
+        <li><strong>Android:</strong> Open the file → select your calendar app → confirm import</li>
+        <li><strong>Google Calendar:</strong> Go to calendar.google.com → Settings ⚙️ → Import &amp; Export → Import → choose the file</li>
+        <li><strong>Outlook:</strong> Double-click the file, or drag it into your Outlook calendar window</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="danceList"></div>
+</div>
+
+<!-- ===== PLACES TO EAT ===== -->
+<div id="eat" class="tab-content">
+  <div class="section-header">🍽️ Places to Eat</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Good news — the hotel is in downtown Poughkeepsie with real walkable restaurant options!
+  </p>
+  <div class="section-subheader">🚶 Walkable from Hotel</div>
+  <div id="walkableList"></div>
+  <div id="foodMap" class="map-container"></div>
+  <div class="section-subheader">🚗 Short Drive or Delivery</div>
+  <div id="driveList"></div>
+</div>
+
+<!-- ===== THINGS TO DO ===== -->
+<div id="todo" class="tab-content">
+  <div class="section-header">🗺️ Things to Do</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Poughkeepsie has some genuinely great spots — the Walkway Over the Hudson alone is worth the trip.
+  </p>
+  <div id="activitiesList"></div>
+  <div id="activitiesMap" class="map-container"></div>
+</div>
+
+<!-- ===== WEEKEND INFO ===== -->
+<div id="weekend" class="tab-content">
+  <div class="section-header">📋 Weekend Info</div>
+
+  <div class="info-card">
+    <h3>🏨 Hotel</h3>
+    <div class="info-row"><span class="info-label">Name</span><span class="info-value">DoubleTree by Hilton Poughkeepsie</span></div>
+    <div class="info-row"><span class="info-label">Address</span><span class="info-value">40 Civic Center Plaza, Poughkeepsie, NY 12601</span></div>
+    <div class="info-row"><span class="info-label">Check-in</span><span class="info-value">3:00 PM</span></div>
+    <div class="info-row"><span class="info-label">Check-out</span><span class="info-value">11:00 AM</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">(845) 485-5300</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://maps.google.com/?q=40+Civic+Center+Plaza+Poughkeepsie+NY+12601" target="_blank" class="action-btn directions">📍 Directions to Hotel</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🎭 Competition Venue</h3>
+    <div class="info-row"><span class="info-label">Competition</span><span class="info-value">Believe Dance Competition — Poughkeepsie</span></div>
+    <div class="info-row"><span class="info-label">Venue</span><span class="info-value">Mid-Hudson Civic Center (connected to hotel)</span></div>
+    <div class="info-row"><span class="info-label">Saturday</span><span class="info-value">April 18 — First performance 9:02 AM</span></div>
+    <div class="info-row"><span class="info-label">Sunday</span><span class="info-value">April 19 — First performance 8:30 AM</span></div>
+  </div>
+
+  <div class="info-card">
+    <h3>📅 Weekend at a Glance</h3>
+    <div class="info-row"><span class="info-label">Sat 4/18</span><span class="info-value">9:02 AM – 9:30 PM · Solos, Small Groups, Large Groups</span></div>
+    <div class="info-row"><span class="info-label">Sun 4/19</span><span class="info-value">8:30 AM – 7:00 PM · Groups, Lines, Solos</span></div>
+    <div class="info-row" style="margin-top:6px;"><span class="info-label">Awards</span><span class="info-value">Sat: 11:45 AM · 4:45 PM · 9:30 PM</span></div>
+    <div class="info-row"><span class="info-label"></span><span class="info-value">Sun: 1:30 PM · 7:00 PM</span></div>
+  </div>
+
+  <div class="info-card">
+    <h3>🚗 Getting There from Teaneck</h3>
+    <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); margin-bottom:14px;">About 80 miles · 1.5 – 2 hours depending on traffic</p>
+
+    <div class="route-stop">
+      <div class="stop-dot">1</div>
+      <div>
+        <div class="stop-title">Tate Academy — Teaneck, NJ</div>
+        <div class="stop-desc">Head north on I-95 → George Washington Bridge → I-87 North (NYS Thruway)</div>
+      </div>
+    </div>
+
+    <div class="route-stop">
+      <div class="stop-dot rest-stop">☕</div>
+      <div>
+        <div class="stop-title">Sloatsburg Service Plaza <span style="color:rgba(255,255,255,0.4); font-weight:400; font-size:0.8rem;">(optional early stop)</span></div>
+        <div class="stop-desc">~45 min into drive · Mile Marker 33 on I-87 N, between exits 15A–16 · McDonald's, Dunkin, Starbucks · Good for coffee and a bathroom before the highway stretch</div>
+      </div>
+    </div>
+
+    <div class="route-stop">
+      <div class="stop-dot rest-stop">🍟</div>
+      <div>
+        <div class="stop-title">Plattekill Service Plaza <span style="color:rgba(255,255,255,0.4); font-weight:400; font-size:0.8rem;">(last stop before Poughkeepsie)</span></div>
+        <div class="stop-desc">~1 hr 15 min into drive · Mile Marker 65 on I-87 N, between exits 17–18 · McDonald's, Dunkin, Burger King · Perfect final pit stop — you'll exit the Thruway just a few miles ahead</div>
+      </div>
+    </div>
+
+    <div class="route-stop">
+      <div class="stop-dot">2</div>
+      <div>
+        <div class="stop-title">Exit 18 — New Paltz</div>
+        <div class="stop-desc">Take Exit 18 off I-87 → Route 44/55 East toward Poughkeepsie (~15 min to hotel)</div>
+      </div>
+    </div>
+
+    <div class="route-stop">
+      <div class="stop-dot finish">🎭</div>
+      <div>
+        <div class="stop-title">DoubleTree by Hilton Poughkeepsie</div>
+        <div class="stop-desc">40 Civic Center Plaza · Hotel and competition venue (Mid-Hudson Civic Center)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUGGEST UPDATES ===== -->
+<div id="suggest" class="tab-content">
+  <div class="section-header">💬 Suggest Updates</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Know a great restaurant nearby? Spot something wrong on the dance order? Let us know!
+  </p>
+  <iframe
+    src="https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true"
+    width="100%"
+    height="834"
+    frameborder="0"
+    marginheight="0"
+    marginwidth="0"
+    style="border-radius:10px;">
+    Loading form...
+  </iframe>
+</div>
+
+</main>
+
+<footer>
+  <p>Tate Academy Company · Believe 2026 · Poughkeepsie, NY</p>
+  <p style="margin-top:5px;">Built by <a href="https://lhasa.app" target="_blank">Lhasa LLC</a></p>
+</footer>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let icsOpen = false;
+let foodMapReady = false;
+let actMapReady = false;
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'eat')  renderFoodMap();
+  if (id === 'todo') renderActMap();
+}
+
+function toggleICS() {
+  icsOpen = !icsOpen;
+  const el = document.getElementById('icsInstructions');
+  el.classList.toggle('open', icsOpen);
+  document.querySelector('.ics-toggle').textContent = (icsOpen ? '▾' : '▸') + ' How to import the .ics file';
+}
+
+// ============================================================
+// DATA
+// month is 0-indexed: 3 = April
+// Always use explicit constructor — never parse date strings
+// ============================================================
+const SAT = { year: 2026, month: 3, day: 18 };
+const SUN = { year: 2026, month: 3, day: 19 };
+const VENUE = 'Mid-Hudson Civic Center, 40 Civic Center Plaza, Poughkeepsie, NY 12601';
+
+const dances = [
+  // ---- SATURDAY APRIL 18 ----
+  { day:'Saturday, April 18', time:'9:02 AM', type:'solo', age:'age-9-11',
+    title:'Wings', style:'Jazz', division:'Competitive Solo',
+    dancer:'Liana Yaros',
+    d:SAT, sh:9, sm:2, eh:9, em:5 },
+  { day:'Saturday, April 18', time:'9:08 AM', type:'solo', age:'age-9-11',
+    title:'Le Freake', style:'Jazz', division:'Competitive Solo',
+    dancer:'Anaya Martinez',
+    d:SAT, sh:9, sm:8, eh:9, em:11 },
+  { day:'Saturday, April 18', time:'9:54 AM', type:'solo', age:'age-9-11',
+    title:'Raspberry Beret', style:'Jazz', division:'Competitive Solo',
+    dancer:'Isabella Elsebai',
+    d:SAT, sh:9, sm:54, eh:9, em:57 },
+  { day:'Saturday, April 18', time:'11:45 AM', type:'awards',
+    title:'AWARDS', division:'8 & Under / 9-11 Solos · Duet/Trios — All Levels',
+    d:SAT, sh:11, sm:45, eh:12, em:30 },
+  { day:'Saturday, April 18', time:'1:01 PM', type:'group', age:'age-5-6',
+    title:'Hallelujah', style:'Lyrical', division:'Showcase Small Group',
+    dancer:'Age 5-6 Company',
+    dancers:'Ephesian Chapman, Acelyn Hernandez, Demi Kotright, Stephanie Owusu',
+    d:SAT, sh:13, sm:1, eh:13, em:5 },
+  { day:'Saturday, April 18', time:'1:29 PM', type:'group', age:'age-9-11',
+    title:'Work Me Down', style:'Jazz', division:'Competitive Small Group',
+    dancer:'Age 9-11 Company',
+    dancers:'Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Taydeliz Mota, Charlotte Paltroom, Sierra Sung, Liana Yaros',
+    d:SAT, sh:13, sm:29, eh:13, em:33 },
+  { day:'Saturday, April 18', time:'1:42 PM', type:'group', age:'age-5-6',
+    title:'Covergirl', style:'Jazz', division:'Showcase Small Group',
+    dancer:'Age 5-6 Company',
+    dancers:'Ephesian Chapman, Acelyn Hernandez, Demi Kotright, Stephanie Owusu',
+    d:SAT, sh:13, sm:42, eh:13, em:46 },
+  { day:'Saturday, April 18', time:'1:50 PM', type:'group', age:'age-9-11',
+    title:'Fly', style:'Lyrical', division:'Competitive Small Group',
+    dancer:'Age 9-11 Company',
+    dancers:'Isabella Elsebai, Ava Khan, Taydeliz Mota, Jade Paez',
+    d:SAT, sh:13, sm:50, eh:13, em:54 },
+  { day:'Saturday, April 18', time:'1:59 PM', type:'group', age:'age-9-11',
+    title:'Just Like a River', style:'Lyrical', division:'Competitive Small Group',
+    dancer:'Age 9-11 Company',
+    dancers:'Sasha Lebovitch, Anaya Martinez, Sierra Sung, Liana Yaros',
+    d:SAT, sh:13, sm:59, eh:14, em:3 },
+  { day:'Saturday, April 18', time:'3:04 PM', type:'group', age:'age-9-11',
+    title:'Whacha Know About Me', style:'Hip Hop', division:'Elite Large Group',
+    dancer:'Age 9-11 Company (12)',
+    dancers:'Ella Beharry, Eden Caffie, Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Camila Martinez, Sapphira Morales, Taydeliz Mota, Jade Paez, Robbie Palefski, Liana Yaros',
+    d:SAT, sh:15, sm:4, eh:15, em:9 },
+  { day:'Saturday, April 18', time:'4:04 PM', type:'group', age:'age-9-11',
+    title:'Hairspray', style:'Musical Theater', division:'Elite Large Group',
+    dancer:'Age 9-11 Company (17)',
+    dancers:'Zoey Almonte, Ella Beharry, Eden Caffie, Ephesian Chapman, Isabella Elsebai, Ava Khan, Demi Kotright, Sasha Lebovitch, Zoë Lebovitch, Camila Martinez, Anaya Martinez, Taydeliz Mota, Stephanie Owusu, Jade Paez, Charlotte Paltroom, Sierra Sung, Liana Yaros',
+    d:SAT, sh:16, sm:4, eh:16, em:9 },
+  { day:'Saturday, April 18', time:'4:45 PM', type:'awards',
+    title:'AWARDS', division:'8 & Under / 9-11 Small & Large Groups · Lines · Grand Lines',
+    d:SAT, sh:16, sm:45, eh:17, em:30 },
+  { day:'Saturday, April 18', time:'6:59 PM', type:'solo', age:'age-12-14',
+    title:"That's Life", style:'Jazz', division:'Elite Solo',
+    dancer:'Robbie Palefski',
+    d:SAT, sh:18, sm:59, eh:19, em:2 },
+  { day:'Saturday, April 18', time:'7:22 PM', type:'solo', age:'age-12-14',
+    title:'The Bird', style:'Contemporary', division:'Elite Solo',
+    dancer:'Ella Beharry',
+    d:SAT, sh:19, sm:22, eh:19, em:25 },
+  { day:'Saturday, April 18', time:'7:25 PM', type:'solo', age:'age-12-14',
+    title:'When I Go', style:'Contemporary', division:'Elite Solo',
+    dancer:'Robbie Palefski',
+    d:SAT, sh:19, sm:25, eh:19, em:28 },
+  { day:'Saturday, April 18', time:'7:27 PM', type:'solo', age:'age-12-14',
+    title:'Corps', style:'Contemporary', division:'Elite Solo',
+    dancer:'Camila Martinez',
+    d:SAT, sh:19, sm:27, eh:19, em:30 },
+  { day:'Saturday, April 18', time:'7:38 PM', type:'solo', age:'age-12-14',
+    title:'Slow It Down', style:'Lyrical', division:'Elite Solo',
+    dancer:'Ella Beharry',
+    d:SAT, sh:19, sm:38, eh:19, em:41 },
+  { day:'Saturday, April 18', time:'7:53 PM', type:'solo', age:'age-12-14',
+    title:'River', style:'Lyrical', division:'Elite Solo',
+    dancer:'Eden Caffie',
+    d:SAT, sh:19, sm:53, eh:19, em:56 },
+  { day:'Saturday, April 18', time:'7:58 PM', type:'solo', age:'age-12-14',
+    title:'I Dreamed a Dream', style:'Lyrical', division:'Elite Solo',
+    dancer:'Zoë Lebovitch',
+    d:SAT, sh:19, sm:58, eh:20, em:1 },
+  { day:'Saturday, April 18', time:'8:57 PM', type:'group', age:'age-12-14',
+    title:'What the World Needs Now', style:'Lyrical', division:'Elite Duet/Trio',
+    dancer:'Age 12-14',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch',
+    d:SAT, sh:20, sm:57, eh:21, em:1 },
+  { day:'Saturday, April 18', time:'9:30 PM', type:'awards',
+    title:'AWARDS', division:'12-14 Solos · Duet/Trios — All Levels',
+    d:SAT, sh:21, sm:30, eh:22, em:15 },
+
+  // ---- SUNDAY APRIL 19 ----
+  { day:'Sunday, April 19', time:'8:30 AM', type:'group', age:'age-15-16',
+    title:'Cellophane', style:'Lyrical', division:'Elite Small Group',
+    dancer:'Age 15-16 Company',
+    dancers:'Talya Baruch, Liam Brady, Chloe Choi, Talia Glassberg, Lula Najera, Alina Nam',
+    d:SUN, sh:8, sm:30, eh:8, em:34 },
+  { day:'Sunday, April 19', time:'9:06 AM', type:'group', age:'age-12-14',
+    title:'White Rabbit', style:'Contemporary', division:'Elite Small Group',
+    dancer:'Age 12-14 Company',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
+    d:SUN, sh:9, sm:6, eh:9, em:10 },
+  { day:'Sunday, April 19', time:'9:19 AM', type:'group', age:'age-15-16',
+    title:'Kendrick', style:'Hip Hop', division:'Elite Small Group',
+    dancer:'Age 15-16 Company',
+    dancers:'Carly Baitner, Chloe Choi, Rylee Dennis, Ella Guy, Charlotte Mejia, Lula Najera, Alina Nam, Kaelynn Vargas',
+    d:SUN, sh:9, sm:19, eh:9, em:23 },
+  { day:'Sunday, April 19', time:'9:43 AM', type:'group', age:'age-12-14',
+    title:'The Way You Make Me Feel', style:'Jazz', division:'Elite Small Group',
+    dancer:'Age 12-14 Company',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
+    d:SUN, sh:9, sm:43, eh:9, em:47 },
+  { day:'Sunday, April 19', time:'9:46 AM', type:'group', age:'age-15-16',
+    title:'Dead & Done', style:'Contemporary', division:'Elite Small Group',
+    dancer:'Age 15-16 Company',
+    dancers:'Carly Baitner, Liam Brady, Chloe Choi, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam',
+    d:SUN, sh:9, sm:46, eh:9, em:50 },
+  { day:'Sunday, April 19', time:'11:38 AM', type:'group', age:'age-15-16',
+    title:'Cry to Me', style:'Jazz', division:'Elite Large Group',
+    dancer:'Age 15-16 Company (10)',
+    dancers:'Carly Baitner, Talya Baruch, Liam Brady, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam, Genevieve Tomic',
+    d:SUN, sh:11, sm:38, eh:11, em:43 },
+  { day:'Sunday, April 19', time:'12:01 PM', type:'group', age:'age-15-16',
+    title:'End of Love', style:'Lyrical', division:'Elite Large Group',
+    dancer:'Age 15-16 Company (15)',
+    dancers:'Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Zoë Lebovitch, Camila Martinez, Lula Najera, Alina Nam, Robbie Palefski, Genevieve Tomic',
+    d:SUN, sh:12, sm:1, eh:12, em:6 },
+  { day:'Sunday, April 19', time:'12:34 PM', type:'group', age:'age-12-14',
+    title:'Golden Years', style:'Jazz', division:'Elite Line',
+    dancer:'Full Company Line (28)',
+    dancers:'Zoey Almonte, Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Isabella Elsebai, Talia Glassberg, Ella Guy, Ava Khan, Sasha Lebovitch, Zoë Lebovitch, Anaya Martinez, Camila Martinez, Charlotte Mejia, Sapphira Morales, Taydeliz Mota, Lula Najera, Alina Nam, Jade Paez, Robbie Palefski, Charlotte Paltroom, Sierra Sung, Genevieve Tomic, Kaelynn Vargas, Liana Yaros',
+    d:SUN, sh:12, sm:34, eh:12, em:40 },
+  { day:'Sunday, April 19', time:'1:30 PM', type:'awards',
+    title:'AWARDS', division:'12-14 & 15-19 Small & Large Groups · Lines · Grand Lines',
+    d:SUN, sh:13, sm:30, eh:14, em:30 },
+  { day:'Sunday, April 19', time:'3:28 PM', type:'solo', age:'age-15-16',
+    title:'Other Side', style:'Contemporary', division:'Elite Solo',
+    dancer:'Carly Baitner',
+    d:SUN, sh:15, sm:28, eh:15, em:31 },
+  { day:'Sunday, April 19', time:'4:01 PM', type:'solo', age:'age-15-16',
+    title:'Out There', style:'Contemporary', division:'Elite Solo',
+    dancer:'Alina Nam',
+    d:SUN, sh:16, sm:1, eh:16, em:4 },
+  { day:'Sunday, April 19', time:'4:08 PM', type:'solo', age:'age-15-16',
+    title:'Dreams', style:'Jazz', division:'Elite Solo',
+    dancer:'Ella Guy',
+    d:SUN, sh:16, sm:8, eh:16, em:11 },
+  { day:'Sunday, April 19', time:'4:24 PM', type:'solo', age:'age-15-16',
+    title:'Foolish Games', style:'Lyrical', division:'Elite Solo',
+    dancer:'Talia Glassberg',
+    d:SUN, sh:16, sm:24, eh:16, em:27 },
+  { day:'Sunday, April 19', time:'4:31 PM', type:'solo', age:'age-15-16',
+    title:'Death Wish', style:'Lyrical', division:'Elite Solo',
+    dancer:'Ella Guy',
+    d:SUN, sh:16, sm:31, eh:16, em:34 },
+  { day:'Sunday, April 19', time:'4:41 PM', type:'solo', age:'age-15-16',
+    title:'One More Moment', style:'Lyrical', division:'Elite Solo',
+    dancer:'Talya Baruch',
+    d:SUN, sh:16, sm:41, eh:16, em:44 },
+  { day:'Sunday, April 19', time:'5:12 PM', type:'solo', age:'age-17-19',
+    title:'Tennessee Whiskey', style:'Contemporary', division:'Elite Solo',
+    dancer:'Liam Brady',
+    d:SUN, sh:17, sm:12, eh:17, em:15 },
+  { day:'Sunday, April 19', time:'5:15 PM', type:'solo', age:'age-17-19',
+    title:'Winner Takes It All', style:'Contemporary', division:'Elite Solo',
+    dancer:'Lula Najera',
+    d:SUN, sh:17, sm:15, eh:17, em:18 },
+  { day:'Sunday, April 19', time:'5:17 PM', type:'solo', age:'age-17-19',
+    title:'These Arms of Mine', style:'Contemporary', division:'Elite Solo',
+    dancer:'Chloe Choi',
+    d:SUN, sh:17, sm:17, eh:17, em:20 },
+  { day:'Sunday, April 19', time:'5:33 PM', type:'solo', age:'age-17-19',
+    title:"Where's My Husband", style:'Jazz', division:'Elite Solo',
+    dancer:'Rylee Dennis',
+    d:SUN, sh:17, sm:33, eh:17, em:36 },
+  { day:'Sunday, April 19', time:'5:50 PM', type:'solo', age:'age-17-19',
+    title:'Lose Yourself', style:'Hip Hop', division:'Elite Solo',
+    dancer:'Rylee Dennis',
+    d:SUN, sh:17, sm:50, eh:17, em:53 },
+  { day:'Sunday, April 19', time:'7:00 PM', type:'awards',
+    title:'AWARDS', division:'15-19 & 20+ Solos · Duet/Trios — All Levels',
+    d:SUN, sh:19, sm:0, eh:20, em:0 }
+];
+
+const walkable = [
+  { name:'Brasserie 292', cuisine:'French / American', distance:'~10 min walk', price:'$$$',
+    address:'292 Main St, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Brasserie+292+292+Main+St+Poughkeepsie+NY',
+    menu:'https://www.brasserie292.com/menu', web:'https://www.brasserie292.com',
+    notes:'Classic French bistro — great for a sit-down dinner' },
+  { name:'Mill House Brewing Company', cuisine:'American / Gastropub', distance:'~12 min walk', price:'$$',
+    address:'289 Mill St, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Mill+House+Brewing+289+Mill+St+Poughkeepsie+NY',
+    menu:'https://millhousebrewing.com/poughkeepsie-menu/', web:'https://millhousebrewing.com',
+    notes:'Craft beer, great food, casual vibe' },
+  { name:"The Artist's Palate", cuisine:'American Bistro', distance:'~12 min walk', price:'$$',
+    address:'307 Main St, Poughkeepsie, NY',
+    map:"https://maps.google.com/?q=The+Artist's+Palate+307+Main+St+Poughkeepsie+NY",
+    menu:'https://www.theartistspalate.biz/menus/', web:'https://www.theartistspalate.biz',
+    notes:'Creative dishes, great for groups' },
+  { name:'Soul Dog', cuisine:'American / Hot Dogs', distance:'~8 min walk', price:'$',
+    address:'33 Raymond Ave, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Soul+Dog+33+Raymond+Ave+Poughkeepsie+NY',
+    menu:'https://souldogpoughkeepsie.com/menu/', web:'https://souldogpoughkeepsie.com',
+    notes:'Casual and fast — perfect between performances' },
+  { name:'The Poughkeepsie Grind', cuisine:'Coffee / Bakery', distance:'~10 min walk', price:'$',
+    address:'478 Main St, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Poughkeepsie+Grind+478+Main+St+Poughkeepsie+NY',
+    menu:'', web:'',
+    notes:'Local coffee shop — great for the morning rush' },
+  { name:'Milanese Restaurant', cuisine:'Italian', distance:'~6 min walk', price:'$$',
+    address:'115 Main St, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Milanese+Restaurant+115+Main+St+Poughkeepsie+NY',
+    menu:'', web:'',
+    notes:'Solid Italian, very close to the hotel' }
+];
+
+const driveOptions = [
+  { name:'Shadows on the Hudson', cuisine:'American / Waterfront', distance:'5 min drive', price:'$$$',
+    address:'176 Rinaldi Blvd, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Shadows+on+the+Hudson+176+Rinaldi+Blvd+Poughkeepsie+NY',
+    menu:'https://shadowsonthehudson.com/menu/', web:'https://shadowsonthehudson.com',
+    notes:'Beautiful river views — great for a special dinner' },
+  { name:"Cosimo's Trattoria", cuisine:'Italian / Wood-fired Pizza', distance:'8 min drive', price:'$$',
+    address:'120 Delafield St, Poughkeepsie, NY',
+    map:"https://maps.google.com/?q=Cosimo's+Trattoria+120+Delafield+Poughkeepsie+NY",
+    menu:"https://www.cosimostrattoria.com/menu/", web:"https://www.cosimostrattoria.com",
+    notes:'Very popular locally — wood-fired pizza' },
+  { name:'Gomen Kudasai', cuisine:'Japanese / Ramen', distance:'5 min drive', price:'$$',
+    address:'301 Main St, Poughkeepsie, NY',
+    map:'https://maps.google.com/?q=Gomen+Kudasai+Ramen+Poughkeepsie+NY',
+    menu:'', web:'',
+    notes:'Best ramen in Poughkeepsie' }
+];
+
+const activities = [
+  { name:'Walkway Over the Hudson', free:true,
+    desc:"A converted railroad bridge turned into a pedestrian walkway — stunning Hudson River views. One of the coolest free things in the Hudson Valley.",
+    distance:'1 mile walk / 5 min drive',
+    map:'https://maps.google.com/?q=Walkway+Over+the+Hudson+Poughkeepsie+NY',
+    web:'https://walkway.org', lat:41.7076, lng:-73.9456 },
+  { name:'Union Street Historic District', free:true,
+    desc:"Charming Victorian neighborhood just a short walk from the hotel — good for a stroll between competition blocks.",
+    distance:'10 min walk',
+    map:'https://maps.google.com/?q=Union+Street+Historic+District+Poughkeepsie+NY',
+    web:'', lat:41.7034, lng:-73.9267 },
+  { name:"Locust Grove Estate", free:false,
+    desc:"Samuel Morse's historic estate with beautiful gardens, trails, and Hudson River views.",
+    distance:'8 min drive',
+    map:'https://maps.google.com/?q=Locust+Grove+Estate+2683+South+Rd+Poughkeepsie+NY',
+    web:'https://www.lgny.org', lat:41.6792, lng:-73.9345 },
+  { name:'Culinary Institute of America', free:true,
+    desc:"One of the top culinary schools in the world — open campus, student-run restaurants, gorgeous grounds to walk around.",
+    distance:'8 min drive',
+    map:'https://maps.google.com/?q=Culinary+Institute+of+America+Hyde+Park+NY',
+    web:'https://www.ciachef.edu', lat:41.7834, lng:-73.9332 },
+  { name:'Frances Lehman Loeb Art Center', free:true,
+    desc:"Free art museum on the Vassar College campus — excellent permanent collection.",
+    distance:'8 min drive',
+    map:'https://maps.google.com/?q=Loeb+Art+Center+Vassar+College+Poughkeepsie+NY',
+    web:'https://artcenter.vassar.edu', lat:41.6868, lng:-73.8942 },
+  { name:'FDR Home National Historic Site', free:true,
+    desc:"Franklin Roosevelt's family estate, Springwood — beautiful grounds, FREE with National Park pass or small entry fee.",
+    distance:'15 min drive',
+    map:'https://maps.google.com/?q=FDR+Home+National+Historic+Site+Hyde+Park+NY',
+    web:'https://www.nps.gov/hofr/index.htm', lat:41.7785, lng:-73.9315 }
+];
+
+const HOTEL_LAT = 41.7001, HOTEL_LNG = -73.9301;
+
+// Approximate coords for walkable restaurant markers
+const foodCoords = [
+  [41.7010, -73.9280], [41.7025, -73.9320], [41.7015, -73.9285],
+  [41.6998, -73.9268], [41.7020, -73.9295], [41.7005, -73.9275]
+];
+
+// ============================================================
+// CALENDAR HELPERS
+// ============================================================
+const pad = n => String(n).padStart(2,'0');
+
+function gcDate(d) {
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+}
+
+function icsDate(d) { return gcDate(d); }
+
+function addToCalendar(idx) {
+  const item = dances[idx];
+  // Use explicit constructor — never parse date strings
+  const start = new Date(item.d.year, item.d.month, item.d.day, item.sh, item.sm);
+  const end   = new Date(item.d.year, item.d.month, item.d.day, item.eh, item.em);
+  const desc  = `${item.division} · ${item.style}${item.dancer ? ' · ' + item.dancer : ''}`;
+  const p = new URLSearchParams({
+    action:'TEMPLATE',
+    text:`${item.title} — Tate Academy (Believe)`,
+    dates:`${gcDate(start)}/${gcDate(end)}`,
+    location: VENUE,
+    details: desc
+  });
+  window.open(`https://calendar.google.com/calendar/render?${p}`, '_blank');
+}
+
+function generateICS() {
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Tate Academy//Believe 2026//EN\r\n';
+  let uid = 0;
+  dances.forEach(d => {
+    if (d.type === 'awards') return;
+    const s = new Date(d.d.year, d.d.month, d.d.day, d.sh, d.sm);
+    const e = new Date(d.d.year, d.d.month, d.d.day, d.eh, d.em);
+    ics += `BEGIN:VEVENT\r\n`;
+    ics += `UID:believe-2026-${uid++}@tateacademy.com\r\n`;
+    ics += `DTSTART:${icsDate(s)}\r\nDTEND:${icsDate(e)}\r\n`;
+    ics += `SUMMARY:${d.title} - Tate Academy (Believe)\r\n`;
+    ics += `LOCATION:${VENUE}\r\n`;
+    ics += `DESCRIPTION:${d.division} - ${d.style}${d.dancer ? ' - ' + d.dancer : ''}\r\n`;
+    ics += `END:VEVENT\r\n`;
+  });
+  ics += 'END:VCALENDAR';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ics], {type:'text/calendar;charset=utf-8'}));
+  a.download = 'Believe_2026_Tate_Academy.ics';
+  a.click();
+}
+
+// ============================================================
+// RENDER DANCE ORDER
+// ============================================================
+function renderDances() {
+  let html = '', curDay = '';
+  dances.forEach((d, i) => {
+    if (d.day !== curDay) {
+      curDay = d.day;
+      html += `<div class="day-header">📅 ${d.day}</div>`;
+    }
+    const cls = d.type === 'awards' ? 'awards' : `${d.age}${d.type === 'solo' ? ' solo' : ''}`;
+    const btn = d.type !== 'awards'
+      ? `<button class="cal-btn" onclick="addToCalendar(${i})">+ Add to Calendar</button>` : '';
+    const extra = d.dancers
+      ? `<div class="dance-dancers">${d.dancers}</div>` : '';
+    html += `
+      <div class="dance-row ${cls}">
+        <div class="dance-time">${d.time}</div>
+        <div class="dance-info">
+          <div class="dance-title">${d.type==='awards' ? '🏆 ' : ''}${d.title}</div>
+          <div class="dance-meta">${[d.division, d.style, d.dancer].filter(Boolean).join(' · ')}</div>
+          ${extra}
+        </div>
+        ${btn}
+      </div>`;
+  });
+  document.getElementById('danceList').innerHTML = html;
+}
+
+// ============================================================
+// RENDER RESTAURANTS
+// ============================================================
+function makeCard(r) {
+  const menuBtn = r.menu ? `<a href="${r.menu}" target="_blank" class="action-btn menu">Menu</a>` : '';
+  const webBtn  = r.web  ? `<a href="${r.web}"  target="_blank" class="action-btn website">Website</a>` : '';
+  const note    = r.notes ? `<div class="card-notes">ℹ️ ${r.notes}</div>` : '';
+  return `
+    <div class="card">
+      <a href="${r.map}" target="_blank" class="card-name">${r.name}</a>
+      <div class="card-meta">${r.cuisine} · ${r.distance} · ${r.price} · ${r.address}</div>
+      ${note}
+      <div class="card-actions">
+        <a href="${r.map}" target="_blank" class="action-btn directions">📍 Directions</a>
+        ${menuBtn}${webBtn}
+      </div>
+    </div>`;
+}
+
+function renderRestaurants() {
+  document.getElementById('walkableList').innerHTML = walkable.map(makeCard).join('');
+  document.getElementById('driveList').innerHTML    = driveOptions.map(makeCard).join('');
+}
+
+// ============================================================
+// RENDER ACTIVITIES
+// ============================================================
+function renderActivities() {
+  const html = activities.map(a => {
+    const free = a.free ? '<span class="free-badge">FREE</span>' : '';
+    const webBtn = a.web ? `<a href="${a.web}" target="_blank" class="action-btn website">Website</a>` : '';
+    return `
+      <div class="card">
+        <a href="${a.map}" target="_blank" class="card-name">${a.name}${free}</a>
+        <div class="card-meta">${a.distance}</div>
+        <div class="card-desc">${a.desc}</div>
+        <div class="card-actions">
+          <a href="${a.map}" target="_blank" class="action-btn directions">📍 Directions</a>
+          ${webBtn}
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('activitiesList').innerHTML = html;
+}
+
+// ============================================================
+// MAPS
+// ============================================================
+function renderFoodMap() {
+  if (foodMapReady) return;
+  foodMapReady = true;
+  const map = L.map('foodMap').setView([HOTEL_LAT, HOTEL_LNG], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+  L.marker([HOTEL_LAT, HOTEL_LNG]).addTo(map)
+    .bindPopup('<b>🏨 DoubleTree Hotel</b>').openPopup();
+  walkable.forEach((r, i) => {
+    if (foodCoords[i]) {
+      L.marker(foodCoords[i]).addTo(map)
+        .bindPopup(`<b>${r.name}</b><br>${r.cuisine} · ${r.distance}`);
+    }
+  });
+}
+
+function renderActMap() {
+  if (actMapReady) return;
+  actMapReady = true;
+  const map = L.map('activitiesMap').setView([HOTEL_LAT, HOTEL_LNG], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+  L.marker([HOTEL_LAT, HOTEL_LNG]).addTo(map)
+    .bindPopup('<b>🏨 DoubleTree Hotel</b>').openPopup();
+  activities.forEach(a => {
+    if (a.lat) L.marker([a.lat, a.lng]).addTo(map)
+      .bindPopup(`<b>${a.name}</b><br>${a.distance}`);
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderDances();
+renderRestaurants();
+renderActivities();
+</script>
+</body>
+</html>
