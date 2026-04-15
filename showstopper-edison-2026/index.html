@@ -231,8 +231,33 @@ The level affects what score is needed for each award tier.</p>
   <h4>📊 Score Reference Chart</h4>
   <button class="collapse-toggle" onclick="toggleCollapse('scoreChart')">▸ What score do I need?</button>
   <div id="scoreChart" class="collapse-content">
-    <p style="margin-bottom:10px;">Scores shown are for <strong>4-judge rooms</strong> (3-judge scores in parentheses).
-    Tate's older dancers are Competitive level. Younger dancers may be Advanced.</p>
+    <p style="font-weight:600; color:#e8a0b4; margin:10px 0 6px;">Mini (8 & under) — Competitive</p>
+<table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+  <tr style="color:rgba(255,255,255,0.4); border-bottom:1px solid rgba(255,255,255,0.1);">
+    <td style="padding:5px 6px; font-weight:600;">Award</td>
+    <td style="padding:5px 6px; text-align:center;">Mini 8 & under</td>
+  </tr>
+  <tr style="border-bottom:1px solid rgba(255,255,255,0.07); color:#f0d080;">
+    <td style="padding:5px 6px; font-weight:600;">Crystal ⭐</td>
+    <td style="padding:5px 6px; text-align:center;">113.1 (84.8)</td>
+  </tr>
+  <tr style="border-bottom:1px solid rgba(255,255,255,0.07); color:#c0e0ff;">
+    <td style="padding:5px 6px; font-weight:600;">Dbl Platinum</td>
+    <td style="padding:5px 6px; text-align:center;">111.7 (83.8)</td>
+  </tr>
+  <tr style="border-bottom:1px solid rgba(255,255,255,0.07); color:#d0d0d0;">
+    <td style="padding:5px 6px; font-weight:600;">Platinum</td>
+    <td style="padding:5px 6px; text-align:center;">109.5 (82.1)</td>
+  </tr>
+  <tr style="border-bottom:1px solid rgba(255,255,255,0.07); color:#f0c060;">
+    <td style="padding:5px 6px; font-weight:600;">Gold</td>
+    <td style="padding:5px 6px; text-align:center;">105.1 (78.8)</td>
+  </tr>
+  <tr style="color:#c0c0c0;">
+    <td style="padding:5px 6px; font-weight:600;">Silver</td>
+    <td style="padding:5px 6px; text-align:center;">105.0 & under</td>
+  </tr>
+</table>
 
     <p style="font-weight:600; color:#e87ba0; margin:10px 0 6px;">Competitive Level</p>
     <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
@@ -308,7 +333,7 @@ The level affects what score is needed for each award tier.</p>
       </tr>
     </table>
     <p style="font-size:0.75rem; color:rgba(255,255,255,0.35); margin-top:10px;">
-      Note: No Crystal award at Advanced level. Mini scores also available — ask in the Suggest Updates tab if you need them added.
+      Note: No Crystal award at Advanced level.
     </p>
   </div>
 </div>
@@ -489,69 +514,69 @@ const VENUE = 'NJ Convention & Exposition Center, 97 Sunfield Ave, Edison, NJ 08
 const dances = [
   // ---- FRIDAY APRIL 24 ----
   { day:'Friday, April 24', time:'9:38 AM', type:'solo', age:'age-15-16', room:'room2',
-    title:'Other Side', style:'Contemporary', division:'Elite Solo',
+    title:'Other Side', style:'Contemporary', division:'Competitive Solo · Senior',
     dancer:'Carly Baitner', entry:'#1176',
     d:FRI, sh:9, sm:38, eh:9, em:41 },
   { day:'Friday, April 24', time:'11:00 AM', type:'awards', room:'room2',
     title:'AWARDS', division:'Room 2 Awards',
     d:FRI, sh:11, sm:0, eh:11, em:20 },
   { day:'Friday, April 24', time:'11:23 AM', type:'solo', age:'age-15-16', room:'room2',
-    title:'Foolish Games', style:'Lyrical', division:'Elite Solo',
+    title:'Foolish Games', style:'Lyrical', division:'Competitive Solo · Senior',
     dancer:'Talia Glassberg', entry:'#1190',
     d:FRI, sh:11, sm:23, eh:11, em:26 },
   { day:'Friday, April 24', time:'11:39 AM', type:'group', age:'age-5-6', room:'room1',
-    title:'Covergirl', style:'Jazz', division:'Showcase Small Group',
+    title:'Covergirl', style:'Jazz', division:'Showcase Small Group · Mini',
     dancer:'Age 5-6 Company', entry:'#1159',
     dancers:'Ephesian Chapman, Acelyn Hernandez, Demi Kotright, Stephanie Owusu',
     d:FRI, sh:11, sm:39, eh:11, em:43 },
   { day:'Friday, April 24', time:'11:42 AM', type:'solo', age:'age-15-16', room:'room2',
-    title:'One More Moment', style:'Lyrical', division:'Elite Solo',
+    title:'One More Moment', style:'Lyrical', division:'Competitive Solo · Senior',
     dancer:'Talya Baruch', entry:'#1191',
     d:FRI, sh:11, sm:42, eh:11, em:45 },
   { day:'Friday, April 24', time:'11:48 AM', type:'group', age:'age-5-6', room:'room1',
-    title:'Hallelujah', style:'Lyrical', division:'Showcase Small Group',
+    title:'Hallelujah', style:'Lyrical', division:'Showcase Small Group · Mini',
     dancer:'Age 5-6 Company', entry:'#1160',
     dancers:'Ephesian Chapman, Acelyn Hernandez, Demi Kotright, Stephanie Owusu',
     d:FRI, sh:11, sm:48, eh:11, em:52 },
   { day:'Friday, April 24', time:'12:04 PM', type:'solo', age:'age-15-16', room:'room2',
-    title:'Death Wish', style:'Lyrical', division:'Elite Solo',
+    title:'Death Wish', style:'Lyrical', division:'Competitive Solo · Senior',
     dancer:'Ella Guy', entry:'#1179',
     d:FRI, sh:12, sm:4, eh:12, em:7 },
   { day:'Friday, April 24', time:'1:00 PM', type:'awards', room:'room1',
     title:'AWARDS', division:'Room 1 Awards',
     d:FRI, sh:13, sm:0, eh:13, em:20 },
   { day:'Friday, April 24', time:'1:05 PM', type:'solo', age:'age-15-16', room:'room2',
-    title:'Dreams', style:'Jazz', division:'Elite Solo',
+    title:'Dreams', style:'Jazz', division:'Competitive Solo · Senior',
     dancer:'Ella Guy', entry:'#1178',
     d:FRI, sh:13, sm:5, eh:13, em:8 },
   { day:'Friday, April 24', time:'1:30 PM', type:'awards', room:'room2',
     title:'AWARDS', division:'Room 2 Awards',
     d:FRI, sh:13, sm:30, eh:13, em:50 },
   { day:'Friday, April 24', time:'2:33 PM', type:'solo', age:'age-15-16', room:'room2',
-    title:'Out There', style:'Contemporary', division:'Elite Solo',
+    title:'Out There', style:'Contemporary', division:'Competitive Solo · Senior',
     dancer:'Alina Nam', entry:'#1165',
     d:FRI, sh:14, sm:33, eh:14, em:36 },
   { day:'Friday, April 24', time:'4:08 PM', type:'solo', age:'age-9-11', room:'room1',
-    title:'Raspberry Beret', style:'Jazz', division:'Competitive Solo',
+    title:'Raspberry Beret', style:'Jazz', division:'Competitive Solo · Junior',
     dancer:'Isabella Elsebai', entry:'#1167',
     d:FRI, sh:16, sm:8, eh:16, em:11 },
   { day:'Friday, April 24', time:'4:10 PM', type:'awards', room:'room2',
     title:'AWARDS', division:'Room 2 Awards',
     d:FRI, sh:16, sm:10, eh:16, em:30 },
   { day:'Friday, April 24', time:'5:14 PM', type:'solo', age:'age-17-19', room:'room2',
-    title:'Winner Takes It All', style:'Contemporary', division:'Elite Solo',
+    title:'Winner Takes It All', style:'Contemporary', division:'Competitive Solo · Senior',
     dancer:'Lula Najera', entry:'#1182',
     d:FRI, sh:17, sm:14, eh:17, em:17 },
   { day:'Friday, April 24', time:'5:27 PM', type:'solo', age:'age-17-19', room:'room2',
-    title:'Tennessee Whiskey', style:'Contemporary', division:'Elite Solo',
+    title:'Tennessee Whiskey', style:'Contemporary', division:'Competitive Solo · Senior',
     dancer:'Liam Brady', entry:'#1181',
     d:FRI, sh:17, sm:27, eh:17, em:30 },
   { day:'Friday, April 24', time:'5:57 PM', type:'solo', age:'age-9-11', room:'room1',
-    title:'Wings', style:'Jazz', division:'Competitive Solo',
+    title:'Wings', style:'Jazz', division:'Competitive Solo · Junior',
     dancer:'Liana Yaros', entry:'#1168',
     d:FRI, sh:17, sm:57, eh:18, em:0 },
   { day:'Friday, April 24', time:'6:00 PM', type:'solo', age:'age-9-11', room:'room1',
-    title:'Freak Out', style:'Jazz', division:'Competitive Solo',
+    title:'Freak Out', style:'Jazz', division:'Competitive Solo · Junior',
     dancer:'Anaya Martinez', entry:'#1166',
     d:FRI, sh:18, sm:0, eh:18, em:3 },
   { day:'Friday, April 24', time:'6:05 PM', type:'awards', room:'room1',
@@ -561,15 +586,15 @@ const dances = [
     title:'AWARDS', division:'Room 2 Awards',
     d:FRI, sh:18, sm:40, eh:19, em:0 },
   { day:'Friday, April 24', time:'7:49 PM', type:'solo', age:'age-17-19', room:'room2',
-    title:"Where's My Husband", style:'Jazz', division:'Elite Solo',
+    title:"Where's My Husband", style:'Jazz', division:'Competitive Solo · Senior',
     dancer:'Rylee Dennis', entry:'#1189',
     d:FRI, sh:19, sm:49, eh:19, em:52 },
   { day:'Friday, April 24', time:'8:02 PM', type:'solo', age:'age-17-19', room:'room2',
-    title:'These Arms of Mine', style:'Contemporary', division:'Elite Solo',
+    title:'These Arms of Mine', style:'Contemporary', division:'Competitive Solo · Senior',
     dancer:'Chloe Choi', entry:'#1177',
     d:FRI, sh:20, sm:2, eh:20, em:5 },
   { day:'Friday, April 24', time:'8:34 PM', type:'solo', age:'age-17-19', room:'room2',
-    title:'Lose Yourself', style:'Hip Hop', division:'Elite Solo',
+    title:'Lose Yourself', style:'Hip Hop', division:'Competitive Solo · Senior',
     dancer:'Rylee Dennis', entry:'#1188',
     d:FRI, sh:20, sm:34, eh:20, em:37 },
   { day:'Friday, April 24', time:'8:55 PM', type:'awards', room:'room2',
@@ -578,60 +603,60 @@ const dances = [
 
   // ---- SATURDAY APRIL 25 ----
   { day:'Saturday, April 25', time:'8:16 AM', type:'solo', age:'age-12-14', room:'room2',
-    title:'The Bird', style:'Contemporary', division:'Elite Solo',
+    title:'The Bird', style:'Contemporary', division:'Competitive Solo · Teen',
     dancer:'Ella Beharry', entry:'#1171',
     d:SAT, sh:8, sm:16, eh:8, em:19 },
   { day:'Saturday, April 25', time:'9:19 AM', type:'solo', age:'age-12-14', room:'room2',
-    title:"That's Life", style:'Jazz', division:'Elite Solo',
+    title:"That's Life", style:'Jazz', division:'Competitive Solo · Teen',
     dancer:'Robbie Palefski', entry:'#1173',
     d:SAT, sh:9, sm:19, eh:9, em:22 },
   { day:'Saturday, April 25', time:'9:48 AM', type:'solo', age:'age-12-14', room:'room2',
-    title:'Slow It Down', style:'Lyrical', division:'Elite Solo',
+    title:'Slow It Down', style:'Lyrical', division:'Competitive Solo · Teen',
     dancer:'Ella Beharry', entry:'#1172',
     d:SAT, sh:9, sm:48, eh:9, em:51 },
   { day:'Saturday, April 25', time:'10:15 AM', type:'awards', room:'room2',
     title:'AWARDS', division:'Room 2 Awards',
     d:SAT, sh:10, sm:15, eh:10, em:35 },
   { day:'Saturday, April 25', time:'11:08 AM', type:'solo', age:'age-12-14', room:'room2',
-    title:'When I Go', style:'Contemporary', division:'Elite Solo',
+    title:'When I Go', style:'Contemporary', division:'Competitive Solo · Teen',
     dancer:'Robbie Palefski', entry:'#1174',
     d:SAT, sh:11, sm:8, eh:11, em:11 },
   { day:'Saturday, April 25', time:'11:28 AM', type:'group', age:'age-9-11', room:'room1',
-    title:'Whatcha Know About Me', style:'Hip Hop', division:'Elite Large Group',
+    title:'Whatcha Know About Me', style:'Hip Hop', division:'Competitive Large Group · Junior',
     dancer:'Age 9-11 Company (12)', entry:'#1157',
     dancers:'Ella Beharry, Eden Caffie, Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Camila Martinez, Sapphira Morales, Taydeliz Mota, Jade Paez, Robbie Palefski, Liana Yaros',
     d:SAT, sh:11, sm:28, eh:11, em:33 },
   { day:'Saturday, April 25', time:'11:40 AM', type:'solo', age:'age-12-14', room:'room2',
-    title:'River', style:'Lyrical', division:'Elite Solo',
+    title:'River', style:'Lyrical', division:'Competitive Solo · Teen',
     dancer:'Eden Caffie', entry:'#1170',
     d:SAT, sh:11, sm:40, eh:11, em:43 },
   { day:'Saturday, April 25', time:'11:55 AM', type:'awards', room:'room1',
     title:'AWARDS', division:'Room 1 Awards',
     d:SAT, sh:11, sm:55, eh:12, em:15 },
   { day:'Saturday, April 25', time:'11:59 AM', type:'solo', age:'age-12-14', room:'room2',
-    title:'I Dreamed a Dream', style:'Lyrical', division:'Elite Solo',
+    title:'I Dreamed a Dream', style:'Lyrical', division:'Competitive Solo · Teen',
     dancer:'Zoë Lebovitch', entry:'#1175',
     d:SAT, sh:11, sm:59, eh:12, em:2 },
   { day:'Saturday, April 25', time:'12:40 PM', type:'awards', room:'room2',
     title:'AWARDS', division:'Room 2 Awards',
     d:SAT, sh:12, sm:40, eh:13, em:0 },
   { day:'Saturday, April 25', time:'12:45 PM', type:'group', age:'age-9-11', room:'room1',
-    title:'Fly', style:'Lyrical', division:'Competitive Small Group',
+    title:'Fly', style:'Lyrical', division:'Competitive Small Group · Junior',
     dancer:'Age 9-11 Company', entry:'#1156',
     dancers:'Isabella Elsebai, Ava Khan, Taydeliz Mota, Jade Paez',
     d:SAT, sh:12, sm:45, eh:12, em:49 },
   { day:'Saturday, April 25', time:'1:15 PM', type:'group', age:'age-9-11', room:'room1',
-    title:'Just Like a River', style:'Lyrical', division:'Competitive Small Group',
+    title:'Just Like a River', style:'Lyrical', division:'Competitive Small Group · Junior',
     dancer:'Age 9-11 Company', entry:'#1155',
     dancers:'Sasha Lebovitch, Anaya Martinez, Sierra Sung, Liana Yaros',
     d:SAT, sh:13, sm:15, eh:13, em:19 },
   { day:'Saturday, April 25', time:'1:22 PM', type:'group', age:'age-9-11', room:'room1',
-    title:'Work Me Down', style:'Jazz', division:'Competitive Small Group',
+    title:'Work Me Down', style:'Jazz', division:'Competitive Small Group · Junior',
     dancer:'Age 9-11 Company (8)', entry:'#1154',
     dancers:'Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Taydeliz Mota, Charlotte Paltroom, Sierra Sung, Liana Yaros',
     d:SAT, sh:13, sm:22, eh:13, em:26 },
   { day:'Saturday, April 25', time:'2:12 PM', type:'group', age:'age-9-11', room:'room1',
-    title:'Hairspray', style:'Musical Theater', division:'Elite Large Group',
+    title:'Hairspray', style:'Musical Theater', division:'Competitive Large Group · Junior',
     dancer:'Age 9-11 Company (17)', entry:'#1153',
     dancers:'Zoey Almonte, Ella Beharry, Eden Caffie, Ephesian Chapman, Isabella Elsebai, Ava Khan, Demi Kotright, Sasha Lebovitch, Zoë Lebovitch, Camila Martinez, Anaya Martinez, Taydeliz Mota, Stephanie Owusu, Jade Paez, Charlotte Paltroom, Sierra Sung, Liana Yaros',
     d:SAT, sh:14, sm:12, eh:14, em:17 },
@@ -639,14 +664,14 @@ const dances = [
     title:'AWARDS', division:'Room 1 Awards',
     d:SAT, sh:14, sm:40, eh:15, em:0 },
   { day:'Saturday, April 25', time:'3:14 PM', type:'solo', age:'age-12-14', room:'room2',
-    title:'Corps', style:'Contemporary', division:'Elite Solo',
+    title:'Corps', style:'Contemporary', division:'Competitive Solo · Teen',
     dancer:'Camila Martinez', entry:'#1169',
     d:SAT, sh:15, sm:14, eh:15, em:17 },
   { day:'Saturday, April 25', time:'3:35 PM', type:'awards', room:'room2',
     title:'AWARDS', division:'Room 2 Awards',
     d:SAT, sh:15, sm:35, eh:15, em:55 },
   { day:'Saturday, April 25', time:'4:18 PM', type:'group', age:'age-12-14', room:'room2',
-    title:'What the World Needs Now', style:'Lyrical', division:'Elite Duet/Trio',
+    title:'What the World Needs Now', style:'Lyrical', division:'Competitive Duet/Trio · Teen',
     dancer:'Age 12-14', entry:'#1164',
     dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch',
     d:SAT, sh:16, sm:18, eh:16, em:22 },
@@ -654,12 +679,12 @@ const dances = [
     title:'AWARDS', division:'Room 2 Awards',
     d:SAT, sh:17, sm:25, eh:17, em:45 },
   { day:'Saturday, April 25', time:'5:40 PM', type:'group', age:'age-12-14', room:'room1',
-    title:'White Rabbit', style:'Contemporary', division:'Elite Small Group',
+    title:'White Rabbit', style:'Contemporary', division:'Competitive Small Group · Teen',
     dancer:'Age 12-14 Company', entry:'#1161',
     dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
     d:SAT, sh:17, sm:40, eh:17, em:44 },
   { day:'Saturday, April 25', time:'6:03 PM', type:'group', age:'age-12-14', room:'room1',
-    title:'The Way You Make Me Feel', style:'Jazz', division:'Elite Small Group',
+    title:'The Way You Make Me Feel', style:'Jazz', division:'Competitive Small Group · Teen',
     dancer:'Age 12-14 Company', entry:'#1158',
     dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
     d:SAT, sh:18, sm:3, eh:18, em:7 },
@@ -667,12 +692,12 @@ const dances = [
     title:'AWARDS', division:'Room 1 Awards',
     d:SAT, sh:19, sm:30, eh:19, em:50 },
   { day:'Saturday, April 25', time:'7:55 PM', type:'group', age:'age-15-16', room:'room1',
-    title:'End of Love', style:'Lyrical', division:'Elite Large Group',
+    title:'End of Love', style:'Lyrical', division:'Competitive Large Group · Senior',
     dancer:'Age 15-16 Company (15)', entry:'#1150',
     dancers:'Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Zoë Lebovitch, Camila Martinez, Lula Najera, Alina Nam, Robbie Palefski, Genevieve Tomic',
     d:SAT, sh:19, sm:55, eh:20, em:0 },
   { day:'Saturday, April 25', time:'9:25 PM', type:'group', age:'age-15-16', room:'room1',
-    title:'Cry to Me', style:'Jazz', division:'Elite Large Group',
+    title:'Cry to Me', style:'Jazz', division:'Competitive Large Group · Senior',
     dancer:'Age 15-16 Company (10)', entry:'#1152',
     dancers:'Carly Baitner, Talya Baruch, Liam Brady, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam, Genevieve Tomic',
     d:SAT, sh:21, sm:25, eh:21, em:30 },
@@ -682,17 +707,17 @@ const dances = [
 
   // ---- SUNDAY APRIL 26 ----
   { day:'Sunday, April 26', time:'12:50 PM', type:'group', age:'age-15-16', room:'room1',
-    title:'Kendrick', style:'Hip Hop', division:'Elite Small Group',
+    title:'Kendrick', style:'Hip Hop', division:'Competitive Small Group · Senior',
     dancer:'Age 15-16 Company (8)', entry:'#1151',
     dancers:'Carly Baitner, Chloe Choi, Rylee Dennis, Ella Guy, Charlotte Mejia, Lula Najera, Alina Nam, Kaelynn Vargas',
     d:SUN, sh:12, sm:50, eh:12, em:55 },
   { day:'Sunday, April 26', time:'1:06 PM', type:'group', age:'age-15-16', room:'room1',
-    title:'Cellophane', style:'Lyrical', division:'Elite Small Group',
+    title:'Cellophane', style:'Lyrical', division:'Competitive Small Group · Senior',
     dancer:'Age 15-16 Company', entry:'#1163',
     dancers:'Talya Baruch, Liam Brady, Chloe Choi, Talia Glassberg, Lula Najera, Alina Nam',
     d:SUN, sh:13, sm:6, eh:13, em:10 },
   { day:'Sunday, April 26', time:'1:31 PM', type:'group', age:'age-15-16', room:'room1',
-    title:'Dead & Done', style:'Contemporary', division:'Elite Small Group',
+    title:'Dead & Done', style:'Contemporary', division:'Competitive Small Group · Senior',
     dancer:'Age 15-16 Company', entry:'#1162',
     dancers:'Carly Baitner, Liam Brady, Chloe Choi, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam',
     d:SUN, sh:13, sm:31, eh:13, em:35 },
@@ -700,7 +725,7 @@ const dances = [
     title:'AWARDS', division:'Room 1 Awards',
     d:SUN, sh:14, sm:40, eh:15, em:0 },
   { day:'Sunday, April 26', time:'4:05 PM', type:'group', age:'age-12-14', room:'room1',
-    title:'Golden Years', style:'Jazz', division:'Elite Line',
+    title:'Golden Years', style:'Jazz', division:'Competitive Line · Teen',
     dancer:'Full Company Line (28)', entry:'#1149',
     dancers:'Zoey Almonte, Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Isabella Elsebai, Talia Glassberg, Ella Guy, Ava Khan, Sasha Lebovitch, Zoë Lebovitch, Anaya Martinez, Camila Martinez, Charlotte Mejia, Sapphira Morales, Taydeliz Mota, Lula Najera, Alina Nam, Jade Paez, Robbie Palefski, Charlotte Paltroom, Sierra Sung, Genevieve Tomic, Kaelynn Vargas, Liana Yaros',
     d:SUN, sh:16, sm:5, eh:16, em:10 },
