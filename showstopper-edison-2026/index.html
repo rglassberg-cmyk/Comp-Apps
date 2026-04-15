@@ -475,7 +475,7 @@ function applyFilter() {
   document.querySelectorAll('.dance-row').forEach(row => {
     if (roomFilter === 'all') { row.classList.remove('hidden'); return; }
     const r = row.dataset.room;
-    row.classList.toggle('hidden', r && r !== roomFilter && row.dataset.type !== 'awards');
+    row.classList.toggle('hidden', r && r !== roomFilter);
   });
 }
 
