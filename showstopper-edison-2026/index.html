@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tate Academy - Showstopper Edison 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #1a1b1d; color: #f0f0f0; min-height: 100vh; }
+
+    header {
+      background: linear-gradient(135deg, #d5164d, #9a1039);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 6px; }
+    header p  { color: rgba(255,255,255,0.85); font-size: 1rem; }
+    header .sub { font-size: 0.85rem; margin-top: 4px; opacity: 0.75; }
+
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 12px 16px; background: #111213;
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid #2a2b2d;
+    }
+    .tab-btn {
+      padding: 8px 14px; border: none; background: #2a2b2d; color: #ccc;
+      border-radius: 20px; cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem; font-weight: 500; transition: all 0.2s; white-space: nowrap;
+    }
+    .tab-btn.active { background: #d5164d; color: white; }
+    .tab-btn:hover:not(.active) { background: #3a3b3d; color: white; }
+
+    .tab-content { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+    .tab-content.active { display: block; }
+
+    .section-header {
+      background: linear-gradient(135deg, #d5164d, #9a1039);
+      color: white; padding: 14px 18px; border-radius: 10px;
+      margin-bottom: 16px; font-size: 1.1rem; font-weight: 600;
+    }
+    .section-subheader {
+      background: #2a2b2d; color: white; padding: 10px 16px;
+      border-radius: 8px; margin: 16px 0 10px 0; font-size: 0.95rem; font-weight: 600;
+    }
+
+    /* ICS / Explainer blocks */
+    .info-block {
+      background: #2a2b2d; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;
+    }
+    .info-block-top {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .collapse-content { display: none; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
+    .collapse-content.open { display: block; }
+    .collapse-toggle { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 0.8rem; font-family: 'Outfit', sans-serif; }
+    .collapse-content p  { font-size: 0.85rem; color: #ccc; line-height: 1.6; margin-bottom: 8px; }
+    .collapse-content ol, .collapse-content ul { padding-left: 20px; }
+    .collapse-content li { margin: 6px 0; font-size: 0.85rem; color: #ccc; line-height: 1.5; }
+
+    /* Awards explainer */
+    .awards-explainer {
+      background: linear-gradient(135deg, rgba(213,22,77,0.12), rgba(154,16,57,0.12));
+      border: 1px solid rgba(213,22,77,0.3);
+      border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;
+    }
+    .awards-explainer h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; color: #e87ba0; }
+
+    /* Room filter */
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15);
+      background: #2a2b2d; color: #ccc; font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn.active { background: #d5164d; color: white; border-color: #d5164d; }
+    .filter-btn.r1.active { background: #1e3a5f; border-color: #5090d0; color: #90c0f0; }
+    .filter-btn.r2.active { background: #2d1a40; border-color: #9060c0; color: #c090f0; }
+
+    /* Room badges */
+    .room-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 0.7rem; font-weight: 600; flex-shrink: 0; margin-top: 3px;
+    }
+    .room-badge.r1 { background: rgba(30,90,150,0.3); color: #90c0f0; border: 1px solid rgba(80,140,200,0.4); }
+    .room-badge.r2 { background: rgba(90,40,130,0.3); color: #c090f0; border: 1px solid rgba(140,80,200,0.4); }
+
+    /* Entry number */
+    .entry-num { font-size: 0.7rem; color: rgba(255,255,255,0.3); font-weight: 400; margin-left: 6px; }
+
+    /* Dance rows */
+    .day-header {
+      background: #1e1f21; border-left: 4px solid #d5164d;
+      padding: 10px 14px; margin: 16px 0 8px 0;
+      border-radius: 0 8px 8px 0; font-weight: 600; font-size: 1rem;
+    }
+    .dance-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .dance-row.age-5-6   { background: rgba(213,22,77,0.08);  border-left: 3px solid #e8a0b4; }
+    .dance-row.age-9-11  { background: rgba(213,22,77,0.14);  border-left: 3px solid #c4527a; }
+    .dance-row.age-12-14 { background: rgba(176,16,64,0.20);  border-left: 3px solid #b01040; }
+    .dance-row.age-15-16 { background: rgba(213,22,77,0.24);  border-left: 3px solid #d5164d; }
+    .dance-row.age-17-19 { background: rgba(154,16,57,0.30);  border-left: 3px solid #9a1039; }
+    .dance-row.solo      { box-shadow: inset 0 0 0 1px rgba(213,22,77,0.4); }
+    .dance-row.awards    { background: #1e1f21; border-left: 3px solid #555; }
+    .dance-row.hidden    { display: none; }
+
+    .dance-time { min-width: 76px; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.65); padding-top: 3px; flex-shrink: 0; }
+    .dance-info { flex: 1; min-width: 0; }
+    .dance-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+    .dance-meta  { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+    .dance-dancers { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; line-height: 1.4; }
+    .dance-room-cal { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+
+    .cal-btn {
+      padding: 5px 10px; background: #d5164d; color: white;
+      border: none; border-radius: 6px; font-size: 0.72rem;
+      font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .cal-btn:hover { background: #b01040; }
+
+    /* Cards */
+    .card {
+      background: #2a2b2d; border-radius: 10px; padding: 14px 16px;
+      margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.07);
+    }
+    .card-name { font-size: 1rem; font-weight: 600; color: #e87ba0; text-decoration: none; display: block; margin-bottom: 4px; }
+    .card-name:hover { color: #d5164d; }
+    .card-meta  { font-size: 0.82rem; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+    .card-desc  { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px; line-height: 1.5; }
+    .card-notes { font-size: 0.78rem; color: #f0a0b0; margin: 6px 0; }
+    .free-badge { color: #80e080; font-size: 0.72rem; font-weight: 700; margin-left: 6px; }
+    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+    .action-btn {
+      padding: 6px 14px; border-radius: 20px; font-size: 0.8rem;
+      font-family: 'Outfit', sans-serif; font-weight: 500; cursor: pointer;
+      text-decoration: none; display: inline-block; border: none; transition: opacity 0.15s;
+    }
+    .action-btn:hover { opacity: 0.8; }
+    .action-btn.directions { background: #d5164d; color: white; }
+    .action-btn.menu    { background: #1e2d3d; color: #90c0e0; border: 1px solid #90c0e0; }
+    .action-btn.website { background: #1e1e35; color: #a090e0; border: 1px solid #a090e0; }
+    .action-btn.book    { background: #1a2e1a; color: #80d080; border: 1px solid #80d080; }
+
+    .map-container { height: 300px; border-radius: 10px; overflow: hidden; margin: 16px 0; }
+
+    /* Weekend Info */
+    .info-card {
+      background: #2a2b2d; border-radius: 10px; padding: 16px;
+      margin-bottom: 14px; border-left: 4px solid #d5164d;
+    }
+    .info-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #e87ba0; }
+    .info-row { display: flex; gap: 10px; margin-bottom: 7px; font-size: 0.88rem; }
+    .info-label { min-width: 110px; color: rgba(255,255,255,0.45); font-weight: 500; flex-shrink: 0; }
+    .info-value { color: #f0f0f0; line-height: 1.5; }
+
+    .btn-primary {
+      padding: 9px 16px; background: #d5164d; color: white; border: none;
+      border-radius: 8px; font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-primary:hover { background: #b01040; }
+
+    footer {
+      background: #111213; text-align: center; padding: 18px; margin-top: 40px;
+      color: rgba(255,255,255,0.35); font-size: 0.8rem; border-top: 1px solid #2a2b2d;
+    }
+    footer a { color: #d5164d; text-decoration: none; }
+
+    @media (max-width: 560px) {
+      header h1 { font-size: 1.5rem; }
+      .dance-row { flex-wrap: wrap; }
+      .cal-btn { font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Tate Academy Company</h1>
+  <p>Showstopper — Edison, NJ</p>
+  <p class="sub">April 24–26, 2026 · NJ Convention &amp; Exposition Center</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('danceOrder', this)">🎭 Dance Order</button>
+  <button class="tab-btn"        onclick="switchTab('eat', this)">🍽️ Places to Eat</button>
+  <button class="tab-btn"        onclick="switchTab('todo', this)">🗺️ Things to Do</button>
+  <button class="tab-btn"        onclick="switchTab('weekend', this)">📋 Weekend Info</button>
+  <button class="tab-btn"        onclick="switchTab('suggest', this)">💬 Suggest Updates</button>
+</nav>
+
+<main>
+
+<!-- ===== DANCE ORDER ===== -->
+<div id="danceOrder" class="tab-content active">
+  <div class="section-header">🎭 Competition Dance Order</div>
+
+  <!-- Awards explainer -->
+  <div class="awards-explainer">
+    <h4>ℹ️ How Showstopper Awards Work</h4>
+    <button class="collapse-toggle" onclick="toggleCollapse('awardsExp')">▸ Read before the competition</button>
+    <div id="awardsExp" class="collapse-content">
+      <p>There are two types of awards running throughout the weekend: <strong>Category Awards</strong> and <strong>Overall Awards</strong> — and they work very differently.</p>
+      <p><strong>Category Awards</strong> are straightforward. Every routine gets one based on its score alone. The tiers are Crystal, Double Platinum, Platinum, Gold, and Silver. These are announced at each awards ceremony and don't change.</p>
+      <p><strong>Overall Awards</strong> are where it gets interesting. The top 10 overall are determined within each age division (Mini 8 &amp; under, Junior 9–11, Teen 12–14, Senior 15–19) across the entire day. Every awards ceremony updates the running top 10 based on all routines that have competed so far. So if your dancer is announced as 3rd overall at the 1:00 PM awards, that means 3rd out of everyone who has competed by that point. As more dancers compete throughout the day, rankings shift. A dancer could be 3rd at 1 PM and 7th by 8 PM — or move up if later dancers score lower.</p>
+      <p><strong>The final top 10 is only settled at the last awards of the day for that division.</strong> For Senior solos at this competition, that's the 8:55 PM awards on Friday. That's the one that counts for All-Star qualification and top overall honors.</p>
+      <p style="color:#e87ba0; font-weight:500;">Bottom line: don't stress the intermediate standings. Wait for the final awards of the day to see where your dancer truly lands.</p>
+    </div>
+  </div>
+
+  <!-- ICS download -->
+  <div class="info-block">
+    <div class="info-block-top">
+      <div>
+        <div style="font-weight:600; margin-bottom:2px;">📅 Add Full Schedule to Calendar</div>
+        <button class="collapse-toggle" onclick="toggleCollapse('icsInstr')">▸ How to import the .ics file</button>
+      </div>
+      <button class="btn-primary" onclick="generateICS()">⬇ Download .ics File</button>
+    </div>
+    <div id="icsInstr" class="collapse-content">
+      <ol>
+        <li><strong>iPhone / iPad:</strong> Tap the downloaded file → tap "Add All" → Done</li>
+        <li><strong>Android:</strong> Open the file → select your calendar app → confirm import</li>
+        <li><strong>Google Calendar:</strong> Go to calendar.google.com → Settings ⚙️ → Import &amp; Export → Import → choose the file</li>
+        <li><strong>Outlook:</strong> Double-click the file, or drag it into your Outlook calendar window</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Room filter -->
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All Performances</button>
+    <button class="filter-btn r1"     onclick="setFilter('room1', this)">🔵 Room 1 Only</button>
+    <button class="filter-btn r2"     onclick="setFilter('room2', this)">🟣 Room 2 Only</button>
+  </div>
+
+  <div id="danceList"></div>
+</div>
+
+<!-- ===== PLACES TO EAT ===== -->
+<div id="eat" class="tab-content">
+  <div class="section-header">🍽️ Places to Eat</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Edison has a great food scene — especially if you like Indian food. Oak Tree Road is one of the best South Asian dining strips on the East Coast, about 10 minutes from the venue.
+  </p>
+  <div class="section-subheader">🚗 Close to Venue</div>
+  <div id="nearList"></div>
+  <div id="foodMap" class="map-container"></div>
+  <div class="section-subheader">🍛 Oak Tree Road (10 min) — Indian Food Strip</div>
+  <div id="oakTreeList"></div>
+</div>
+
+<!-- ===== THINGS TO DO ===== -->
+<div id="todo" class="tab-content">
+  <div class="section-header">🗺️ Things to Do</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Edison and the surrounding area have plenty to keep families busy between competition blocks.
+  </p>
+  <div id="activitiesList"></div>
+  <div id="activitiesMap" class="map-container"></div>
+</div>
+
+<!-- ===== WEEKEND INFO ===== -->
+<div id="weekend" class="tab-content">
+  <div class="section-header">📋 Weekend Info</div>
+
+  <div class="info-card">
+    <h3>🎭 Competition Venue</h3>
+    <div class="info-row"><span class="info-label">Competition</span><span class="info-value">Showstopper — Edison, NJ Regional</span></div>
+    <div class="info-row"><span class="info-label">Venue</span><span class="info-value">NJ Convention &amp; Exposition Center</span></div>
+    <div class="info-row"><span class="info-label">Address</span><span class="info-value">97 Sunfield Ave, Edison, NJ 08837</span></div>
+    <div class="info-row"><span class="info-label">Friday</span><span class="info-value">April 24 — First performance 9:38 AM · Final awards 8:55 PM</span></div>
+    <div class="info-row"><span class="info-label">Saturday</span><span class="info-value">April 25 — First performance 8:16 AM · Final awards 9:40 PM</span></div>
+    <div class="info-row"><span class="info-label">Sunday</span><span class="info-value">April 26 — First performance 12:50 PM · Final awards 4:45 PM</span></div>
+    <div class="info-row"><span class="info-label">Parking</span><span class="info-value">Details released in "Know Before You Go" email 3 days before the event</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://maps.google.com/?q=97+Sunfield+Ave+Edison+NJ+08837" target="_blank" class="action-btn directions">📍 Directions to Venue</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🚗 Driving from Teaneck</h3>
+    <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); margin-bottom:14px;">About 35–45 minutes depending on traffic. No rest stops needed — it's a short drive!</p>
+    <div class="info-row"><span class="info-label">Route</span><span class="info-value">Route 4 East → NJ Turnpike South (I-95) → Exit 10 (Edison/New Brunswick) → Route 287 East → Exit 1 (Raritan Center) → Sunfield Ave</span></div>
+    <div class="info-row"><span class="info-label">Tip</span><span class="info-value">Check Google Maps the morning of — the Turnpike can get congested, especially Friday morning. Build in an extra 15 min buffer.</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://maps.google.com/?saddr=519+Cedar+Lane+Teaneck+NJ&daddr=97+Sunfield+Ave+Edison+NJ" target="_blank" class="action-btn directions">🗺️ Get Directions from Tate</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🏨 Staying the Weekend?</h3>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); margin-bottom:12px;">
+      Some families are staying for the full weekend (including Shabbat). Showstopper has reserved discounted hotel rooms at nearby hotels through their travel partner.
+    </p>
+    <div class="info-row"><span class="info-label">Book via</span><span class="info-value">Showstopper Travel — exclusive rates at hand-selected hotels near the venue</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://hotel.showstoppertravel.com/group-event?id=88322" target="_blank" class="action-btn book">🏨 Book Hotel via Showstopper Travel</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>📱 Showstopper App</h3>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); margin-bottom:12px;">
+      Download the free Showstopper app before the competition. It has real-time schedule updates, your dancer's personal schedule, overall results on touchscreen TVs after each awards set, and the free live stream of every routine.
+    </p>
+    <div class="info-row"><span class="info-label">Live Stream</span><span class="info-value">Free on the website and app — includes a "next up" screen so you know when your dancer is on</span></div>
+    <div class="info-row"><span class="info-label">Videos/Photos</span><span class="info-value">Pre-order discounted media by entering your dancer's name and birthday</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://www.goshowstopper.com/competitions/live-stream/" target="_blank" class="action-btn website">📺 Live Stream</a>
+      <a href="https://www.goshowstopper.com/pre-order1.cfm" target="_blank" class="action-btn website">📸 Pre-Order Photos &amp; Videos</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUGGEST UPDATES ===== -->
+<div id="suggest" class="tab-content">
+  <div class="section-header">💬 Suggest Updates</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Know something we got wrong? Found a great restaurant nearby? Let us know!
+  </p>
+  <iframe
+    src="https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true"
+    width="100%" height="834" frameborder="0" marginheight="0" marginwidth="0"
+    style="border-radius:10px;">Loading form...
+  </iframe>
+</div>
+
+</main>
+
+<footer>
+  <p>Tate Academy Company · Showstopper Edison 2026</p>
+  <p style="margin-top:5px;">Built by <a href="https://lhasa.app" target="_blank">Lhasa LLC</a></p>
+</footer>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let roomFilter = 'all';
+let foodMapReady = false;
+let actMapReady = false;
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'eat')  renderFoodMap();
+  if (id === 'todo') renderActMap();
+}
+
+function toggleCollapse(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  const btn = el.previousElementSibling;
+  btn.textContent = (el.classList.contains('open') ? '▾' : '▸') + btn.textContent.slice(1);
+}
+
+function setFilter(filter, btn) {
+  roomFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  document.querySelectorAll('.dance-row').forEach(row => {
+    if (roomFilter === 'all') { row.classList.remove('hidden'); return; }
+    const r = row.dataset.room;
+    row.classList.toggle('hidden', r && r !== roomFilter && row.dataset.type !== 'awards');
+  });
+}
+
+// ============================================================
+// DATA
+// month is 0-indexed: 3 = April
+// ============================================================
+const FRI = { year: 2026, month: 3, day: 24 };
+const SAT = { year: 2026, month: 3, day: 25 };
+const SUN = { year: 2026, month: 3, day: 26 };
+const VENUE = 'NJ Convention & Exposition Center, 97 Sunfield Ave, Edison, NJ 08837';
+
+const dances = [
+  // ---- FRIDAY APRIL 24 ----
+  { day:'Friday, April 24', time:'9:38 AM', type:'solo', age:'age-15-16', room:'room2',
+    title:'Other Side', style:'Contemporary', division:'Elite Solo',
+    dancer:'Carly Baitner', entry:'#1176',
+    d:FRI, sh:9, sm:38, eh:9, em:41 },
+  { day:'Friday, April 24', time:'11:00 AM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:FRI, sh:11, sm:0, eh:11, em:20 },
+  { day:'Friday, April 24', time:'11:23 AM', type:'solo', age:'age-15-16', room:'room2',
+    title:'Foolish Games', style:'Lyrical', division:'Elite Solo',
+    dancer:'Talia Glassberg', entry:'#1190',
+    d:FRI, sh:11, sm:23, eh:11, em:26 },
+  { day:'Friday, April 24', time:'11:39 AM', type:'group', age:'age-5-6', room:'room1',
+    title:'Covergirl', style:'Jazz', division:'Showcase Small Group',
+    dancer:'Age 5-6 Company', entry:'#1159',
+    dancers:'Ephesian Chapman, Acelyn Hernandez, Demi Kotright, Stephanie Owusu',
+    d:FRI, sh:11, sm:39, eh:11, em:43 },
+  { day:'Friday, April 24', time:'11:42 AM', type:'solo', age:'age-15-16', room:'room2',
+    title:'One More Moment', style:'Lyrical', division:'Elite Solo',
+    dancer:'Talya Baruch', entry:'#1191',
+    d:FRI, sh:11, sm:42, eh:11, em:45 },
+  { day:'Friday, April 24', time:'11:48 AM', type:'group', age:'age-5-6', room:'room1',
+    title:'Hallelujah', style:'Lyrical', division:'Showcase Small Group',
+    dancer:'Age 5-6 Company', entry:'#1160',
+    dancers:'Ephesian Chapman, Acelyn Hernandez, Demi Kotright, Stephanie Owusu',
+    d:FRI, sh:11, sm:48, eh:11, em:52 },
+  { day:'Friday, April 24', time:'12:04 PM', type:'solo', age:'age-15-16', room:'room2',
+    title:'Death Wish', style:'Lyrical', division:'Elite Solo',
+    dancer:'Ella Guy', entry:'#1179',
+    d:FRI, sh:12, sm:4, eh:12, em:7 },
+  { day:'Friday, April 24', time:'1:00 PM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:FRI, sh:13, sm:0, eh:13, em:20 },
+  { day:'Friday, April 24', time:'1:05 PM', type:'solo', age:'age-15-16', room:'room2',
+    title:'Dreams', style:'Jazz', division:'Elite Solo',
+    dancer:'Ella Guy', entry:'#1178',
+    d:FRI, sh:13, sm:5, eh:13, em:8 },
+  { day:'Friday, April 24', time:'1:30 PM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:FRI, sh:13, sm:30, eh:13, em:50 },
+  { day:'Friday, April 24', time:'2:33 PM', type:'solo', age:'age-15-16', room:'room2',
+    title:'Out There', style:'Contemporary', division:'Elite Solo',
+    dancer:'Alina Nam', entry:'#1165',
+    d:FRI, sh:14, sm:33, eh:14, em:36 },
+  { day:'Friday, April 24', time:'4:08 PM', type:'solo', age:'age-9-11', room:'room1',
+    title:'Raspberry Beret', style:'Jazz', division:'Competitive Solo',
+    dancer:'Isabella Elsebai', entry:'#1167',
+    d:FRI, sh:16, sm:8, eh:16, em:11 },
+  { day:'Friday, April 24', time:'4:10 PM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:FRI, sh:16, sm:10, eh:16, em:30 },
+  { day:'Friday, April 24', time:'5:14 PM', type:'solo', age:'age-17-19', room:'room2',
+    title:'Winner Takes It All', style:'Contemporary', division:'Elite Solo',
+    dancer:'Lula Najera', entry:'#1182',
+    d:FRI, sh:17, sm:14, eh:17, em:17 },
+  { day:'Friday, April 24', time:'5:27 PM', type:'solo', age:'age-17-19', room:'room2',
+    title:'Tennessee Whiskey', style:'Contemporary', division:'Elite Solo',
+    dancer:'Liam Brady', entry:'#1181',
+    d:FRI, sh:17, sm:27, eh:17, em:30 },
+  { day:'Friday, April 24', time:'5:57 PM', type:'solo', age:'age-9-11', room:'room1',
+    title:'Wings', style:'Jazz', division:'Competitive Solo',
+    dancer:'Liana Yaros', entry:'#1168',
+    d:FRI, sh:17, sm:57, eh:18, em:0 },
+  { day:'Friday, April 24', time:'6:00 PM', type:'solo', age:'age-9-11', room:'room1',
+    title:'Freak Out', style:'Jazz', division:'Competitive Solo',
+    dancer:'Anaya Martinez', entry:'#1166',
+    d:FRI, sh:18, sm:0, eh:18, em:3 },
+  { day:'Friday, April 24', time:'6:05 PM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:FRI, sh:18, sm:5, eh:18, em:25 },
+  { day:'Friday, April 24', time:'6:40 PM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:FRI, sh:18, sm:40, eh:19, em:0 },
+  { day:'Friday, April 24', time:'7:49 PM', type:'solo', age:'age-17-19', room:'room2',
+    title:"Where's My Husband", style:'Jazz', division:'Elite Solo',
+    dancer:'Rylee Dennis', entry:'#1189',
+    d:FRI, sh:19, sm:49, eh:19, em:52 },
+  { day:'Friday, April 24', time:'8:02 PM', type:'solo', age:'age-17-19', room:'room2',
+    title:'These Arms of Mine', style:'Contemporary', division:'Elite Solo',
+    dancer:'Chloe Choi', entry:'#1177',
+    d:FRI, sh:20, sm:2, eh:20, em:5 },
+  { day:'Friday, April 24', time:'8:34 PM', type:'solo', age:'age-17-19', room:'room2',
+    title:'Lose Yourself', style:'Hip Hop', division:'Elite Solo',
+    dancer:'Rylee Dennis', entry:'#1188',
+    d:FRI, sh:20, sm:34, eh:20, em:37 },
+  { day:'Friday, April 24', time:'8:55 PM', type:'awards', room:'room2',
+    title:'AWARDS — Senior Solos Final Top 10', division:'Room 2 · Final Senior Overall Awards',
+    d:FRI, sh:20, sm:55, eh:21, em:30 },
+
+  // ---- SATURDAY APRIL 25 ----
+  { day:'Saturday, April 25', time:'8:16 AM', type:'solo', age:'age-12-14', room:'room2',
+    title:'The Bird', style:'Contemporary', division:'Elite Solo',
+    dancer:'Ella Beharry', entry:'#1171',
+    d:SAT, sh:8, sm:16, eh:8, em:19 },
+  { day:'Saturday, April 25', time:'9:19 AM', type:'solo', age:'age-12-14', room:'room2',
+    title:"That's Life", style:'Jazz', division:'Elite Solo',
+    dancer:'Robbie Palefski', entry:'#1173',
+    d:SAT, sh:9, sm:19, eh:9, em:22 },
+  { day:'Saturday, April 25', time:'9:48 AM', type:'solo', age:'age-12-14', room:'room2',
+    title:'Slow It Down', style:'Lyrical', division:'Elite Solo',
+    dancer:'Ella Beharry', entry:'#1172',
+    d:SAT, sh:9, sm:48, eh:9, em:51 },
+  { day:'Saturday, April 25', time:'10:15 AM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:SAT, sh:10, sm:15, eh:10, em:35 },
+  { day:'Saturday, April 25', time:'11:08 AM', type:'solo', age:'age-12-14', room:'room2',
+    title:'When I Go', style:'Contemporary', division:'Elite Solo',
+    dancer:'Robbie Palefski', entry:'#1174',
+    d:SAT, sh:11, sm:8, eh:11, em:11 },
+  { day:'Saturday, April 25', time:'11:28 AM', type:'group', age:'age-9-11', room:'room1',
+    title:'Whatcha Know About Me', style:'Hip Hop', division:'Elite Large Group',
+    dancer:'Age 9-11 Company (12)', entry:'#1157',
+    dancers:'Ella Beharry, Eden Caffie, Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Camila Martinez, Sapphira Morales, Taydeliz Mota, Jade Paez, Robbie Palefski, Liana Yaros',
+    d:SAT, sh:11, sm:28, eh:11, em:33 },
+  { day:'Saturday, April 25', time:'11:40 AM', type:'solo', age:'age-12-14', room:'room2',
+    title:'River', style:'Lyrical', division:'Elite Solo',
+    dancer:'Eden Caffie', entry:'#1170',
+    d:SAT, sh:11, sm:40, eh:11, em:43 },
+  { day:'Saturday, April 25', time:'11:55 AM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:SAT, sh:11, sm:55, eh:12, em:15 },
+  { day:'Saturday, April 25', time:'11:59 AM', type:'solo', age:'age-12-14', room:'room2',
+    title:'I Dreamed a Dream', style:'Lyrical', division:'Elite Solo',
+    dancer:'Zoë Lebovitch', entry:'#1175',
+    d:SAT, sh:11, sm:59, eh:12, em:2 },
+  { day:'Saturday, April 25', time:'12:40 PM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:SAT, sh:12, sm:40, eh:13, em:0 },
+  { day:'Saturday, April 25', time:'12:45 PM', type:'group', age:'age-9-11', room:'room1',
+    title:'Fly', style:'Lyrical', division:'Competitive Small Group',
+    dancer:'Age 9-11 Company', entry:'#1156',
+    dancers:'Isabella Elsebai, Ava Khan, Taydeliz Mota, Jade Paez',
+    d:SAT, sh:12, sm:45, eh:12, em:49 },
+  { day:'Saturday, April 25', time:'1:15 PM', type:'group', age:'age-9-11', room:'room1',
+    title:'Just Like a River', style:'Lyrical', division:'Competitive Small Group',
+    dancer:'Age 9-11 Company', entry:'#1155',
+    dancers:'Sasha Lebovitch, Anaya Martinez, Sierra Sung, Liana Yaros',
+    d:SAT, sh:13, sm:15, eh:13, em:19 },
+  { day:'Saturday, April 25', time:'1:22 PM', type:'group', age:'age-9-11', room:'room1',
+    title:'Work Me Down', style:'Jazz', division:'Competitive Small Group',
+    dancer:'Age 9-11 Company (8)', entry:'#1154',
+    dancers:'Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Taydeliz Mota, Charlotte Paltroom, Sierra Sung, Liana Yaros',
+    d:SAT, sh:13, sm:22, eh:13, em:26 },
+  { day:'Saturday, April 25', time:'2:12 PM', type:'group', age:'age-9-11', room:'room1',
+    title:'Hairspray', style:'Musical Theater', division:'Elite Large Group',
+    dancer:'Age 9-11 Company (17)', entry:'#1153',
+    dancers:'Zoey Almonte, Ella Beharry, Eden Caffie, Ephesian Chapman, Isabella Elsebai, Ava Khan, Demi Kotright, Sasha Lebovitch, Zoë Lebovitch, Camila Martinez, Anaya Martinez, Taydeliz Mota, Stephanie Owusu, Jade Paez, Charlotte Paltroom, Sierra Sung, Liana Yaros',
+    d:SAT, sh:14, sm:12, eh:14, em:17 },
+  { day:'Saturday, April 25', time:'2:40 PM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:SAT, sh:14, sm:40, eh:15, em:0 },
+  { day:'Saturday, April 25', time:'3:14 PM', type:'solo', age:'age-12-14', room:'room2',
+    title:'Corps', style:'Contemporary', division:'Elite Solo',
+    dancer:'Camila Martinez', entry:'#1169',
+    d:SAT, sh:15, sm:14, eh:15, em:17 },
+  { day:'Saturday, April 25', time:'3:35 PM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:SAT, sh:15, sm:35, eh:15, em:55 },
+  { day:'Saturday, April 25', time:'4:18 PM', type:'group', age:'age-12-14', room:'room2',
+    title:'What the World Needs Now', style:'Lyrical', division:'Elite Duet/Trio',
+    dancer:'Age 12-14', entry:'#1164',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch',
+    d:SAT, sh:16, sm:18, eh:16, em:22 },
+  { day:'Saturday, April 25', time:'5:25 PM', type:'awards', room:'room2',
+    title:'AWARDS', division:'Room 2 Awards',
+    d:SAT, sh:17, sm:25, eh:17, em:45 },
+  { day:'Saturday, April 25', time:'5:40 PM', type:'group', age:'age-12-14', room:'room1',
+    title:'White Rabbit', style:'Contemporary', division:'Elite Small Group',
+    dancer:'Age 12-14 Company', entry:'#1161',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
+    d:SAT, sh:17, sm:40, eh:17, em:44 },
+  { day:'Saturday, April 25', time:'6:03 PM', type:'group', age:'age-12-14', room:'room1',
+    title:'The Way You Make Me Feel', style:'Jazz', division:'Elite Small Group',
+    dancer:'Age 12-14 Company', entry:'#1158',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
+    d:SAT, sh:18, sm:3, eh:18, em:7 },
+  { day:'Saturday, April 25', time:'7:30 PM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:SAT, sh:19, sm:30, eh:19, em:50 },
+  { day:'Saturday, April 25', time:'7:55 PM', type:'group', age:'age-15-16', room:'room1',
+    title:'End of Love', style:'Lyrical', division:'Elite Large Group',
+    dancer:'Age 15-16 Company (15)', entry:'#1150',
+    dancers:'Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Zoë Lebovitch, Camila Martinez, Lula Najera, Alina Nam, Robbie Palefski, Genevieve Tomic',
+    d:SAT, sh:19, sm:55, eh:20, em:0 },
+  { day:'Saturday, April 25', time:'9:25 PM', type:'group', age:'age-15-16', room:'room1',
+    title:'Cry to Me', style:'Jazz', division:'Elite Large Group',
+    dancer:'Age 15-16 Company (10)', entry:'#1152',
+    dancers:'Carly Baitner, Talya Baruch, Liam Brady, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam, Genevieve Tomic',
+    d:SAT, sh:21, sm:25, eh:21, em:30 },
+  { day:'Saturday, April 25', time:'9:40 PM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:SAT, sh:21, sm:40, eh:22, em:15 },
+
+  // ---- SUNDAY APRIL 26 ----
+  { day:'Sunday, April 26', time:'12:50 PM', type:'group', age:'age-15-16', room:'room1',
+    title:'Kendrick', style:'Hip Hop', division:'Elite Small Group',
+    dancer:'Age 15-16 Company (8)', entry:'#1151',
+    dancers:'Carly Baitner, Chloe Choi, Rylee Dennis, Ella Guy, Charlotte Mejia, Lula Najera, Alina Nam, Kaelynn Vargas',
+    d:SUN, sh:12, sm:50, eh:12, em:55 },
+  { day:'Sunday, April 26', time:'1:06 PM', type:'group', age:'age-15-16', room:'room1',
+    title:'Cellophane', style:'Lyrical', division:'Elite Small Group',
+    dancer:'Age 15-16 Company', entry:'#1163',
+    dancers:'Talya Baruch, Liam Brady, Chloe Choi, Talia Glassberg, Lula Najera, Alina Nam',
+    d:SUN, sh:13, sm:6, eh:13, em:10 },
+  { day:'Sunday, April 26', time:'1:31 PM', type:'group', age:'age-15-16', room:'room1',
+    title:'Dead & Done', style:'Contemporary', division:'Elite Small Group',
+    dancer:'Age 15-16 Company', entry:'#1162',
+    dancers:'Carly Baitner, Liam Brady, Chloe Choi, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam',
+    d:SUN, sh:13, sm:31, eh:13, em:35 },
+  { day:'Sunday, April 26', time:'2:40 PM', type:'awards', room:'room1',
+    title:'AWARDS', division:'Room 1 Awards',
+    d:SUN, sh:14, sm:40, eh:15, em:0 },
+  { day:'Sunday, April 26', time:'4:05 PM', type:'group', age:'age-12-14', room:'room1',
+    title:'Golden Years', style:'Jazz', division:'Elite Line',
+    dancer:'Full Company Line (28)', entry:'#1149',
+    dancers:'Zoey Almonte, Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Isabella Elsebai, Talia Glassberg, Ella Guy, Ava Khan, Sasha Lebovitch, Zoë Lebovitch, Anaya Martinez, Camila Martinez, Charlotte Mejia, Sapphira Morales, Taydeliz Mota, Lula Najera, Alina Nam, Jade Paez, Robbie Palefski, Charlotte Paltroom, Sierra Sung, Genevieve Tomic, Kaelynn Vargas, Liana Yaros',
+    d:SUN, sh:16, sm:5, eh:16, em:10 },
+  { day:'Sunday, April 26', time:'4:45 PM', type:'awards', room:'room1',
+    title:'AWARDS — Final Awards', division:'Room 1 · Final Awards',
+    d:SUN, sh:16, sm:45, eh:17, em:30 }
+];
+
+// ============================================================
+// RESTAURANTS & ACTIVITIES
+// ============================================================
+const nearRestaurants = [
+  { name:"Sawa Restaurant & Bar", cuisine:'American / Sushi', distance:'8 min drive', price:'$$',
+    address:'2373 Lincoln Hwy, Edison, NJ',
+    map:'https://maps.google.com/?q=Sawa+Restaurant+Edison+NJ',
+    menu:'', web:'', notes:'Popular local spot near Rt 1' },
+  { name:"Applebee's", cuisine:'American', distance:'5 min drive', price:'$',
+    address:'895 US-1, Edison, NJ',
+    map:'https://maps.google.com/?q=Applebees+895+US-1+Edison+NJ',
+    menu:'https://www.applebees.com/en/menu', web:'', notes:'' },
+  { name:"Steakhouse 85", cuisine:'American Steakhouse', distance:'10 min drive', price:'$$$',
+    address:'85 Church St, New Brunswick, NJ',
+    map:'https://maps.google.com/?q=Steakhouse+85+New+Brunswick+NJ',
+    menu:'https://steakhouse85.com/menus/', web:'https://steakhouse85.com', notes:'Great for a dinner out' },
+  { name:"Menlo Park Mall Food Court", cuisine:'Various', distance:'10 min drive', price:'$',
+    address:'55 Parsonage Rd, Edison, NJ',
+    map:'https://maps.google.com/?q=Menlo+Park+Mall+Edison+NJ',
+    menu:'', web:'', notes:'Good for a quick group meal with lots of options' }
+];
+
+const oakTreeRestaurants = [
+  { name:"Moghul", cuisine:'Indian / Pakistani', distance:'12 min drive', price:'$$',
+    address:'1655 Oak Tree Rd, Edison, NJ',
+    map:'https://maps.google.com/?q=Moghul+1655+Oak+Tree+Rd+Edison+NJ',
+    menu:'https://www.moghulrestaurant.com/menu/', web:'https://www.moghulrestaurant.com',
+    notes:'One of the most well-known Indian restaurants in NJ' },
+  { name:"Spice Rack", cuisine:'Indian', distance:'12 min drive', price:'$$',
+    address:'1661 Oak Tree Rd, Edison, NJ',
+    map:'https://maps.google.com/?q=Spice+Rack+Edison+NJ',
+    menu:'', web:'', notes:'Excellent biriyani and curries' },
+  { name:"Sukhadia's", cuisine:'Indian Sweets & Snacks', distance:'12 min drive', price:'$',
+    address:'1743 Oak Tree Rd, Edison, NJ',
+    map:'https://maps.google.com/?q=Sukhadias+Edison+NJ',
+    menu:'', web:'', notes:'Great for quick snacks, sweets, and chai' }
+];
+
+const activities = [
+  { name:"Menlo Park Mall", free:false,
+    desc:"Full shopping mall 10 minutes from the venue — good for downtime between competition blocks.",
+    distance:'10 min drive',
+    map:'https://maps.google.com/?q=Menlo+Park+Mall+Edison+NJ',
+    web:'https://www.simon.com/mall/menlo-park', lat:40.5329, lng:-74.3576 },
+  { name:"Thomas Edison National Historical Park", free:false,
+    desc:"Edison's original laboratory complex — genuinely fascinating and very fitting given the location.",
+    distance:'15 min drive',
+    map:'https://maps.google.com/?q=Thomas+Edison+National+Historical+Park+West+Orange+NJ',
+    web:'https://www.nps.gov/edis/index.htm', lat:40.7658, lng:-74.2381 },
+  { name:"Rutgers Gardens", free:true,
+    desc:"Beautiful botanical gardens on the Rutgers campus — free to walk around, peaceful escape.",
+    distance:'15 min drive',
+    map:'https://maps.google.com/?q=Rutgers+Gardens+New+Brunswick+NJ',
+    web:'https://rutgersgardens.rutgers.edu', lat:40.4499, lng:-74.3668 },
+  { name:"Oak Tree Road", free:true,
+    desc:"One of the best South Asian shopping and dining strips in the country. Great for exploring between performances.",
+    distance:'12 min drive',
+    map:'https://maps.google.com/?q=Oak+Tree+Road+Edison+NJ',
+    web:'', lat:40.5652, lng:-74.3521 },
+  { name:"Gravity Vault Rock Climbing", free:false,
+    desc:"Indoor rock climbing — great for kids and teens with energy to burn.",
+    distance:'15 min drive',
+    map:'https://maps.google.com/?q=Gravity+Vault+Middlesex+NJ',
+    web:'https://thegravityvault.com', lat:40.5743, lng:-74.5001 }
+];
+
+const VENUE_LAT = 40.5174, VENUE_LNG = -74.3706;
+
+// ============================================================
+// CALENDAR HELPERS
+// ============================================================
+const pad = n => String(n).padStart(2,'0');
+function gcDate(d) {
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+}
+
+function addToCalendar(idx) {
+  const item = dances[idx];
+  const start = new Date(item.d.year, item.d.month, item.d.day, item.sh, item.sm);
+  const end   = new Date(item.d.year, item.d.month, item.d.day, item.eh, item.em);
+  const name  = item.type === 'solo' ? item.dancer.split(' ')[0] : 'Tate Academy';
+  const title = item.type === 'awards'
+    ? `🏆 ${item.title} — Tate (Showstopper)`
+    : `${item.title} — (${name})`;
+  const desc  = `${item.division}${item.style ? ' · ' + item.style : ''}${item.dancer ? ' · ' + item.dancer : ''}${item.entry ? ' · Entry ' + item.entry : ''}`;
+  const p = new URLSearchParams({
+    action:'TEMPLATE', text: title,
+    dates:`${gcDate(start)}/${gcDate(end)}`,
+    location: VENUE, details: desc
+  });
+  window.open(`https://calendar.google.com/calendar/render?${p}`, '_blank');
+}
+
+function generateICS() {
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Tate Academy//Showstopper Edison 2026//EN\r\n';
+  let uid = 0;
+  dances.forEach(d => {
+    const s = new Date(d.d.year, d.d.month, d.d.day, d.sh, d.sm);
+    const e = new Date(d.d.year, d.d.month, d.d.day, d.eh, d.em);
+    const fmt = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+    const name = d.type === 'solo' ? d.dancer.split(' ')[0] : 'Tate Academy';
+    const summary = d.type === 'awards'
+      ? `🏆 ${d.title} — Tate (Showstopper)`
+      : `${d.title} — (${name})`;
+    ics += `BEGIN:VEVENT\r\nUID:showstopper-edison-2026-${uid++}@tateacademy.com\r\n`;
+    ics += `DTSTART:${fmt(s)}\r\nDTEND:${fmt(e)}\r\n`;
+    ics += `SUMMARY:${summary}\r\nLOCATION:${VENUE}\r\n`;
+    ics += `DESCRIPTION:${d.division}${d.style ? ' - ' + d.style : ''}${d.dancer ? ' - ' + d.dancer : ''}${d.entry ? ' - Entry ' + d.entry : ''}\r\n`;
+    ics += `END:VEVENT\r\n`;
+  });
+  ics += 'END:VCALENDAR';
+  const a = document.createElement('a');
+  a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  a.download = 'Showstopper_Edison_2026_TateAcademy.ics';
+  a.click();
+}
+
+// ============================================================
+// RENDER DANCE ORDER
+// ============================================================
+function renderDances() {
+  let html = '', curDay = '';
+  dances.forEach((d, i) => {
+    if (d.day !== curDay) {
+      curDay = d.day;
+      html += `<div class="day-header">📅 ${d.day}</div>`;
+    }
+    const ageClass = d.type === 'awards' ? 'awards' : d.age;
+    const soloClass = d.type === 'solo' ? ' solo' : '';
+    const roomBadge = d.room
+      ? `<span class="room-badge ${d.room === 'room1' ? 'r1' : 'r2'}">Room ${d.room === 'room1' ? '1' : '2'}</span>`
+      : '';
+    const calBtn = `<button class="cal-btn" onclick="addToCalendar(${i})">+ Add to Calendar</button>`;
+    const extra = d.dancers
+      ? `<div class="dance-dancers">${d.dancers}</div>` : '';
+    const entryNum = d.entry ? `<span class="entry-num">${d.entry}</span>` : '';
+    html += `
+      <div class="dance-row ${ageClass}${soloClass}" data-room="${d.room||''}" data-type="${d.type}">
+        <div class="dance-time">${d.time}</div>
+        <div class="dance-info">
+          <div class="dance-title">${d.type==='awards' ? '🏆 ' : ''}${d.title}${entryNum}</div>
+          <div class="dance-meta">${[d.division, d.style, d.dancer].filter(Boolean).join(' · ')}</div>
+          ${extra}
+        </div>
+        <div class="dance-room-cal">
+          ${roomBadge}
+          ${calBtn}
+        </div>
+      </div>`;
+  });
+  document.getElementById('danceList').innerHTML = html;
+}
+
+// ============================================================
+// RENDER RESTAURANTS
+// ============================================================
+function makeCard(r) {
+  const menuBtn = r.menu ? `<a href="${r.menu}" target="_blank" class="action-btn menu">Menu</a>` : '';
+  const webBtn  = r.web  ? `<a href="${r.web}"  target="_blank" class="action-btn website">Website</a>` : '';
+  const note    = r.notes ? `<div class="card-notes">ℹ️ ${r.notes}</div>` : '';
+  return `
+    <div class="card">
+      <a href="${r.map}" target="_blank" class="card-name">${r.name}</a>
+      <div class="card-meta">${r.cuisine} · ${r.distance} · ${r.price} · ${r.address}</div>
+      ${note}
+      <div class="card-actions">
+        <a href="${r.map}" target="_blank" class="action-btn directions">📍 Directions</a>
+        ${menuBtn}${webBtn}
+      </div>
+    </div>`;
+}
+
+function renderRestaurants() {
+  document.getElementById('nearList').innerHTML = nearRestaurants.map(makeCard).join('');
+  document.getElementById('oakTreeList').innerHTML = oakTreeRestaurants.map(makeCard).join('');
+}
+
+// ============================================================
+// RENDER ACTIVITIES
+// ============================================================
+function renderActivities() {
+  const html = activities.map(a => {
+    const free = a.free ? '<span class="free-badge">FREE</span>' : '';
+    const webBtn = a.web ? `<a href="${a.web}" target="_blank" class="action-btn website">Website</a>` : '';
+    return `
+      <div class="card">
+        <a href="${a.map}" target="_blank" class="card-name">${a.name}${free}</a>
+        <div class="card-meta">${a.distance}</div>
+        <div class="card-desc">${a.desc}</div>
+        <div class="card-actions">
+          <a href="${a.map}" target="_blank" class="action-btn directions">📍 Directions</a>
+          ${webBtn}
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('activitiesList').innerHTML = html;
+}
+
+// ============================================================
+// MAPS
+// ============================================================
+function renderFoodMap() {
+  if (foodMapReady) return;
+  foodMapReady = true;
+  const map = L.map('foodMap').setView([VENUE_LAT, VENUE_LNG], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+  L.marker([VENUE_LAT, VENUE_LNG]).addTo(map)
+    .bindPopup('<b>🎭 Competition Venue</b>').openPopup();
+  L.marker([40.5652, -74.3521]).addTo(map)
+    .bindPopup('<b>🍛 Oak Tree Road</b><br>Indian food strip');
+  L.marker([40.5329, -74.3576]).addTo(map)
+    .bindPopup('<b>🛍️ Menlo Park Mall</b>');
+}
+
+function renderActMap() {
+  if (actMapReady) return;
+  actMapReady = true;
+  const map = L.map('activitiesMap').setView([VENUE_LAT, VENUE_LNG], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+  L.marker([VENUE_LAT, VENUE_LNG]).addTo(map)
+    .bindPopup('<b>🎭 Competition Venue</b>').openPopup();
+  activities.forEach(a => {
+    if (a.lat) L.marker([a.lat, a.lng]).addTo(map)
+      .bindPopup(`<b>${a.name}</b><br>${a.distance}`);
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderDances();
+renderRestaurants();
+renderActivities();
+</script>
+</body>
+</html>
