@@ -258,7 +258,7 @@
     <div class="info-row"><span class="info-label">Name</span><span class="info-value">Econo Lodge Hicksville</span></div>
     <div class="info-row"><span class="info-label">Address</span><span class="info-value">429 Duffy Ave, Hicksville, NY 11801</span></div>
     <div class="info-row"><span class="info-label">Phone</span><span class="info-value">(516) 433-3900</span></div>
-    <div class="info-row"><span class="info-label">Walk to venue</span><span class="info-value">~15–20 min walk · See walking map below</span></div>
+    <div class="info-row"><span class="info-label">Walk to venue</span><span class="info-value">~35 min walk (~1.7 miles) · See walking map below</span></div>
     <div class="card-actions" style="margin-top:12px;">
       <a href="https://maps.google.com/?q=429+Duffy+Ave+Hicksville+NY+11801" target="_blank" class="action-btn directions">📍 Hotel on Map</a>
     </div>
@@ -267,10 +267,17 @@
   <div class="info-card">
     <h3>🚶 Walking to the Venue on Shabbat</h3>
     <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); margin-bottom:14px;">
-      For families staying over Friday night, the venue is walkable from the hotel. The route is mostly on sidewalks through a residential neighborhood — about 0.8 miles.
+      For families staying over Friday night, the venue is walkable from the hotel. The route is mostly on sidewalks through a residential neighborhood — about 1.7 miles.
     </p>
-    <div class="info-row"><span class="info-label">Route</span><span class="info-value">Head north on Duffy Ave → left on Old Country Rd → right on Newbridge Rd → right on Cherry Lane → venue on left</span></div>
-    <div class="info-row"><span class="info-label">Walk time</span><span class="info-value">~15–20 minutes at a comfortable pace</span></div>
+    <div class="info-row"><span class="info-label">Route</span><span class="info-value">Head south on Duffy Ave → right on Old Country Rd heading east → continue southeast through Hicksville → Cherry Lane on right → venue on left. Follow Google Maps walking directions for exact turns.</span></div>
+    <div class="info-row">
+      <span class="info-label">Google Maps</span>
+      <span class="info-value">
+        <a href="https://maps.app.goo.gl/7Dd5Jgzfp821UMnv9" target="_blank"
+           style="color:#e87ba0;">Open walking directions ↗</a>
+      </span>
+    </div>
+    <div class="info-row"><span class="info-label">Walk time</span><span class="info-value">~35 minutes at a comfortable pace — wear comfortable shoes!</span></div>
     <div class="walk-map-container" id="walkMap"></div>
   </div>
 
@@ -348,8 +355,8 @@ function toggleCollapse(id) {
 const FRI = { year: 2026, month: 4, day: 8 };
 const SAT = { year: 2026, month: 4, day: 9 };
 const VENUE = 'Holy Trinity Diocesan High School, 98 Cherry Lane, Hicksville, NY 11801';
-const HOTEL_LAT = 40.7567, HOTEL_LNG = -73.5201;
-const VENUE_LAT = 40.7669, VENUE_LNG = -73.5249;
+const HOTEL_LAT = 40.7577, HOTEL_LNG = -73.5487;
+const VENUE_LAT = 40.7469, VENUE_LNG = -73.5328;
 
 const dances = [
   // ---- FRIDAY MAY 8 ----
@@ -766,12 +773,13 @@ function renderWalkMap() {
 
   // Walking route (approximate waypoints)
   const route = [
-    [HOTEL_LAT, HOTEL_LNG],
-    [40.7580, -73.5205],
-    [40.7600, -73.5215],
-    [40.7630, -73.5235],
-    [40.7650, -73.5245],
-    [VENUE_LAT, VENUE_LNG]
+    [40.7577, -73.5487],
+    [40.7555, -73.5487],
+    [40.7540, -73.5460],
+    [40.7520, -73.5420],
+    [40.7500, -73.5380],
+    [40.7480, -73.5350],
+    [40.7469, -73.5328]
   ];
   L.polyline(route, { color:'#d5164d', weight:3, dashArray:'6 4', opacity:0.8 }).addTo(map);
 }
