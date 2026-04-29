@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tate Academy - Dream Maker Long Island 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #1a1b1d; color: #f0f0f0; min-height: 100vh; }
+
+    header {
+      background: linear-gradient(135deg, #d5164d, #9a1039);
+      padding: 24px 20px; text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; color: white; margin-bottom: 6px; }
+    header p  { color: rgba(255,255,255,0.85); font-size: 1rem; }
+    header .sub { font-size: 0.85rem; margin-top: 4px; opacity: 0.75; }
+
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 12px 16px; background: #111213;
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid #2a2b2d;
+    }
+    .tab-btn {
+      padding: 8px 14px; border: none; background: #2a2b2d; color: #ccc;
+      border-radius: 20px; cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem; font-weight: 500; transition: all 0.2s; white-space: nowrap;
+    }
+    .tab-btn.active { background: #d5164d; color: white; }
+    .tab-btn:hover:not(.active) { background: #3a3b3d; color: white; }
+
+    .tab-content { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+    .tab-content.active { display: block; }
+
+    .section-header {
+      background: linear-gradient(135deg, #d5164d, #9a1039);
+      color: white; padding: 14px 18px; border-radius: 10px;
+      margin-bottom: 16px; font-size: 1.1rem; font-weight: 600;
+    }
+    .section-subheader {
+      background: #2a2b2d; color: white; padding: 10px 16px;
+      border-radius: 8px; margin: 16px 0 10px 0; font-size: 0.95rem; font-weight: 600;
+    }
+
+    .info-block {
+      background: #2a2b2d; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;
+    }
+    .info-block-top {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .collapse-content { display: none; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
+    .collapse-content.open { display: block; }
+    .collapse-toggle { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 0.8rem; font-family: 'Outfit', sans-serif; }
+    .collapse-content p  { font-size: 0.85rem; color: #ccc; line-height: 1.6; margin-bottom: 8px; }
+    .collapse-content ol, .collapse-content ul { padding-left: 20px; }
+    .collapse-content li { margin: 6px 0; font-size: 0.85rem; color: #ccc; line-height: 1.5; }
+
+    /* Level badge */
+    .level-badge {
+      display: inline-block; padding: 1px 7px; border-radius: 8px;
+      font-size: 0.68rem; font-weight: 600; margin-left: 6px; vertical-align: middle;
+    }
+    .level-elite       { background: rgba(213,22,77,0.2); color: #e87ba0; border: 1px solid rgba(213,22,77,0.3); }
+    .level-competitive { background: rgba(80,140,200,0.2); color: #90c0f0; border: 1px solid rgba(80,140,200,0.3); }
+    .level-showcase    { background: rgba(80,180,100,0.2); color: #80d080; border: 1px solid rgba(80,180,100,0.3); }
+
+    /* Entry number */
+    .entry-num { font-size: 0.7rem; color: rgba(255,255,255,0.3); font-weight: 400; margin-left: 5px; }
+
+    /* Dance rows */
+    .day-header {
+      background: #1e1f21; border-left: 4px solid #d5164d;
+      padding: 10px 14px; margin: 16px 0 8px 0;
+      border-radius: 0 8px 8px 0; font-weight: 600; font-size: 1rem;
+    }
+    .dance-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .dance-row.age-5-6   { background: rgba(213,22,77,0.08);  border-left: 3px solid #e8a0b4; }
+    .dance-row.age-9-11  { background: rgba(213,22,77,0.14);  border-left: 3px solid #c4527a; }
+    .dance-row.age-12-14 { background: rgba(176,16,64,0.20);  border-left: 3px solid #b01040; }
+    .dance-row.age-15-16 { background: rgba(213,22,77,0.24);  border-left: 3px solid #d5164d; }
+    .dance-row.age-17-19 { background: rgba(154,16,57,0.30);  border-left: 3px solid #9a1039; }
+    .dance-row.solo      { box-shadow: inset 0 0 0 1px rgba(213,22,77,0.4); }
+    .dance-row.awards    { background: #1e1f21; border-left: 3px solid #555; }
+
+    .dance-time { min-width: 76px; font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.65); padding-top: 3px; flex-shrink: 0; }
+    .dance-info { flex: 1; min-width: 0; }
+    .dance-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+    .dance-meta  { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+    .dance-dancers { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; line-height: 1.4; }
+
+    .cal-btn {
+      flex-shrink: 0; padding: 5px 10px; background: #d5164d; color: white;
+      border: none; border-radius: 6px; font-size: 0.72rem;
+      font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .cal-btn:hover { background: #b01040; }
+
+    /* Cards */
+    .card {
+      background: #2a2b2d; border-radius: 10px; padding: 14px 16px;
+      margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.07);
+    }
+    .card-name { font-size: 1rem; font-weight: 600; color: #e87ba0; text-decoration: none; display: block; margin-bottom: 4px; }
+    .card-name:hover { color: #d5164d; }
+    .card-meta  { font-size: 0.82rem; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+    .card-desc  { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 10px; line-height: 1.5; }
+    .card-notes { font-size: 0.78rem; color: #f0a0b0; margin: 6px 0; }
+    .free-badge { color: #80e080; font-size: 0.72rem; font-weight: 700; margin-left: 6px; }
+    .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+    .action-btn {
+      padding: 6px 14px; border-radius: 20px; font-size: 0.8rem;
+      font-family: 'Outfit', sans-serif; font-weight: 500; cursor: pointer;
+      text-decoration: none; display: inline-block; border: none; transition: opacity 0.15s;
+    }
+    .action-btn:hover { opacity: 0.8; }
+    .action-btn.directions { background: #d5164d; color: white; }
+    .action-btn.menu    { background: #1e2d3d; color: #90c0e0; border: 1px solid #90c0e0; }
+    .action-btn.website { background: #1e1e35; color: #a090e0; border: 1px solid #a090e0; }
+    .action-btn.stream  { background: #1a2e1a; color: #80d080; border: 1px solid #80d080; }
+
+    .map-container { height: 300px; border-radius: 10px; overflow: hidden; margin: 16px 0; }
+    .walk-map-container { height: 340px; border-radius: 10px; overflow: hidden; margin: 16px 0; }
+
+    /* Weekend Info */
+    .info-card {
+      background: #2a2b2d; border-radius: 10px; padding: 16px;
+      margin-bottom: 14px; border-left: 4px solid #d5164d;
+    }
+    .info-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #e87ba0; }
+    .info-row { display: flex; gap: 10px; margin-bottom: 7px; font-size: 0.88rem; }
+    .info-label { min-width: 110px; color: rgba(255,255,255,0.45); font-weight: 500; flex-shrink: 0; }
+    .info-value { color: #f0f0f0; line-height: 1.5; }
+
+    .btn-primary {
+      padding: 9px 16px; background: #d5164d; color: white; border: none;
+      border-radius: 8px; font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-primary:hover { background: #b01040; }
+
+    footer {
+      background: #111213; text-align: center; padding: 18px; margin-top: 40px;
+      color: rgba(255,255,255,0.35); font-size: 0.8rem; border-top: 1px solid #2a2b2d;
+    }
+    footer a { color: #d5164d; text-decoration: none; }
+
+    @media (max-width: 560px) {
+      header h1 { font-size: 1.5rem; }
+      .dance-row { flex-wrap: wrap; }
+      .cal-btn { font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Tate Academy Company</h1>
+  <p>Dream Maker — Long Island, NY</p>
+  <p class="sub">May 8–9, 2026 · Holy Trinity Diocesan High School · Hicksville, NY</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('danceOrder', this)">🎭 Dance Order</button>
+  <button class="tab-btn"        onclick="switchTab('eat', this)">🍽️ Places to Eat</button>
+  <button class="tab-btn"        onclick="switchTab('todo', this)">🗺️ Things to Do</button>
+  <button class="tab-btn"        onclick="switchTab('weekend', this)">📋 Weekend Info</button>
+  <button class="tab-btn"        onclick="switchTab('suggest', this)">💬 Suggest Updates</button>
+</nav>
+
+<main>
+
+<!-- ===== DANCE ORDER ===== -->
+<div id="danceOrder" class="tab-content active">
+  <div class="section-header">🎭 Competition Dance Order</div>
+
+  <!-- Livestream callout -->
+  <div class="info-block" style="border-left: 3px solid #80d080;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div style="font-weight:600; margin-bottom:3px;">📺 Live Stream Available</div>
+        <div style="font-size:0.82rem; color:rgba(255,255,255,0.55);">Watch from anywhere — free on Dream Maker's website</div>
+      </div>
+      <a href="https://www.dreammakerdance.com/livestream/" target="_blank" class="action-btn stream">Watch Live Stream</a>
+    </div>
+  </div>
+
+  <!-- ICS -->
+  <div class="info-block">
+    <div class="info-block-top">
+      <div>
+        <div style="font-weight:600; margin-bottom:2px;">📅 Add Full Schedule to Calendar</div>
+        <button class="collapse-toggle" onclick="toggleCollapse('icsInstr')">▸ How to import the .ics file</button>
+      </div>
+      <button class="btn-primary" onclick="generateICS()">⬇ Download .ics File</button>
+    </div>
+    <div id="icsInstr" class="collapse-content">
+      <ol>
+        <li><strong>iPhone / iPad:</strong> Tap the downloaded file → tap "Add All" → Done</li>
+        <li><strong>Android:</strong> Open the file → select your calendar app → confirm import</li>
+        <li><strong>Google Calendar:</strong> calendar.google.com → Settings ⚙️ → Import &amp; Export → Import</li>
+        <li><strong>Outlook:</strong> Double-click the file or drag into your calendar window</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="danceList"></div>
+</div>
+
+<!-- ===== PLACES TO EAT ===== -->
+<div id="eat" class="tab-content">
+  <div class="section-header">🍽️ Places to Eat</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Broadway Mall is about 5 minutes away and has plenty of options for a quick group meal. Hicksville also has a great mix of local spots.
+  </p>
+  <div class="section-subheader">🚗 Close to Venue</div>
+  <div id="nearList"></div>
+  <div id="foodMap" class="map-container"></div>
+</div>
+
+<!-- ===== THINGS TO DO ===== -->
+<div id="todo" class="tab-content">
+  <div class="section-header">🗺️ Things to Do</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Long Island has a lot going on — Jones Beach alone is worth the trip if there's downtime on Saturday.
+  </p>
+  <div id="activitiesList"></div>
+  <div id="activitiesMap" class="map-container"></div>
+</div>
+
+<!-- ===== WEEKEND INFO ===== -->
+<div id="weekend" class="tab-content">
+  <div class="section-header">📋 Weekend Info</div>
+
+  <div class="info-card">
+    <h3>🎭 Competition Venue</h3>
+    <div class="info-row"><span class="info-label">Competition</span><span class="info-value">Dream Maker Dance — Long Island Regional</span></div>
+    <div class="info-row"><span class="info-label">Venue</span><span class="info-value">Holy Trinity Diocesan High School</span></div>
+    <div class="info-row"><span class="info-label">Address</span><span class="info-value">98 Cherry Lane, Hicksville, NY 11801</span></div>
+    <div class="info-row"><span class="info-label">Friday</span><span class="info-value">May 8 — First performance 7:18 PM · Awards 10:30 PM</span></div>
+    <div class="info-row"><span class="info-label">Saturday</span><span class="info-value">May 9 — First performance 11:00 AM · Awards 10:30 PM</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://maps.google.com/?q=98+Cherry+Lane+Hicksville+NY+11801" target="_blank" class="action-btn directions">📍 Directions to Venue</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🏨 Hotel</h3>
+    <div class="info-row"><span class="info-label">Name</span><span class="info-value">Econo Lodge Hicksville</span></div>
+    <div class="info-row"><span class="info-label">Address</span><span class="info-value">429 Duffy Ave, Hicksville, NY 11801</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">(516) 433-3900</span></div>
+    <div class="info-row"><span class="info-label">Walk to venue</span><span class="info-value">~15–20 min walk · See walking map below</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://maps.google.com/?q=429+Duffy+Ave+Hicksville+NY+11801" target="_blank" class="action-btn directions">📍 Hotel on Map</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🚶 Walking to the Venue on Shabbat</h3>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); margin-bottom:14px;">
+      For families staying over Friday night, the venue is walkable from the hotel. The route is mostly on sidewalks through a residential neighborhood — about 0.8 miles.
+    </p>
+    <div class="info-row"><span class="info-label">Route</span><span class="info-value">Head north on Duffy Ave → left on Old Country Rd → right on Newbridge Rd → right on Cherry Lane → venue on left</span></div>
+    <div class="info-row"><span class="info-label">Walk time</span><span class="info-value">~15–20 minutes at a comfortable pace</span></div>
+    <div class="walk-map-container" id="walkMap"></div>
+  </div>
+
+  <div class="info-card">
+    <h3>🚗 Driving from Teaneck</h3>
+    <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); margin-bottom:14px;">About 45–60 minutes depending on traffic.</p>
+    <div class="info-row"><span class="info-label">Route</span><span class="info-value">I-95 S → Cross Bronx → Throgs Neck Bridge → I-495 East (LIE) → Exit 40S (Newbridge Rd South) → Cherry Lane</span></div>
+    <div class="info-row"><span class="info-label">Tip</span><span class="info-value">Friday evening traffic on the LIE can be heavy. Build in an extra 20 min buffer if driving Friday for the 7:18 PM start.</span></div>
+    <div class="card-actions" style="margin-top:12px;">
+      <a href="https://maps.google.com/?saddr=519+Cedar+Lane+Teaneck+NJ&daddr=98+Cherry+Lane+Hicksville+NY" target="_blank" class="action-btn directions">🗺️ Directions from Tate</a>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h3>🎬 Photos &amp; Videos — Dancebug</h3>
+    <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); margin-bottom:12px;">
+      Competition media will be posted to Dancebug. You likely already have a login from Believe — use the same account to find your dancer's videos and photos.
+    </p>
+    <div class="card-actions">
+      <a href="https://www.dancebug.com/#studios" target="_blank" class="action-btn website">Open Dancebug</a>
+      <a href="https://www.dreammakerdance.com/livestream/" target="_blank" class="action-btn stream">📺 Live Stream</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUGGEST UPDATES ===== -->
+<div id="suggest" class="tab-content">
+  <div class="section-header">💬 Suggest Updates</div>
+  <p style="font-size:0.85rem; color:rgba(255,255,255,0.6); margin-bottom:16px;">
+    Spot something wrong? Know a great place nearby? Let us know!
+  </p>
+  <iframe
+    src="https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true"
+    width="100%" height="834" frameborder="0" marginheight="0" marginwidth="0"
+    style="border-radius:10px;">Loading form...
+  </iframe>
+</div>
+
+</main>
+
+<footer>
+  <p>Tate Academy Company · Dream Maker Long Island 2026</p>
+  <p style="margin-top:5px;">Built by <a href="https://lhasa.app" target="_blank">Lhasa LLC</a></p>
+</footer>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let foodMapReady = false;
+let actMapReady  = false;
+let walkMapReady = false;
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'eat')     renderFoodMap();
+  if (id === 'todo')    renderActMap();
+  if (id === 'weekend') renderWalkMap();
+}
+
+function toggleCollapse(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  const btn = el.previousElementSibling;
+  btn.textContent = (el.classList.contains('open') ? '▾' : '▸') + btn.textContent.slice(1);
+}
+
+// ============================================================
+// DATA
+// month 0-indexed: 4 = May
+// ============================================================
+const FRI = { year: 2026, month: 4, day: 8 };
+const SAT = { year: 2026, month: 4, day: 9 };
+const VENUE = 'Holy Trinity Diocesan High School, 98 Cherry Lane, Hicksville, NY 11801';
+const HOTEL_LAT = 40.7567, HOTEL_LNG = -73.5201;
+const VENUE_LAT = 40.7669, VENUE_LNG = -73.5249;
+
+const dances = [
+  // ---- FRIDAY MAY 8 ----
+  { day:'Friday, May 8', time:'7:18 PM', type:'group', age:'age-9-11',
+    title:'Just Like a River', style:'Lyrical', division:'Elite Small Group · Junior', entry:'#104',
+    dancer:'Age 9-11 Company',
+    dancers:'Sasha Lebovitch, Anaya Martinez, Sierra Sung, Liana Yaros',
+    level:'elite', d:FRI, sh:19, sm:18, eh:19, em:21 },
+  { day:'Friday, May 8', time:'7:29 PM', type:'group', age:'age-12-14',
+    title:'What the World Needs Now', style:'Lyrical', division:'Elite Duet/Trio · Teen', entry:'#108',
+    dancer:'Age 12-14',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch',
+    level:'elite', d:FRI, sh:19, sm:29, eh:19, em:32 },
+  { day:'Friday, May 8', time:'8:09 PM', type:'group', age:'age-9-11',
+    title:'Fly', style:'Lyrical', division:'Elite Small Group · Junior', entry:'#120',
+    dancer:'Age 9-11 Company',
+    dancers:'Isabella Elsebai, Ava Khan, Taydeliz Mota, Jade Paez',
+    level:'elite', d:FRI, sh:20, sm:9, eh:20, em:12 },
+  { day:'Friday, May 8', time:'8:22 PM', type:'group', age:'age-15-16',
+    title:'Cellophane', style:'Lyrical', division:'Elite Small Group · Senior', entry:'#124',
+    dancer:'Age 15-16 Company',
+    dancers:'Talya Baruch, Liam Brady, Chloe Choi, Talia Glassberg, Lula Najera, Alina Nam',
+    level:'elite', d:FRI, sh:20, sm:22, eh:20, em:26 },
+  { day:'Friday, May 8', time:'8:28 PM', type:'group', age:'age-9-11',
+    title:'Work Me Down', style:'Jazz', division:'Elite Small Group · Junior', entry:'#126',
+    dancer:'Age 9-11 Company (8)',
+    dancers:'Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Taydeliz Mota, Charlotte Paltroom, Sierra Sung, Liana Yaros',
+    level:'elite', d:FRI, sh:20, sm:28, eh:20, em:32 },
+  { day:'Friday, May 8', time:'8:43 PM', type:'group', age:'age-12-14',
+    title:'White Rabbit', style:'Contemporary', division:'Elite Small Group · Teen', entry:'#130',
+    dancer:'Age 12-14 Company',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
+    level:'elite', d:FRI, sh:20, sm:43, eh:20, em:47 },
+  { day:'Friday, May 8', time:'8:49 PM', type:'group', age:'age-15-16',
+    title:'Kendrick', style:'Hip Hop', division:'Elite Small Group · Senior', entry:'#132',
+    dancer:'Age 15-16 Company (8)',
+    dancers:'Carly Baitner, Chloe Choi, Rylee Dennis, Ella Guy, Charlotte Mejia, Lula Najera, Alina Nam, Kaelynn Vargas',
+    level:'elite', d:FRI, sh:20, sm:49, eh:20, em:53 },
+  { day:'Friday, May 8', time:'9:05 PM', type:'group', age:'age-12-14',
+    title:'The Way You Make Me Feel', style:'Jazz', division:'Elite Small Group · Teen', entry:'#137',
+    dancer:'Age 12-14 Company',
+    dancers:'Ella Beharry, Eden Caffie, Zoë Lebovitch, Camila Martinez, Jade Paez, Robbie Palefski',
+    level:'elite', d:FRI, sh:21, sm:5, eh:21, em:9 },
+  { day:'Friday, May 8', time:'9:26 PM', type:'group', age:'age-15-16',
+    title:'Dead & Done', style:'Contemporary', division:'Elite Small Group · Senior', entry:'#144',
+    dancer:'Age 15-16 Company',
+    dancers:'Carly Baitner, Liam Brady, Chloe Choi, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam',
+    level:'elite', d:FRI, sh:21, sm:26, eh:21, em:30 },
+  { day:'Friday, May 8', time:'10:30 PM', type:'awards',
+    title:'AWARDS', division:'Friday Awards',
+    d:FRI, sh:22, sm:30, eh:23, em:15 },
+
+  // ---- SATURDAY MAY 9 ----
+  { day:'Saturday, May 9', time:'11:00 AM', type:'group', age:'age-9-11',
+    title:'Whatcha Know About Me', style:'Hip Hop', division:'Elite Large Group · Junior', entry:'#262',
+    dancer:'Age 9-11 Company (12)',
+    dancers:'Ella Beharry, Eden Caffie, Isabella Elsebai, Ava Khan, Sasha Lebovitch, Anaya Martinez, Camila Martinez, Sapphira Morales, Taydeliz Mota, Jade Paez, Robbie Palefski, Liana Yaros',
+    level:'elite', d:SAT, sh:11, sm:0, eh:11, em:5 },
+  { day:'Saturday, May 9', time:'11:23 AM', type:'group', age:'age-9-11',
+    title:'Hairspray', style:'Musical Theater', division:'Elite Large Group · Junior', entry:'#268',
+    dancer:'Age 9-11 Company (17)',
+    dancers:'Zoey Almonte, Ella Beharry, Eden Caffie, Ephesian Chapman, Isabella Elsebai, Ava Khan, Demi Kotright, Sasha Lebovitch, Zoë Lebovitch, Anaya Martinez, Camila Martinez, Taydeliz Mota, Stephanie Owusu, Jade Paez, Charlotte Paltroom, Sierra Sung, Liana Yaros',
+    level:'elite', d:SAT, sh:11, sm:23, eh:11, em:28 },
+  { day:'Saturday, May 9', time:'11:45 AM', type:'awards',
+    title:'AWARDS', division:'Saturday Morning Awards',
+    d:SAT, sh:11, sm:45, eh:12, em:30 },
+  { day:'Saturday, May 9', time:'1:32 PM', type:'group', age:'age-15-16',
+    title:'End of Love', style:'Lyrical', division:'Elite Large Group · Senior', entry:'#315',
+    dancer:'Age 15-16 Company (15)',
+    dancers:'Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Zoë Lebovitch, Camila Martinez, Lula Najera, Alina Nam, Robbie Palefski, Genevieve Tomic',
+    level:'elite', d:SAT, sh:13, sm:32, eh:13, em:37 },
+  { day:'Saturday, May 9', time:'2:00 PM', type:'group', age:'age-15-16',
+    title:'Cry to Me', style:'Jazz', division:'Elite Large Group · Senior', entry:'#321',
+    dancer:'Age 15-16 Company (10)',
+    dancers:'Carly Baitner, Talya Baruch, Liam Brady, Chloe Choi, Rylee Dennis, Talia Glassberg, Ella Guy, Lula Najera, Alina Nam, Genevieve Tomic',
+    level:'elite', d:SAT, sh:14, sm:0, eh:14, em:5 },
+  { day:'Saturday, May 9', time:'2:32 PM', type:'group', age:'age-12-14',
+    title:'Golden Years', style:'Jazz', division:'Elite Line · Teen', entry:'#329',
+    dancer:'Full Company Line (28)',
+    dancers:'Zoey Almonte, Carly Baitner, Talya Baruch, Ella Beharry, Liam Brady, Eden Caffie, Chloe Choi, Rylee Dennis, Isabella Elsebai, Talia Glassberg, Ella Guy, Ava Khan, Sasha Lebovitch, Zoë Lebovitch, Anaya Martinez, Camila Martinez, Charlotte Mejia, Sapphira Morales, Taydeliz Mota, Lula Najera, Alina Nam, Jade Paez, Robbie Palefski, Charlotte Paltroom, Sierra Sung, Genevieve Tomic, Kaelynn Vargas, Liana Yaros',
+    level:'elite', d:SAT, sh:14, sm:32, eh:14, em:38 },
+  { day:'Saturday, May 9', time:'3:27 PM', type:'solo', age:'age-9-11',
+    title:'Le Freake', style:'Jazz', division:'Competitive Solo · Junior', entry:'#347',
+    dancer:'Anaya Martinez',
+    level:'competitive', d:SAT, sh:15, sm:27, eh:15, em:30 },
+  { day:'Saturday, May 9', time:'3:30 PM', type:'solo', age:'age-9-11',
+    title:'Wings', style:'Jazz', division:'Competitive Solo · Junior', entry:'#348',
+    dancer:'Liana Yaros',
+    level:'competitive', d:SAT, sh:15, sm:30, eh:15, em:33 },
+  { day:'Saturday, May 9', time:'3:42 PM', type:'solo', age:'age-9-11',
+    title:'Raspberry Beret', style:'Jazz', division:'Competitive Solo · Junior', entry:'#352',
+    dancer:'Isabella Elsebai',
+    level:'competitive', d:SAT, sh:15, sm:42, eh:15, em:45 },
+  { day:'Saturday, May 9', time:'4:30 PM', type:'awards',
+    title:'AWARDS', division:'Saturday Afternoon Awards',
+    d:SAT, sh:16, sm:30, eh:17, em:15 },
+  { day:'Saturday, May 9', time:'6:06 PM', type:'solo', age:'age-12-14',
+    title:'The Bird', style:'Contemporary', division:'Elite Solo · Teen', entry:'#417',
+    dancer:'Ella Beharry',
+    level:'elite', d:SAT, sh:18, sm:6, eh:18, em:9 },
+  { day:'Saturday, May 9', time:'6:20 PM', type:'solo', age:'age-12-14',
+    title:'When I Go', style:'Contemporary', division:'Elite Solo · Teen', entry:'#422',
+    dancer:'Robbie Palefski',
+    level:'elite', d:SAT, sh:18, sm:20, eh:18, em:23 },
+  { day:'Saturday, May 9', time:'6:55 PM', type:'solo', age:'age-12-14',
+    title:'Corps', style:'Contemporary', division:'Elite Solo · Teen', entry:'#434',
+    dancer:'Camila Martinez',
+    level:'elite', d:SAT, sh:18, sm:55, eh:18, em:58 },
+  { day:'Saturday, May 9', time:'7:18 PM', type:'solo', age:'age-12-14',
+    title:"That's Life", style:'Jazz', division:'Elite Solo · Teen', entry:'#442',
+    dancer:'Robbie Palefski',
+    level:'elite', d:SAT, sh:19, sm:18, eh:19, em:21 },
+  { day:'Saturday, May 9', time:'7:30 PM', type:'solo', age:'age-12-14',
+    title:'Slow It Down', style:'Lyrical', division:'Elite Solo · Teen', entry:'#446',
+    dancer:'Ella Beharry',
+    level:'elite', d:SAT, sh:19, sm:30, eh:19, em:33 },
+  { day:'Saturday, May 9', time:'7:47 PM', type:'solo', age:'age-12-14',
+    title:'I Dreamed a Dream', style:'Lyrical', division:'Elite Solo · Teen', entry:'#452',
+    dancer:'Zoë Lebovitch',
+    level:'elite', d:SAT, sh:19, sm:47, eh:19, em:50 },
+  { day:'Saturday, May 9', time:'7:50 PM', type:'solo', age:'age-12-14',
+    title:'River', style:'Lyrical', division:'Elite Solo · Teen', entry:'#453',
+    dancer:'Eden Caffie',
+    level:'elite', d:SAT, sh:19, sm:50, eh:19, em:53 },
+  { day:'Saturday, May 9', time:'8:29 PM', type:'solo', age:'age-15-16',
+    title:'Other Side', style:'Contemporary', division:'Elite Solo · Senior', entry:'#467',
+    dancer:'Carly Baitner',
+    level:'elite', d:SAT, sh:20, sm:29, eh:20, em:32 },
+  { day:'Saturday, May 9', time:'8:38 PM', type:'solo', age:'age-15-16',
+    title:'Dreams', style:'Jazz', division:'Elite Solo · Senior', entry:'#470',
+    dancer:'Ella Guy',
+    level:'elite', d:SAT, sh:20, sm:38, eh:20, em:41 },
+  { day:'Saturday, May 9', time:'8:47 PM', type:'solo', age:'age-15-16',
+    title:'Foolish Games', style:'Lyrical', division:'Elite Solo · Senior', entry:'#473',
+    dancer:'Talia Glassberg',
+    level:'elite', d:SAT, sh:20, sm:47, eh:20, em:50 },
+  { day:'Saturday, May 9', time:'8:50 PM', type:'solo', age:'age-15-16',
+    title:'One More Moment', style:'Lyrical', division:'Elite Solo · Senior', entry:'#474',
+    dancer:'Talya Baruch',
+    level:'elite', d:SAT, sh:20, sm:50, eh:20, em:53 },
+  { day:'Saturday, May 9', time:'8:56 PM', type:'solo', age:'age-15-16',
+    title:'Death Wish', style:'Lyrical', division:'Elite Solo · Senior', entry:'#476',
+    dancer:'Ella Guy',
+    level:'elite', d:SAT, sh:20, sm:56, eh:20, em:59 },
+  { day:'Saturday, May 9', time:'9:08 PM', type:'solo', age:'age-17-19',
+    title:'Winner Takes It All', style:'Contemporary', division:'Elite Solo · Senior', entry:'#480',
+    dancer:'Lula Najera',
+    level:'elite', d:SAT, sh:21, sm:8, eh:21, em:11 },
+  { day:'Saturday, May 9', time:'9:15 PM', type:'solo', age:'age-17-19',
+    title:'Tennessee Whiskey', style:'Contemporary', division:'Elite Solo · Senior', entry:'#482',
+    dancer:'Liam Brady',
+    level:'elite', d:SAT, sh:21, sm:15, eh:21, em:18 },
+  { day:'Saturday, May 9', time:'9:20 PM', type:'solo', age:'age-17-19',
+    title:'These Arms of Mine', style:'Contemporary', division:'Elite Solo · Senior', entry:'#484',
+    dancer:'Chloe Choi',
+    level:'elite', d:SAT, sh:21, sm:20, eh:21, em:23 },
+  { day:'Saturday, May 9', time:'9:29 PM', type:'solo', age:'age-17-19',
+    title:'Lose Yourself', style:'Hip Hop', division:'Elite Solo · Senior', entry:'#487',
+    dancer:'Rylee Dennis',
+    level:'elite', d:SAT, sh:21, sm:29, eh:21, em:32 },
+  { day:'Saturday, May 9', time:'9:43 PM', type:'solo', age:'age-15-16',
+    title:'Out There', style:'Contemporary', division:'Elite Solo · Senior', entry:'#492',
+    dancer:'Alina Nam',
+    level:'elite', d:SAT, sh:21, sm:43, eh:21, em:46 },
+  { day:'Saturday, May 9', time:'9:49 PM', type:'solo', age:'age-17-19',
+    title:"Where's My Husband", style:'Jazz', division:'Elite Solo · Senior', entry:'#494',
+    dancer:'Rylee Dennis',
+    level:'elite', d:SAT, sh:21, sm:49, eh:21, em:52 },
+  { day:'Saturday, May 9', time:'10:30 PM', type:'awards',
+    title:'AWARDS — Final Awards', division:'Saturday Final Awards',
+    d:SAT, sh:22, sm:30, eh:23, em:15 }
+];
+
+// ============================================================
+// RESTAURANTS & ACTIVITIES
+// ============================================================
+const restaurants = [
+  { name:"Broadway Mall Food Court", cuisine:'Various', distance:'5 min drive', price:'$',
+    address:'358 Old Country Rd, Hicksville, NY',
+    map:'https://maps.google.com/?q=Broadway+Mall+Hicksville+NY',
+    menu:'', web:'https://broadwaymall.com', notes:'Lots of options — fast, easy for groups' },
+  { name:"Chick-fil-A", cuisine:'American / Fast Food', distance:'5 min drive', price:'$',
+    address:'Broadway Mall, Hicksville, NY',
+    map:'https://maps.google.com/?q=Chick-fil-A+Broadway+Mall+Hicksville+NY',
+    menu:'https://www.chick-fil-a.com/menu', web:'', notes:'' },
+  { name:"Bagel Boss", cuisine:'Bagels / Breakfast', distance:'8 min drive', price:'$',
+    address:'Hicksville, NY',
+    map:'https://maps.google.com/?q=Bagel+Boss+Hicksville+NY',
+    menu:'', web:'', notes:'Long Island institution — great for morning of competition' },
+  { name:"Millie's Place", cuisine:'American / Diner', distance:'5 min drive', price:'$$',
+    address:'Hicksville, NY',
+    map:'https://maps.google.com/?q=Millies+Place+Hicksville+NY',
+    menu:'', web:'', notes:'Local diner, good for a sit-down meal' },
+  { name:"Ben's Kosher Deli", cuisine:'Kosher / Jewish Deli', distance:'10 min drive', price:'$$',
+    address:'Greenvale, NY',
+    map:'https://maps.google.com/?q=Bens+Kosher+Deli+Greenvale+NY',
+    menu:'https://www.bensdeli.net/menu/', web:'https://www.bensdeli.net',
+    notes:'Kosher certified — closest kosher option to the venue' },
+  { name:"Trader Joe's", cuisine:'Grocery / Prepared Foods', distance:'5 min drive', price:'$',
+    address:'Hicksville, NY',
+    map:'https://maps.google.com/?q=Trader+Joes+Hicksville+NY',
+    menu:'', web:'', notes:'Great for grab-and-go snacks and meals' }
+];
+
+const activities = [
+  { name:"Jones Beach State Park", free:false,
+    desc:"One of the best beaches on the East Coast — 6 miles of Atlantic Ocean beach. Perfect if there's downtime Saturday before evening performances.",
+    distance:'12 min drive',
+    map:'https://maps.google.com/?q=Jones+Beach+State+Park+NY',
+    web:'https://parks.ny.gov/parks/jonesbeach', lat:40.5975, lng:-73.5119 },
+  { name:"Broadway Mall", free:true,
+    desc:"Full indoor mall with shopping, food court, and a Round 1 Bowling & Arcade inside — great for younger dancers with energy to burn.",
+    distance:'5 min drive',
+    map:'https://maps.google.com/?q=Broadway+Mall+Hicksville+NY',
+    web:'https://broadwaymall.com', lat:40.7631, lng:-73.5193 },
+  { name:"Cantiague Park", free:true,
+    desc:"Nice county park with walking trails, sports facilities, and open space — good for a break between competition blocks.",
+    distance:'8 min drive',
+    map:'https://maps.google.com/?q=Cantiague+Park+Hicksville+NY',
+    web:'', lat:40.7752, lng:-73.5337 },
+  { name:"Cradle of Aviation Museum", free:false,
+    desc:"Incredible aviation museum with 75 aircraft and spacecraft — really worth it if you have a few hours.",
+    distance:'15 min drive',
+    map:'https://maps.google.com/?q=Cradle+of+Aviation+Museum+Garden+City+NY',
+    web:'https://www.cradleofaviation.org', lat:40.7246, lng:-73.5990 },
+  { name:"Eisenhower Park", free:true,
+    desc:"One of the largest parks in Nassau County — walking paths, playgrounds, and open fields.",
+    distance:'10 min drive',
+    map:'https://maps.google.com/?q=Eisenhower+Park+East+Meadow+NY',
+    web:'', lat:40.7265, lng:-73.5614 }
+];
+
+// ============================================================
+// CALENDAR HELPERS
+// ============================================================
+const pad = n => String(n).padStart(2,'0');
+function gcDate(d) {
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+}
+
+function addToCalendar(idx) {
+  const item = dances[idx];
+  const start = new Date(item.d.year, item.d.month, item.d.day, item.sh, item.sm);
+  const end   = new Date(item.d.year, item.d.month, item.d.day, item.eh, item.em);
+  const name  = item.type === 'solo' ? item.dancer.split(' ')[0] : 'Tate Academy';
+  const title = item.type === 'awards'
+    ? `🏆 ${item.title} — Tate (Dream Maker)`
+    : `${item.title} — (${name})`;
+  const p = new URLSearchParams({
+    action:'TEMPLATE', text: title,
+    dates:`${gcDate(start)}/${gcDate(end)}`,
+    location: VENUE,
+    details:`${item.division}${item.style ? ' · ' + item.style : ''}${item.dancer ? ' · ' + item.dancer : ''}${item.entry ? ' · Entry ' + item.entry : ''}`
+  });
+  window.open(`https://calendar.google.com/calendar/render?${p}`, '_blank');
+}
+
+function generateICS() {
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Tate Academy//Dream Maker Long Island 2026//EN\r\n';
+  let uid = 0;
+  dances.forEach(d => {
+    const s = new Date(d.d.year, d.d.month, d.d.day, d.sh, d.sm);
+    const e = new Date(d.d.year, d.d.month, d.d.day, d.eh, d.em);
+    const fmt = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+    const name = d.type === 'solo' ? d.dancer.split(' ')[0] : 'Tate Academy';
+    const summary = d.type === 'awards'
+      ? `🏆 ${d.title} — Tate (Dream Maker)`
+      : `${d.title} — (${name})`;
+    ics += `BEGIN:VEVENT\r\nUID:dreammaker-li-2026-${uid++}@tateacademy.com\r\n`;
+    ics += `DTSTART:${fmt(s)}\r\nDTEND:${fmt(e)}\r\n`;
+    ics += `SUMMARY:${summary}\r\nLOCATION:${VENUE}\r\n`;
+    ics += `DESCRIPTION:${d.division}${d.style ? ' - ' + d.style : ''}${d.dancer ? ' - ' + d.dancer : ''}${d.entry ? ' - Entry ' + d.entry : ''}\r\n`;
+    ics += `END:VEVENT\r\n`;
+  });
+  ics += 'END:VCALENDAR';
+  const a = document.createElement('a');
+  a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  a.download = 'DreamMaker_LongIsland_2026_TateAcademy.ics';
+  a.click();
+}
+
+// ============================================================
+// RENDER DANCE ORDER
+// ============================================================
+function levelBadge(level) {
+  if (!level) return '';
+  const cls = `level-${level}`;
+  const label = level === 'elite' ? 'Elite' : level === 'competitive' ? 'Competitive' : 'Showcase';
+  return `<span class="level-badge ${cls}">${label}</span>`;
+}
+
+function renderDances() {
+  let html = '', curDay = '';
+  dances.forEach((d, i) => {
+    if (d.day !== curDay) {
+      curDay = d.day;
+      html += `<div class="day-header">📅 ${d.day}</div>`;
+    }
+    const ageClass = d.type === 'awards' ? 'awards' : d.age;
+    const soloClass = d.type === 'solo' ? ' solo' : '';
+    const entryNum = d.entry ? `<span class="entry-num">${d.entry}</span>` : '';
+    const badge = levelBadge(d.level);
+    const calBtn = `<button class="cal-btn" onclick="addToCalendar(${i})">+ Add to Calendar</button>`;
+    const extra = d.dancers ? `<div class="dance-dancers">${d.dancers}</div>` : '';
+    html += `
+      <div class="dance-row ${ageClass}${soloClass}">
+        <div class="dance-time">${d.time}</div>
+        <div class="dance-info">
+          <div class="dance-title">${d.type==='awards' ? '🏆 ' : ''}${d.title}${entryNum}${badge}</div>
+          <div class="dance-meta">${[d.division, d.style, d.dancer].filter(Boolean).join(' · ')}</div>
+          ${extra}
+        </div>
+        ${calBtn}
+      </div>`;
+  });
+  document.getElementById('danceList').innerHTML = html;
+}
+
+// ============================================================
+// RENDER RESTAURANTS
+// ============================================================
+function renderRestaurants() {
+  const html = restaurants.map(r => {
+    const menuBtn = r.menu ? `<a href="${r.menu}" target="_blank" class="action-btn menu">Menu</a>` : '';
+    const webBtn  = r.web  ? `<a href="${r.web}"  target="_blank" class="action-btn website">Website</a>` : '';
+    const note    = r.notes ? `<div class="card-notes">ℹ️ ${r.notes}</div>` : '';
+    return `
+      <div class="card">
+        <a href="${r.map}" target="_blank" class="card-name">${r.name}</a>
+        <div class="card-meta">${r.cuisine} · ${r.distance} · ${r.price} · ${r.address}</div>
+        ${note}
+        <div class="card-actions">
+          <a href="${r.map}" target="_blank" class="action-btn directions">📍 Directions</a>
+          ${menuBtn}${webBtn}
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('nearList').innerHTML = html;
+}
+
+// ============================================================
+// RENDER ACTIVITIES
+// ============================================================
+function renderActivities() {
+  const html = activities.map(a => {
+    const free = a.free ? '<span class="free-badge">FREE</span>' : '';
+    const webBtn = a.web ? `<a href="${a.web}" target="_blank" class="action-btn website">Website</a>` : '';
+    return `
+      <div class="card">
+        <a href="${a.map}" target="_blank" class="card-name">${a.name}${free}</a>
+        <div class="card-meta">${a.distance}</div>
+        <div class="card-desc">${a.desc}</div>
+        <div class="card-actions">
+          <a href="${a.map}" target="_blank" class="action-btn directions">📍 Directions</a>
+          ${webBtn}
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('activitiesList').innerHTML = html;
+}
+
+// ============================================================
+// MAPS
+// ============================================================
+function renderFoodMap() {
+  if (foodMapReady) return;
+  foodMapReady = true;
+  if (typeof L === 'undefined') return;
+  const map = L.map('foodMap').setView([VENUE_LAT, VENUE_LNG], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+  L.marker([VENUE_LAT, VENUE_LNG]).addTo(map)
+    .bindPopup('<b>🎭 Holy Trinity</b>').openPopup();
+  L.marker([40.7631, -73.5193]).addTo(map)
+    .bindPopup('<b>🛍 Broadway Mall</b><br>Food court + Chick-fil-A + Round 1');
+  L.marker([40.7690, -73.5210]).addTo(map)
+    .bindPopup('<b>🥯 Bagel Boss</b>');
+  L.marker([40.7583, -73.5330]).addTo(map)
+    .bindPopup('<b>🥙 Ben\'s Kosher Deli</b><br>~10 min drive');
+}
+
+function renderActMap() {
+  if (actMapReady) return;
+  actMapReady = true;
+  if (typeof L === 'undefined') return;
+  const map = L.map('activitiesMap').setView([40.7400, -73.5200], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+  L.marker([VENUE_LAT, VENUE_LNG]).addTo(map)
+    .bindPopup('<b>🎭 Holy Trinity</b>').openPopup();
+  activities.forEach(a => {
+    if (a.lat) L.marker([a.lat, a.lng]).addTo(map)
+      .bindPopup(`<b>${a.name}</b><br>${a.distance}`);
+  });
+}
+
+function renderWalkMap() {
+  if (walkMapReady) return;
+  walkMapReady = true;
+  if (typeof L === 'undefined') return;
+  const map = L.map('walkMap').setView([40.7618, -73.5225], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution:'© OpenStreetMap contributors' }).addTo(map);
+
+  // Hotel marker
+  L.marker([HOTEL_LAT, HOTEL_LNG], {
+    icon: L.divIcon({ className:'', html:'<div style="background:#d5164d;color:white;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;">🏨 Hotel</div>', iconAnchor:[30,10] })
+  }).addTo(map).bindPopup('<b>🏨 Econo Lodge</b><br>429 Duffy Ave');
+
+  // Venue marker
+  L.marker([VENUE_LAT, VENUE_LNG], {
+    icon: L.divIcon({ className:'', html:'<div style="background:#1a3a1a;color:#80d080;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid #80d080;white-space:nowrap;">🎭 Venue</div>', iconAnchor:[30,10] })
+  }).addTo(map).bindPopup('<b>🎭 Holy Trinity</b><br>98 Cherry Ln');
+
+  // Walking route (approximate waypoints)
+  const route = [
+    [HOTEL_LAT, HOTEL_LNG],
+    [40.7580, -73.5205],
+    [40.7600, -73.5215],
+    [40.7630, -73.5235],
+    [40.7650, -73.5245],
+    [VENUE_LAT, VENUE_LNG]
+  ];
+  L.polyline(route, { color:'#d5164d', weight:3, dashArray:'6 4', opacity:0.8 }).addTo(map);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderDances();
+renderRestaurants();
+renderActivities();
+</script>
+</body>
+</html>
