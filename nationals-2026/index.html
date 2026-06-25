@@ -985,11 +985,17 @@ footer a { color: #d5164d; }
 
   <div class="group-activities">
     <h3>👋 Group Activities</h3>
-    <p>Have an idea for a group dinner, beach meetup, or outing? Use the Suggest Updates tab to share it.</p>
+    <p>Have an idea for a group outing? Use the Suggest Updates tab to share it.</p>
     <div class="eat-card" style="margin-bottom:0;">
       <div class="eat-name">Luau Fire & Polynesian Dinner Show 🌺</div>
-      <div class="eat-meta"><span>Tuesday, June 30</span><span>8:00 PM</span><span>Limited seats</span></div>
-      <div class="eat-notes">Tabitha is coordinating tickets — reach out to her ASAP if you're interested. Seats are going fast.</div>
+      <div class="eat-meta"><span>Tuesday, June 30</span><span>8:00 PM</span><span>St. John's Inn</span></div>
+      <div class="eat-notes" style="margin-bottom:6px;">An evening of Polynesian music, hula, and a World Champion Samoan Fire Knife finale — with a buffet dinner included. Check-in is at 7:30 PM. Buffet includes Huli Huli Chicken, Kalua Pulled Pork, sides, and dessert. Cash bar available.</div>
+      <div class="eat-notes" style="color:rgba(213,22,77,0.9);font-style:normal;font-weight:600;">Tabitha is coordinating tickets — reach out to her ASAP if you're interested. Seats are limited.</div>
+      <div class="card-actions" style="margin-top:10px;">
+        <a class="btn-card" href="https://maps.google.com/?q=St.+Johns+Inn+6803+N+Ocean+Blvd+Myrtle+Beach+SC" target="_blank">📍 Directions</a>
+        <a class="btn-card" href="https://www.polynesianfire.com/fire-luau-in-myrtle-beach/" target="_blank">🌐 Website</a>
+        <a class="btn-card" href="tel:8434241978">📞 (843) 424-1978</a>
+      </div>
     </div>
   </div>
 
@@ -1146,8 +1152,9 @@ const DANCES = [
   { type:'awards', d:{year:2026,month:5,day:30}, sh:16, sm:40, eh:17, em:0, room:'1', title:'Awards', dayKey:'tue' },
   { type:'event', d:{year:2026,month:5,day:30}, sh:20, sm:0, eh:22, em:0, room:'off-site',
     title:'Luau Fire & Polynesian Dinner Show 🌺',
-    meta:'8:00 PM · Limited seats — contact Tabitha to join',
-    note:'Tabitha is coordinating tickets. Reach out to her ASAP if you\'re interested — seats are limited.',
+    meta:'8:00 PM · St. John\'s Inn, 6803 N Ocean Blvd, Myrtle Beach',
+    note:'Tabitha is coordinating tickets. Reach out to her ASAP if you\'re interested — seats are limited. Check-in at 7:30 PM.',
+    location:'St. John\'s Inn, 6803 N Ocean Blvd, Myrtle Beach, SC 29572',
     dayKey:'tue' },
 
   // ── WEDNESDAY JULY 1 ──
@@ -1320,13 +1327,16 @@ function dayLabel(key) {
 function addToCalendar(dance) {
   const s = fmtICSDate(dance.d, dance.sh, dance.sm);
   const e = fmtICSDate(dance.d, dance.eh, dance.em);
-  let title, details;
+  let title, details, loc;
+  loc = dance.location || VENUE;
   if (dance.type === 'awards') {
     title = `Awards — Tate Academy (Room ${dance.room})`;
     details = 'Showstopper East Coast Finals Awards Ceremony';
+    loc = VENUE;
   } else if (dance.type === 'event') {
     title = dance.title;
     details = dance.note || '';
+    loc = dance.location || VENUE;
   } else if (dance.type === 'opening-number') {
     title = `${dance.title} — Tate Academy All-Stars`;
     details = dance.note || '';
@@ -1334,7 +1344,7 @@ function addToCalendar(dance) {
     title = `${dance.title} — Tate Academy`;
     details = dance.dancers ? `Dancers: ${dance.dancers.join(', ')}` : '';
   }
-  const p = new URLSearchParams({ action:'TEMPLATE', text:title, dates:`${s}/${e}`, location:VENUE, details });
+  const p = new URLSearchParams({ action:'TEMPLATE', text:title, dates:`${s}/${e}`, location:loc, details });
   window.open(`https://calendar.google.com/calendar/render?${p}`, '_blank');
 }
 
@@ -1393,11 +1403,13 @@ function downloadMyScheduleICS() {
 // ═══════════════════════════════════════════════════════════════
 function getFilteredDances() {
   if (state.selectedDancers.length === 0) return [];
-  return DANCES.filter(d => {
+  const events = DANCES.filter(d => d.type === 'event');
+  const dances = DANCES.filter(d => {
     if (d.type === 'awards' || d.type === 'altd' || d.type === 'event') return false;
     if (!d.dancers) return false;
     return state.selectedDancers.some(name => d.dancers.includes(name));
   });
+  return [...dances, ...events];
 }
 
 function getDancerDances(name) {
