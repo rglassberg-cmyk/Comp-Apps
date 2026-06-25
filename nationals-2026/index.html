@@ -834,6 +834,9 @@ footer a { color: #d5164d; }
   <div class="dancer-filter-wrap">
     <div class="dancer-filter-label">Who do you want to watch?</div>
     <p style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.4;">Tap a name to see their schedule. Tap multiple to combine — great for watching teammates!</p>
+    <input type="text" id="dancerSearch" placeholder="Search dancers..." oninput="filterChips(this.value)"
+      style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid #3a3b3d;background:#2a2b2d;color:#f0f0f0;font-family:'Outfit',sans-serif;font-size:0.82rem;margin-bottom:10px;outline:none;"
+      onfocus="this.style.borderColor='#d5164d'" onblur="this.style.borderColor='#3a3b3d'">
     <div class="dancer-chips" id="dancerChips"></div>
     <div class="filter-actions">
       <button class="btn-filter primary" onclick="selectAllDancers()">View All Tate</button>
@@ -1409,7 +1412,24 @@ function getFilteredDances() {
     if (!d.dancers) return false;
     return state.selectedDancers.some(name => d.dancers.includes(name));
   });
-  return [...dances, ...events];
+
+  // For each day+room where the dancer has a performance, include the awards rows
+  // that follow in the same room on the same day
+  const awards = DANCES.filter(d => d.type === 'awards');
+  const relevantAwards = awards.filter(award => {
+    return dances.some(dance => {
+      const sameDay = dance.d.year === award.d.year &&
+                      dance.d.month === award.d.month &&
+                      dance.d.day === award.d.day;
+      const sameRoom = dance.room === award.room;
+      // Award must come after the dance
+      const danceTime = dance.sh * 60 + dance.sm;
+      const awardTime = award.sh * 60 + award.sm;
+      return sameDay && sameRoom && awardTime > danceTime;
+    });
+  });
+
+  return [...dances, ...relevantAwards, ...events];
 }
 
 function getDancerDances(name) {
@@ -1434,6 +1454,7 @@ function renderMySchedule() {
     const chip = document.createElement('button');
     chip.className = 'dancer-chip' + (state.selectedDancers.includes(name) ? ' selected' : '');
     chip.textContent = name;
+    chip.title = name;
     chip.onclick = () => toggleDancer(name);
     chips.appendChild(chip);
   });
@@ -1485,6 +1506,94 @@ function renderMyScheduleList() {
   });
 
   list.innerHTML = html;
+}
+
+function filterChips(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.dancer-chip').forEach(chip => {
+    const name = (chip.title || chip.textContent).toLowerCase();
+    chip.style.display = (!q || name.includes(q)) ? '' : 'none';
+  });
+
+  if (q) {
+    // While searching, show schedule for all dancers matching the query
+    const matching = [];
+    document.querySelectorAll('.dancer-chip').forEach(chip => {
+      const name = chip.title || chip.textContent;
+      if (name.toLowerCase().includes(q)) matching.push(name);
+    });
+    // Temporarily render matching dancers without changing persistent selection
+    renderMyScheduleListForDancers(matching);
+  } else {
+    // Search cleared — go back to persistent selection
+    renderMyScheduleList();
+  }
+}
+
+function renderMyScheduleListForDancers(dancers) {
+  const list = document.getElementById('myScheduleList');
+  if (!dancers.length) {
+    list.innerHTML = '<div class="schedule-empty">No dancers match your search.</div>';
+    return;
+  }
+
+  const events = DANCES.filter(d => d.type === 'event');
+  let dances = DANCES.filter(d => {
+    if (d.type === 'awards' || d.type === 'altd' || d.type === 'event') return false;
+    if (!d.dancers) return false;
+    return dancers.some(name => d.dancers.includes(name));
+  });
+
+  const awards = DANCES.filter(d => d.type === 'awards');
+  const relevantAwards = awards.filter(award => {
+    return dances.some(dance => {
+      const sameDay = dance.d.year === award.d.year &&
+                      dance.d.month === award.d.month &&
+                      dance.d.day === award.d.day;
+      const sameRoom = dance.room === award.room;
+      const awardTime = award.sh * 60 + award.sm;
+      const danceTime = dance.sh * 60 + dance.sm;
+      return sameDay && sameRoom && awardTime > danceTime;
+    });
+  });
+
+  let allEvents = [...dances, ...relevantAwards, ...events];
+
+  const hasAllStar = dancers.some(n => ALL_STARS.includes(n));
+  if (hasAllStar) allEvents = [...allEvents, ...ON_REHEARSALS];
+
+  allEvents.sort((a,b) => {
+    const ta = new Date(a.d.year, a.d.month, a.d.day, a.sh, a.sm);
+    const tb = new Date(b.d.year, b.d.month, b.d.day, b.sh, b.sm);
+    return ta - tb;
+  });
+
+  if (!allEvents.length) {
+    list.innerHTML = '<div class="schedule-empty">No confirmed dances yet for the selected dancers.</div>';
+    return;
+  }
+
+  const byDay = {};
+  allEvents.forEach(ev => {
+    const key = getDayKey(ev);
+    if (!byDay[key]) byDay[key] = [];
+    byDay[key].push(ev);
+  });
+
+  // Temporarily treat search results as the selected dancers for display purposes
+  const prevSelected = state.selectedDancers;
+  state.selectedDancers = dancers;
+
+  let html = '';
+  DAYS.forEach(day => {
+    if (!byDay[day.key]) return;
+    html += `<div class="schedule-day-group"><div class="schedule-day-label">${day.label}</div>`;
+    byDay[day.key].forEach(ev => { html += renderDanceRow(ev, true); });
+    html += `</div>`;
+  });
+  list.innerHTML = html;
+
+  state.selectedDancers = prevSelected;
 }
 
 function toggleDancer(name) {
