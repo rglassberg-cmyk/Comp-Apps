@@ -1,0 +1,1783 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Showstopper Nationals 2026 — Tate Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: #16171a;
+  color: #f0f0f0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: #d5164d; text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: 'Outfit', sans-serif; cursor: pointer; }
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #d5164d 0%, #9a1039 100%);
+  padding: 28px 20px 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '🏆';
+  position: absolute;
+  font-size: 120px;
+  opacity: 0.07;
+  top: -20px;
+  right: -20px;
+  transform: rotate(15deg);
+  pointer-events: none;
+}
+header::after {
+  content: '🏆';
+  position: absolute;
+  font-size: 90px;
+  opacity: 0.05;
+  bottom: -15px;
+  left: -10px;
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+.header-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 6px;
+}
+header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.header-sub {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+  margin-top: 6px;
+  font-weight: 500;
+}
+.nationals-badge {
+  display: inline-block;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  background: #111213;
+  border-bottom: 2px solid #2a2b2d;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  padding: 13px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: rgba(255,255,255,0.85); }
+.tab-btn.active { color: #d5164d; border-bottom-color: #d5164d; }
+
+/* ── MAIN CONTENT ── */
+main { max-width: 780px; margin: 0 auto; padding: 0 12px 60px; }
+.tab-content { display: none; padding-top: 20px; }
+.tab-content.active { display: block; }
+
+/* ── SECTION HEADERS ── */
+.section-header {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 24px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #2a2b2d;
+  letter-spacing: -0.01em;
+}
+.section-header:first-child { margin-top: 4px; }
+
+/* ── MY SCHEDULE TAB ── */
+.dancer-filter-wrap {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.dancer-filter-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+}
+.dancer-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.dancer-chip {
+  padding: 7px 13px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1.5px solid #3a3b3d;
+  background: #2a2b2d;
+  color: rgba(255,255,255,0.65);
+  transition: all 0.15s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dancer-chip:hover { border-color: #d5164d; color: #fff; }
+.dancer-chip.selected {
+  background: #d5164d;
+  border-color: #d5164d;
+  color: #fff;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn-filter {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1.5px solid #3a3b3d;
+  background: none;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.15s;
+}
+.btn-filter:hover { border-color: #d5164d; color: #d5164d; }
+.btn-filter.primary {
+  background: #2a2b2d;
+  color: rgba(255,255,255,0.8);
+}
+.filter-note {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 10px;
+  font-style: italic;
+}
+.schedule-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+}
+.schedule-day-group { margin-bottom: 24px; }
+.schedule-day-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+.on-note {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.45);
+  font-style: italic;
+  margin-top: 1px;
+}
+
+/* ── DANCE ROW (shared between My Schedule and Dance Order) ── */
+.dance-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  margin-bottom: 5px;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+.dance-row.age-9-11  { background: rgba(20,184,166,0.28);  border-left: 4px solid #14b8a6; }
+.dance-row.age-12-14 { background: rgba(139,92,246,0.28);  border-left: 4px solid #a78bfa; }
+.dance-row.age-15-16 { background: rgba(213,22,77,0.32);   border-left: 4px solid #d5164d; }
+.dance-row.age-17-19 { background: rgba(14,165,233,0.25);  border-left: 4px solid #38bdf8; }
+.dance-row.awards    { background: rgba(255,255,255,0.06);  border-left: 4px solid rgba(255,255,255,0.25); }
+.dance-row.opening-number { background: rgba(245,197,24,0.22); border-left: 4px solid #f5c518; }
+.dance-row.altd      { background: rgba(213,22,77,0.32);   border-left: 4px solid #d5164d; }
+.dance-row.event     { background: rgba(52,211,153,0.20);  border-left: 4px solid #34d399; }
+.dance-time {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  min-width: 60px;
+  white-space: nowrap;
+}
+.dance-info { flex: 1; min-width: 0; }
+.dance-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dance-meta {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.6);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dance-meta .entry-num { color: rgba(255,255,255,0.35); }
+.dance-meta .room-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-right: 4px;
+  color: rgba(255,255,255,0.6);
+}
+.dance-row.awards .dance-title { color: #d5164d; font-size: 0.8rem; font-weight: 600; }
+.dance-row.opening-number .dance-title { color: #f5c518; }
+.cal-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.cal-btn:hover { border-color: #d5164d; color: #d5164d; }
+.solo-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: rgba(213,22,77,0.25);
+  color: #d5164d;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.allstar-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: rgba(245,197,24,0.2);
+  color: #f5c518;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── DANCE ORDER TAB ── */
+.day-filter-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.day-btn {
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border: 1.5px solid #3a3b3d;
+  background: #2a2b2d;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.15s;
+}
+.day-btn:hover { border-color: #d5164d; color: #fff; }
+.day-btn.active { background: #d5164d; border-color: #d5164d; color: #fff; }
+.room-filter-wrap {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.room-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1.5px solid #3a3b3d;
+  background: none;
+  color: rgba(255,255,255,0.5);
+  transition: all 0.15s;
+}
+.room-btn:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
+.room-btn.active { border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.1); }
+.ics-bar {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ics-bar-label { font-size: 0.78rem; color: rgba(255,255,255,0.6); flex: 1; min-width: 140px; }
+.btn-ics {
+  padding: 7px 14px;
+  background: #d5164d;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  transition: background 0.15s;
+}
+.btn-ics:hover { background: #b01040; }
+.btn-ics.secondary {
+  background: #2a2b2d;
+  border: 1.5px solid #3a3b3d;
+  color: rgba(255,255,255,0.7);
+}
+.btn-ics.secondary:hover { border-color: #d5164d; color: #d5164d; background: #2a2b2d; }
+.import-instructions {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.import-toggle {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.import-toggle .arrow { transition: transform 0.25s; font-size: 0.65rem; }
+.import-toggle.open .arrow { transform: rotate(180deg); }
+.import-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.import-body.expanded { max-height: 400px; }
+.import-body ul { list-style: none; padding: 0 14px 14px; }
+.import-body li {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  padding: 5px 0;
+  border-bottom: 1px solid #2a2b2d;
+  display: flex;
+  gap: 8px;
+}
+.import-body li:last-child { border-bottom: none; }
+.import-body li strong { color: rgba(255,255,255,0.85); min-width: 120px; }
+
+/* ── PLACES TO EAT ── */
+.eat-card {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.eat-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.eat-meta {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+}
+.eat-meta span { margin-right: 10px; }
+.eat-notes {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.card-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+.btn-card {
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1.5px solid #3a3b3d;
+  background: none;
+  color: rgba(255,255,255,0.65);
+  transition: all 0.15s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-card:hover { border-color: #d5164d; color: #d5164d; text-decoration: none; }
+.walk-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.free-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── THINGS TO DO ── */
+.todo-card {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.todo-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.todo-desc {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.todo-meta {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 8px;
+}
+.fireworks-callout {
+  background: linear-gradient(135deg, rgba(213,22,77,0.2) 0%, rgba(154,16,57,0.25) 100%);
+  border: 1px solid rgba(213,22,77,0.4);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.fireworks-callout h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.fireworks-callout p {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.fireworks-callout p:last-child { margin-bottom: 0; }
+.fireworks-callout ul {
+  list-style: none;
+  margin: 8px 0;
+}
+.fireworks-callout ul li {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.75);
+  padding: 3px 0;
+  padding-left: 14px;
+  position: relative;
+}
+.fireworks-callout ul li::before {
+  content: '🎆';
+  position: absolute;
+  left: -2px;
+  font-size: 0.65rem;
+}
+#todo-map { height: 260px; border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+
+/* ── WEEKEND INFO ── */
+.info-card {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.info-card h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d5164d;
+  margin-bottom: 10px;
+}
+.info-row {
+  display: flex;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid #2a2b2d;
+  font-size: 0.82rem;
+}
+.info-row:last-of-type { border-bottom: none; }
+.info-label { color: rgba(255,255,255,0.45); font-weight: 500; min-width: 90px; flex-shrink: 0; }
+.info-value { color: #f0f0f0; line-height: 1.4; }
+.connected-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.road-trip {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.road-trip h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d5164d;
+  margin-bottom: 12px;
+}
+.road-stop {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a2b2d;
+  align-items: flex-start;
+}
+.road-stop:last-child { border-bottom: none; }
+.road-stop-icon {
+  font-size: 1.1rem;
+  min-width: 24px;
+  text-align: center;
+  margin-top: 1px;
+}
+.road-stop-text { font-size: 0.82rem; color: #f0f0f0; line-height: 1.4; flex: 1; }
+.road-stop-text strong { color: #fff; display: block; margin-bottom: 1px; }
+.road-stop-text span { color: rgba(255,255,255,0.5); font-size: 0.76rem; }
+.flying-callout {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #2e2f31;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.4;
+}
+.flying-callout strong { color: #fff; }
+.week-glance {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.week-glance h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d5164d;
+  margin-bottom: 10px;
+}
+.glance-day {
+  padding: 8px 0;
+  border-bottom: 1px solid #2a2b2d;
+  font-size: 0.82rem;
+}
+.glance-day:last-child { border-bottom: none; }
+.glance-day-name {
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.glance-day-detail { color: rgba(255,255,255,0.55); font-size: 0.78rem; line-height: 1.5; }
+.sunscreen-tip {
+  background: rgba(255,180,0,0.08);
+  border: 1px solid rgba(255,180,0,0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+}
+.sunscreen-tip strong { color: #ffd166; }
+.group-activities {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.group-activities h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d5164d;
+  margin-bottom: 8px;
+}
+.group-activities p {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.group-placeholder {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+  text-align: center;
+  padding: 18px 0;
+}
+
+/* ── ALTD CALLOUT ── */
+.altd-callout {
+  background: linear-gradient(135deg, rgba(213,22,77,0.18) 0%, rgba(154,16,57,0.22) 100%);
+  border: 1px solid rgba(213,22,77,0.35);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.altd-callout h3 { font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.altd-callout p { font-size: 0.8rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 8px; }
+.altd-callout p:last-child { margin-bottom: 0; }
+.altd-schedule { list-style: none; margin: 6px 0; }
+.altd-schedule li {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  padding: 3px 0;
+  display: flex;
+  gap: 10px;
+}
+.altd-schedule li strong { color: #fff; min-width: 60px; flex-shrink: 0; }
+
+/* ── RESULTS ── */
+.results-card {
+  background: #212224;
+  border: 1px solid #2e2f31;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.results-card h3 { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.results-card p { font-size: 0.85rem; color: rgba(255,255,255,0.6); line-height: 1.5; margin-bottom: 16px; }
+.btn-results {
+  display: inline-block;
+  padding: 10px 22px;
+  background: #d5164d;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.btn-results:hover { background: #b01040; text-decoration: none; }
+
+/* ── SUGGEST ── */
+#suggest iframe { border: none; border-radius: 10px; }
+
+/* ── FOOTER ── */
+footer {
+  background: #111213;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.78rem;
+  border-top: 1px solid #2a2b2d;
+}
+footer a { color: #d5164d; }
+
+/* ── PAST / UP NEXT ── */
+.dance-row.past {
+  opacity: 0.32;
+  filter: saturate(0.4);
+}
+.up-next-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #34d399;
+  margin: 12px 0 5px;
+  padding: 0 2px;
+}
+.up-next-label::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 520px) {
+  header h1 { font-size: 1.4rem; }
+  .dance-row { flex-wrap: wrap; }
+  .cal-btn { font-size: 0.65rem; padding: 4px 8px; }
+  .dance-title { font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Tate Academy</div>
+  <h1>Showstopper Nationals 2026 🏆</h1>
+  <div class="header-sub">East Coast Finals · Myrtle Beach, SC · June 29 – July 4</div>
+  <div class="nationals-badge">Myrtle Beach Convention Center & Sheraton</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('danceOrder',this)">📋 Dance Order</button>
+  <button class="tab-btn" onclick="switchTab('mySchedule',this)">⭐ My Schedule</button>
+  <button class="tab-btn" onclick="switchTab('eat',this)">🍽️ Places to Eat</button>
+  <button class="tab-btn" onclick="switchTab('todo',this)">🗺️ Things to Do</button>
+  <button class="tab-btn" onclick="switchTab('weekend',this)">📋 Weekend Info</button>
+  <button class="tab-btn" onclick="switchTab('results',this)">📺 Livestream & Results</button>
+  <button class="tab-btn" onclick="switchTab('suggest',this)">💬 Suggest Updates</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════
+     MY SCHEDULE TAB
+════════════════════════════════════════ -->
+<div id="mySchedule" class="tab-content">
+  <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.5;">Filter to a specific dancer to see only their performances, add individual dances to your calendar, or download a personal schedule file.</p>
+
+  <div class="dancer-filter-wrap">
+    <div class="dancer-filter-label">Who do you want to watch?</div>
+    <p style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:12px;line-height:1.4;">Tap a name to see their schedule. Tap multiple to combine — great for watching teammates!</p>
+    <div class="dancer-chips" id="dancerChips"></div>
+    <div class="filter-actions">
+      <button class="btn-filter primary" onclick="selectAllDancers()">View All Tate</button>
+      <button class="btn-filter" onclick="clearDancers()">Clear</button>
+      <button class="btn-ics secondary btn-filter" onclick="downloadMyScheduleICS()">⬇ Download My Schedule (.ics)</button>
+    </div>
+  </div>
+
+  <div id="myScheduleList"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     DANCE ORDER TAB
+════════════════════════════════════════ -->
+<div id="danceOrder" class="tab-content active">
+
+  <div class="ics-bar">
+    <div class="ics-bar-label">📅 Download the full Tate schedule to your calendar</div>
+    <button class="btn-ics" onclick="downloadFullICS()">⬇ Download All (.ics)</button>
+  </div>
+
+  <div class="import-instructions">
+    <button class="import-toggle" onclick="toggleImport(this)" id="importToggleBtn">
+      How to import to your calendar <span class="arrow">▼</span>
+    </button>
+    <div class="import-body" id="importBody">
+      <ul>
+        <li><strong>iPhone / iPad</strong> Tap the downloaded file → "Add All"</li>
+        <li><strong>Android</strong> Open the file → select your calendar</li>
+        <li><strong>Google Calendar</strong> Settings → Import &amp; Export → Import</li>
+        <li><strong>Outlook</strong> Double-click the file or drag it into the calendar</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="day-filter-wrap" id="dayFilters"></div>
+  <div class="room-filter-wrap" id="roomFilters">
+    <button class="room-btn active" onclick="filterRoom('all',this)">All Rooms</button>
+    <button class="room-btn" onclick="filterRoom('1',this)">Room 1</button>
+    <button class="room-btn" onclick="filterRoom('2',this)">Room 2</button>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+    <span style="font-size:0.7rem;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#14b8a6;display:inline-block;"></span>Age 9–11</span>
+    <span style="font-size:0.7rem;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#a78bfa;display:inline-block;"></span>Age 12–14</span>
+    <span style="font-size:0.7rem;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#d5164d;display:inline-block;"></span>Age 15–16</span>
+    <span style="font-size:0.7rem;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#38bdf8;display:inline-block;"></span>Age 17–19</span>
+  </div>
+
+  <div id="danceOrderList"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PLACES TO EAT TAB
+════════════════════════════════════════ -->
+<div id="eat" class="tab-content">
+
+  <div class="section-header">🚶 Near the Hotel (Walkable)</div>
+
+  <div id="eatWalkable"></div>
+
+  <div class="section-header">🚗 Short Drive (5–20 min)</div>
+  <p style="font-size:0.76rem;color:rgba(255,255,255,0.4);margin-bottom:12px;font-style:italic;">⭐ = recommended by Tate families who know the area</p>
+
+  <div id="eatDrive"></div>
+
+  <div class="section-header">🏖️ Dining Destinations</div>
+  <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:14px;line-height:1.5;">Broadway at the Beach and Barefoot Landing both have a ton of restaurants, shopping, and entertainment all in one spot. Worth building an evening around.</p>
+
+  <div id="eatDestinations"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     THINGS TO DO TAB
+════════════════════════════════════════ -->
+<div id="todo" class="tab-content">
+
+  <div class="fireworks-callout">
+    <h3>🎆 July 4th Fireworks — You're in the Right Place</h3>
+    <p>This year's competition ends on Independence Day, which means you're in one of the best spots in the country to watch fireworks. Stand on the beach and you can see shows launching in both directions along the coast.</p>
+    <ul>
+      <li><strong>Myrtle Beach Boardwalk</strong> — 9:00 PM, fireworks launched from 2nd Avenue Pier, free, best viewed from the beach</li>
+      <li><strong>Cherry Grove Pier</strong> (North Myrtle Beach) — 9:30 PM, 15 min north</li>
+      <li><strong>Barefoot Landing</strong> — 10:00 PM, over the lake, 15 min north</li>
+      <li><strong>Broadway at the Beach</strong> — 10:00 PM, over Lake Broadway, 10 min away</li>
+    </ul>
+    <p style="margin-top:8px;font-size:0.76rem;color:rgba(255,255,255,0.5);">Note: The regular Wednesday fireworks at the boardwalk are moved to Saturday July 4th this year. Expect crowds — arrive early for a good spot on the sand.</p>
+  </div>
+
+  <div id="todo-map"></div>
+
+  <div id="todoList"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     WEEKEND INFO TAB
+════════════════════════════════════════ -->
+<div id="weekend" class="tab-content">
+
+  <div class="sunscreen-tip">
+    ☀️ <strong>Pack serious sunscreen.</strong> South Carolina summer sun is intense — much stronger than the Northeast. Pack more than you think you'll need.
+  </div>
+
+  <div class="info-card">
+    <h3>🏨 Host Hotel</h3>
+    <div class="info-row"><span class="info-label">Hotel</span><span class="info-value">Sheraton Myrtle Beach Convention Center Hotel</span></div>
+    <div class="info-row"><span class="info-label">Address</span><span class="info-value">2101 North Oak St, Myrtle Beach, SC 29577</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">(843) 918-5000</span></div>
+    <div class="info-row"><span class="info-label">Venue</span><span class="info-value">Myrtle Beach Convention Center <span class="connected-badge">Directly Connected</span></span></div>
+    <div class="info-row"><span class="info-label">Airport</span><span class="info-value">Myrtle Beach Intl (MYR) — ~10 min away</span></div>
+    <div class="card-actions" style="margin-top:10px;">
+      <a class="btn-card" href="https://www.marriott.com/event-reservations/reservation-link.mi?id=1752850014687&key=GRP&app=resvlink" target="_blank">🏨 Group Booking Link</a>
+      <a class="btn-card" href="https://maps.google.com/?q=Sheraton+Myrtle+Beach+Convention+Center+Hotel,+2101+North+Oak+St,+Myrtle+Beach,+SC" target="_blank">📍 Directions</a>
+    </div>
+  </div>
+
+  <div class="flying-callout">
+    ✈️ <strong>Flying in?</strong> Myrtle Beach International Airport (MYR) is about 10 minutes from the hotel. Rideshare, rental cars, and taxis are all available at arrivals. Most families are flying for this one — it's a great option.
+  </div>
+
+  <div class="week-glance">
+    <h3>📅 Week at a Glance</h3>
+    <div class="glance-day">
+      <div class="glance-day-name">Monday, June 29</div>
+      <div class="glance-day-detail">Slow It Down · The Bird · These Arms Of Mine · When I Go · Winner Takes It All · That's Life · I Dreamed A Dream · River · Corps · Awards throughout</div>
+    </div>
+    <div class="glance-day">
+      <div class="glance-day-name">Tuesday, June 30</div>
+      <div class="glance-day-detail">Fly · Other Side · Work Me Down · Just Like a River · Who I Am · Out There · Dreams · One More Moment · Foolish Games · Death Wish · White Rabbit · The Way You Make Me Feel · Awards throughout</div>
+    </div>
+    <div class="glance-day">
+      <div class="glance-day-name">Wednesday, July 1</div>
+      <div class="glance-day-detail">What the World Needs Now · Whatcha Know About Me · Hair Spray · Dead &amp; Done · Kendrick · Cellophane · Awards throughout · Opening Number Rehearsal 6–10 PM (All-Stars)</div>
+    </div>
+    <div class="glance-day">
+      <div class="glance-day-name">Thursday, July 2</div>
+      <div class="glance-day-detail">Light of the 7 · X · Cry To Me · End of Love · Freak Out · Wings · Awards throughout · Opening Number Rehearsal 6:30–10 PM (All-Stars)</div>
+    </div>
+    <div class="glance-day">
+      <div class="glance-day-name">Friday, July 3 — Senior Day 🎓</div>
+      <div class="glance-day-detail">Golden Years · Cosmic Honey · PRODUCTIONMANIA starts 3:55 PM · Awards 6:45 PM · Opening Number Rehearsal 7–10 PM (All-Stars)</div>
+    </div>
+    <div class="glance-day">
+      <div class="glance-day-name">Saturday, July 4 — America Loves to Dance Awards 🇺🇸</div>
+      <div class="glance-day-detail">Doors 6:45 AM · Opening Number 8:30 AM · Group performances &amp; awards all day · Fireworks on the beach at 9 PM 🎆</div>
+    </div>
+  </div>
+
+  <div class="group-activities">
+    <h3>👋 Group Activities</h3>
+    <p>Have an idea for a group dinner, beach meetup, or outing? Use the Suggest Updates tab to share it.</p>
+    <div class="eat-card" style="margin-bottom:0;">
+      <div class="eat-name">Luau Fire & Polynesian Dinner Show 🌺</div>
+      <div class="eat-meta"><span>Tuesday, June 30</span><span>8:00 PM</span><span>Limited seats</span></div>
+      <div class="eat-notes">Tabitha is coordinating tickets — reach out to her ASAP if you're interested. Seats are going fast.</div>
+    </div>
+  </div>
+
+  <div class="road-trip">
+    <h3>🚗 Driving from Teaneck</h3>
+    <div class="road-stop">
+      <div class="road-stop-icon">🏫</div>
+      <div class="road-stop-text">
+        <strong>Tate Academy, Teaneck NJ</strong>
+        <span>Head south on I-95 — expect 9.5–10.5 hrs depending on traffic. Leave early to beat Virginia.</span>
+      </div>
+    </div>
+    <div class="road-stop">
+      <div class="road-stop-icon">⛽</div>
+      <div class="road-stop-text">
+        <strong>Delaware/Maryland rest areas (~2 hrs in)</strong>
+        <span>Good first stop before the long Virginia stretch. Multiple service plazas on I-95.</span>
+      </div>
+    </div>
+    <div class="road-stop">
+      <div class="road-stop-icon">🍔</div>
+      <div class="road-stop-text">
+        <strong>Virginia — watch for traffic (~3–5 hrs in)</strong>
+        <span>The DC/Richmond corridor is the biggest slowdown on this drive. Earlier you leave, the better. Take I-295 to bypass Richmond if needed.</span>
+      </div>
+    </div>
+    <div class="road-stop">
+      <div class="road-stop-icon">⛽</div>
+      <div class="road-stop-text">
+        <strong>North Carolina rest stops (~6–7 hrs in)</strong>
+        <span>Good spot to stretch and refuel before the SC/MB approach. Fayetteville area can have slowdowns on weekend afternoons.</span>
+      </div>
+    </div>
+    <div class="road-stop">
+      <div class="road-stop-icon">🔀</div>
+      <div class="road-stop-text">
+        <strong>Dillon, SC → US-501 East</strong>
+        <span>Exit I-95 at Dillon, SC. Take US-501 East toward Myrtle Beach. Key tip: before Conway, switch to SC-22 East rather than staying on 501 — it avoids heavy traffic through town.</span>
+      </div>
+    </div>
+    <div class="road-stop">
+      <div class="road-stop-icon">🏨</div>
+      <div class="road-stop-text">
+        <strong>Sheraton Myrtle Beach, 2101 N Oak St</strong>
+        <span>You made it! The convention center is right there.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     RESULTS TAB
+════════════════════════════════════════ -->
+<div id="results" class="tab-content">
+  <div class="results-card">
+    <h3>📺 Live Stream</h3>
+    <p>Every routine is streamed live for free on the Showstopper website and app, with a "next up" screen so you always know what's coming.</p>
+    <a class="btn-results" href="https://www.goshowstopper.com" target="_blank">Watch Live at goshowstopper.com →</a>
+  </div>
+  <div class="results-card">
+    <h3>🏅 Competition Results</h3>
+    <p>Showstopper posts scores and results on their website after each awards session. Check back throughout the week as results come in.</p>
+    <a class="btn-results" href="https://www.goshowstopper.com/competitions/2026-east-coast-finals-results/" target="_blank">View Results on Showstopper →</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SUGGEST UPDATES TAB
+════════════════════════════════════════ -->
+<div id="suggest" class="tab-content">
+  <iframe
+    src="https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true"
+    width="100%" height="834">Loading…</iframe>
+</div>
+
+</main>
+
+<footer>
+  Built by <a href="https://lhasa.app" target="_blank">Lhasa LLC</a> for Tate Academy
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════
+
+const VENUE = 'Myrtle Beach Convention Center, 2101 N Oak St, Myrtle Beach, SC 29577';
+
+// month is 0-indexed: 5=June, 6=July
+const DAYS = [
+  { key: 'mon', label: 'Mon 6/29', d: { year:2026, month:5, day:29 } },
+  { key: 'tue', label: 'Tue 6/30', d: { year:2026, month:5, day:30 } },
+  { key: 'wed', label: 'Wed 7/1',  d: { year:2026, month:6, day:1  } },
+  { key: 'thu', label: 'Thu 7/2',  d: { year:2026, month:6, day:2  } },
+  { key: 'fri', label: 'Fri 7/3',  d: { year:2026, month:6, day:3  } },
+  { key: 'sat', label: 'Sat 7/4',  d: { year:2026, month:6, day:4  } },
+];
+
+// All-Star dancers
+const ALL_STARS = ['Talia Glassberg','Robbie Palefski','Zoë Lebovitch','Ella Beharry','Eden Caffie'];
+
+// Opening Number rehearsals
+const ON_REHEARSALS = [
+  { type:'opening-number', d:{year:2026,month:6,day:1},  sh:18, sm:0,  eh:22, em:0,  room:'2',
+    title:'Opening Number Rehearsal', meta:'All-Stars — Room 2 · 6:00–10:00 PM',
+    note:'Bring dance shoes, costume for approval, water & snack' },
+  { type:'opening-number', d:{year:2026,month:6,day:2},  sh:18, sm:30, eh:22, em:0,  room:'2',
+    title:'Opening Number Rehearsal', meta:'All-Stars — Room 2 · 6:30–10:00 PM',
+    note:'If you have a performance during rehearsal, come when you\'re done' },
+  { type:'opening-number', d:{year:2026,month:6,day:3},  sh:19, sm:0,  eh:22, em:0,  room:'1',
+    title:'Opening Number Rehearsal', meta:'All-Stars — Room 1 (practice floor) · 7:00–10:00 PM',
+    note:'Final rehearsal — choreographer will tell you your call time' },
+  { type:'opening-number', d:{year:2026,month:6,day:4},  sh:8,  sm:30, eh:9,  em:0,  room:'main',
+    title:'Opening Number Performance 🏆', meta:'All-Stars — America Loves to Dance Awards · 8:30 AM',
+    note:'Doors open 6:45 AM. Graduating seniors: walk Pink Carpet first, then reset for Opening Number.' },
+];
+
+// Dance data — entry numbers from East Coast Finals At a Glance PDF ONLY
+const DANCES = [
+
+  // ── MONDAY JUNE 29 ──
+  { id:757,  title:'Slow It Down',    type:'solo',  ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:9,  sm:28, eh:9,  em:31,  room:'2', dancers:['Ella Beharry'] },
+  { id:756,  title:'The Bird',        type:'solo',  ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:10, sm:4,  eh:10, em:7,   room:'2', dancers:['Ella Beharry'] },
+  { type:'awards', d:{year:2026,month:5,day:29}, sh:11, sm:10, eh:11, em:30, room:'2', title:'Awards', dayKey:'mon' },
+  { id:760,  title:'These Arms Of Mine', type:'solo', ageGroup:'age-17-19', d:{year:2026,month:5,day:29}, sh:11, sm:51, eh:11, em:54, room:'3', dancers:['Chloe Choi'] },
+  { id:762,  title:'When I Go',        type:'solo',  ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:12, sm:3,  eh:12, em:6,  room:'2', dancers:['Robbie Palefski'] },
+  { id:780,  title:'Winner Takes It All', type:'solo', ageGroup:'age-17-19', d:{year:2026,month:5,day:29}, sh:12, sm:10, eh:12, em:13, room:'3', dancers:['Lula Najera'] },
+  { type:'awards', d:{year:2026,month:5,day:29}, sh:12, sm:25, eh:12, em:45, room:'3', title:'Awards', dayKey:'mon' },
+  { id:761,  title:"That's Life",      type:'solo',  ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:12, sm:48, eh:12, em:51, room:'2', dancers:['Robbie Palefski'] },
+  { id:765,  title:'I Dreamed A Dream', type:'solo', ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:13, sm:1,  eh:13, em:4,  room:'2', dancers:['Zoë Lebovitch'] },
+  { id:764,  title:'River',            type:'solo',  ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:13, sm:20, eh:13, em:23, room:'2', dancers:['Eden Caffie'] },
+  { type:'awards', d:{year:2026,month:5,day:29}, sh:13, sm:35, eh:13, em:55, room:'2', title:'Awards', dayKey:'mon' },
+  { id:770,  title:'Corps',            type:'solo',  ageGroup:'age-12-14', d:{year:2026,month:5,day:29}, sh:15, sm:45, eh:15, em:48, room:'2', dancers:['Camila Martinez'] },
+  { type:'awards', d:{year:2026,month:5,day:29}, sh:15, sm:55, eh:16, em:15, room:'2', title:'Awards', dayKey:'mon' },
+
+  // ── TUESDAY JUNE 30 ──
+  { id:766,  title:'Fly',             type:'group', ageGroup:'age-9-11',  d:{year:2026,month:5,day:30}, sh:9,  sm:3,  eh:9,  em:8,  room:'1', dancers:['Isabella Elsebai','Ava Khan','Taydeliz Mota','Jade Paez'] },
+  { id:779,  title:'Other Side',      type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:10, sm:10, eh:10, em:13, room:'2', dancers:['Carly Baitner'] },
+  { id:768,  title:'Work Me Down',    type:'group', ageGroup:'age-9-11',  d:{year:2026,month:5,day:30}, sh:10, sm:38, eh:10, em:43, room:'1', dancers:['Isabella Elsebai','Ava Khan','Sasha Lebovitch','Anaya Martinez','Taydeliz Mota','Charlotte Paltroom','Sierra Sung','Liana Yaros'] },
+  { type:'awards', d:{year:2026,month:5,day:30}, sh:10, sm:40, eh:11, em:0, room:'2', title:'Awards', dayKey:'tue' },
+  { id:767,  title:'Just Like a River', type:'group', ageGroup:'age-9-11', d:{year:2026,month:5,day:30}, sh:11, sm:2,  eh:11, em:7,  room:'1', dancers:['Sasha Lebovitch','Anaya Martinez','Sierra Sung','Liana Yaros'] },
+  { type:'awards', d:{year:2026,month:5,day:30}, sh:11, sm:10, eh:11, em:30, room:'1', title:'Awards', dayKey:'tue' },
+  { id:786,  title:'Who I Am',        type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:11, sm:33, eh:11, em:36, room:'2', dancers:['Carly Baitner'] },
+  { id:778,  title:'Out There',       type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:12, sm:18, eh:12, em:21, room:'2', dancers:['Alina Nam'] },
+  { type:'awards', d:{year:2026,month:5,day:30}, sh:13, sm:10, eh:13, em:30, room:'2', title:'Awards', dayKey:'tue' },
+  { id:781,  title:'Dreams',          type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:14, sm:16, eh:14, em:19, room:'2', dancers:['Ella Guy'] },
+  { id:783,  title:'One More Moment', type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:14, sm:58, eh:15, em:1,  room:'2', dancers:['Talya Baruch'] },
+  { id:785,  title:'Foolish Games',   type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:15, sm:1,  eh:15, em:4,  room:'2', dancers:['Talia Glassberg'] },
+  { id:782,  title:'Death Wish',      type:'solo',  ageGroup:'age-15-16', d:{year:2026,month:5,day:30}, sh:15, sm:11, eh:15, em:14, room:'2', dancers:['Ella Guy'] },
+  { id:772,  title:'White Rabbit',    type:'group', ageGroup:'age-12-14', d:{year:2026,month:5,day:30}, sh:15, sm:40, eh:15, em:45, room:'1', dancers:['Ella Beharry','Eden Caffie','Zoë Lebovitch','Camila Martinez','Jade Paez','Robbie Palefski'] },
+  { type:'awards', d:{year:2026,month:5,day:30}, sh:15, sm:50, eh:16, em:10, room:'2', title:'Awards', dayKey:'tue' },
+  { id:773,  title:'The Way You Make Me Feel', type:'group', ageGroup:'age-12-14', d:{year:2026,month:5,day:30}, sh:16, sm:7, eh:16, em:12, room:'1', dancers:['Ella Beharry','Eden Caffie','Zoë Lebovitch','Camila Martinez','Jade Paez','Robbie Palefski'] },
+  { type:'awards', d:{year:2026,month:5,day:30}, sh:16, sm:40, eh:17, em:0, room:'1', title:'Awards', dayKey:'tue' },
+  { type:'event', d:{year:2026,month:5,day:30}, sh:20, sm:0, eh:22, em:0, room:'off-site',
+    title:'Luau Fire & Polynesian Dinner Show 🌺',
+    meta:'8:00 PM · Limited seats — contact Tabitha to join',
+    note:'Tabitha is coordinating tickets. Reach out to her ASAP if you\'re interested — seats are limited.',
+    dayKey:'tue' },
+
+  // ── WEDNESDAY JULY 1 ──
+  { id:771,  title:'What the World Needs Now', type:'group', ageGroup:'age-12-14', d:{year:2026,month:6,day:1}, sh:9, sm:26, eh:9, em:31, room:'1', dancers:['Ella Beharry','Eden Caffie','Zoë Lebovitch'] },
+  { type:'awards', d:{year:2026,month:6,day:1}, sh:10, sm:25, eh:10, em:45, room:'1', title:'Awards', dayKey:'wed' },
+  { id:763,  title:'Whatcha Know About Me', type:'group', ageGroup:'age-9-11', d:{year:2026,month:6,day:1}, sh:13, sm:21, eh:13, em:28, room:'1', dancers:['Ella Beharry','Eden Caffie','Isabella Elsebai','Ava Khan','Sasha Lebovitch','Anaya Martinez','Camila Martinez','Sapphira Morales','Taydeliz Mota','Jade Paez','Robbie Palefski','Liana Yaros'] },
+  { id:769,  title:'Hair Spray',      type:'group', ageGroup:'age-9-11',  d:{year:2026,month:6,day:1}, sh:13, sm:59, eh:14, em:7,  room:'1', dancers:['Zoey Almonte','Ella Beharry','Eden Caffie','Ephesian Chapman','Isabella Elsebai','Ava Khan','Demi Kotright','Sasha Lebovitch','Zoë Lebovitch','Anaya Martinez','Camila Martinez','Taydeliz Mota','Stephanie Owusu','Jade Paez','Charlotte Paltroom','Sierra Sung','Liana Yaros'] },
+  { type:'awards', d:{year:2026,month:6,day:1}, sh:14, sm:50, eh:15, em:10, room:'1', title:'Awards', dayKey:'wed' },
+  { id:777,  title:'Dead & Done',     type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:1}, sh:17, sm:51, eh:17, em:57, room:'1', dancers:['Carly Baitner','Liam Brady','Chloe Choi','Talia Glassberg','Ella Guy','Lula Najera','Alina Nam'] },
+  { id:775,  title:'Kendrick',        type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:1}, sh:18, sm:2,  eh:18, em:8,  room:'1', dancers:['Carly Baitner','Chloe Choi','Rylee Dennis','Ella Guy','Charlotte Mejia','Lula Najera','Alina Nam','Kaelynn Vargas'] },
+  { id:776,  title:'Cellophane',      type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:1}, sh:18, sm:39, eh:18, em:45, room:'1', dancers:['Talya Baruch','Liam Brady','Chloe Choi','Talia Glassberg','Lula Najera','Alina Nam'] },
+  { type:'awards', d:{year:2026,month:6,day:1}, sh:19, sm:0,  eh:19, em:20, room:'1', title:'Awards', dayKey:'wed' },
+
+  // ── THURSDAY JULY 2 ──
+  { id:755,  title:'Light of the 7',  type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:2}, sh:12, sm:31, eh:12, em:38, room:'1', dancers:['Zoey Almonte','Carly Baitner','Talya Baruch','Ella Beharry','Liam Brady','Eden Caffie','Chloe Choi','Rylee Dennis','Isabella Elsebai','Talia Glassberg','Ella Guy','Ava Khan','Sasha Lebovitch','Zoë Lebovitch','Anaya Martinez','Camila Martinez','Charlotte Mejia','Sapphira Morales','Taydeliz Mota','Lula Najera','Alina Nam','Jade Paez','Robbie Palefski','Charlotte Paltroom','Sierra Sung','Genevieve Tomic','Kaelynn Vargas','Liana Yaros'] },
+  { id:754,  title:'X',               type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:2}, sh:12, sm:50, eh:12, em:57, room:'1', dancers:['Zoey Almonte','Carly Baitner','Talya Baruch','Ella Beharry','Liam Brady','Eden Caffie','Chloe Choi','Rylee Dennis','Isabella Elsebai','Talia Glassberg','Ella Guy','Ava Khan','Sasha Lebovitch','Zoë Lebovitch','Anaya Martinez','Camila Martinez','Charlotte Mejia','Sapphira Morales','Taydeliz Mota','Lula Najera','Alina Nam','Jade Paez','Robbie Palefski','Charlotte Paltroom','Sierra Sung','Genevieve Tomic','Kaelynn Vargas','Liana Yaros'] },
+  { id:774,  title:'Cry To Me',       type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:2}, sh:13, sm:24, eh:13, em:31, room:'1', dancers:['Carly Baitner','Talya Baruch','Liam Brady','Chloe Choi','Rylee Dennis','Talia Glassberg','Ella Guy','Lula Najera','Alina Nam','Genevieve Tomic'] },
+  { type:'awards', d:{year:2026,month:6,day:2}, sh:13, sm:45, eh:14, em:5, room:'1', title:'Awards', dayKey:'thu' },
+  { id:2251, title:'End of Love',     type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:2}, sh:15, sm:57, eh:16, em:5,  room:'1', dancers:['Carly Baitner','Talya Baruch','Ella Beharry','Liam Brady','Eden Caffie','Chloe Choi','Rylee Dennis','Talia Glassberg','Ella Guy','Zoë Lebovitch','Camila Martinez','Lula Najera','Alina Nam','Robbie Palefski','Genevieve Tomic'] },
+  { type:'awards', d:{year:2026,month:6,day:2}, sh:16, sm:25, eh:16, em:45, room:'1', title:'Awards', dayKey:'thu' },
+  { id:759,  title:'Freak Out',       type:'solo',  ageGroup:'age-9-11',  d:{year:2026,month:6,day:2}, sh:17, sm:4,  eh:17, em:7,  room:'2', dancers:['Anaya Martinez'] },
+  { id:758,  title:'Wings',           type:'solo',  ageGroup:'age-9-11',  d:{year:2026,month:6,day:2}, sh:17, sm:16, eh:17, em:19, room:'2', dancers:['Liana Yaros'] },
+  { type:'awards', d:{year:2026,month:6,day:2}, sh:18, sm:5,  eh:18, em:25, room:'2', title:'Awards', dayKey:'thu' },
+
+  // ── FRIDAY JULY 3 ──
+  { id:784,  title:'Golden Years',    type:'group', ageGroup:'age-12-14', d:{year:2026,month:6,day:3}, sh:12, sm:55, eh:13, em:5,  room:'1', dancers:['Zoey Almonte','Carly Baitner','Talya Baruch','Ella Beharry','Liam Brady','Eden Caffie','Chloe Choi','Rylee Dennis','Isabella Elsebai','Talia Glassberg','Ella Guy','Ava Khan','Sasha Lebovitch','Zoë Lebovitch','Anaya Martinez','Camila Martinez','Charlotte Mejia','Sapphira Morales','Taydeliz Mota','Lula Najera','Alina Nam','Jade Paez','Robbie Palefski','Charlotte Paltroom','Sierra Sung','Genevieve Tomic','Kaelynn Vargas','Liana Yaros'] },
+  { type:'awards', d:{year:2026,month:6,day:3}, sh:13, sm:5,  eh:13, em:25, room:'1', title:'Awards', dayKey:'fri' },
+  { id:753,  title:'Cosmic Honey',    type:'group', ageGroup:'age-15-16', d:{year:2026,month:6,day:3}, sh:18, sm:7,  eh:18, em:14, room:'1', dancers:['Zoey Almonte','Carly Baitner','Talya Baruch','Ella Beharry','Liam Brady','Eden Caffie','Chloe Choi','Rylee Dennis','Isabella Elsebai','Talia Glassberg','Ella Guy','Ava Khan','Sasha Lebovitch','Zoë Lebovitch','Anaya Martinez','Camila Martinez','Charlotte Mejia','Sapphira Morales','Taydeliz Mota','Lula Najera','Alina Nam','Jade Paez','Robbie Palefski','Charlotte Paltroom','Sierra Sung','Genevieve Tomic','Kaelynn Vargas','Liana Yaros'] },
+  { type:'awards', d:{year:2026,month:6,day:3}, sh:18, sm:45, eh:19, em:5,  room:'1', title:'Awards', dayKey:'fri' },
+
+  // ── SATURDAY JULY 4 — ALTD ──
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:8,  sm:30, eh:8,  em:45,  room:'main', title:'Opening Number Performance', meta:'All-Star Dancers — America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:8,  sm:45, eh:9,  em:40,  room:'main', title:'Mini Small Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:9,  sm:40, eh:10, em:40,  room:'main', title:'Junior Small Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:10, sm:40, eh:11, em:40,  room:'main', title:'Teen Small Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:11, sm:40, eh:12, em:45,  room:'main', title:'Senior Small Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:12, sm:45, eh:13, em:15,  room:'main', title:'Mini/Junior Super Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:14, sm:0,  eh:14, em:40,  room:'main', title:'Teen/Senior Super Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:14, sm:40, eh:15, em:20,  room:'main', title:'Mini & Junior Large Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:15, sm:20, eh:16, em:20,  room:'main', title:'Teen Large Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+  { type:'altd', d:{year:2026,month:6,day:4}, sh:16, sm:20, eh:17, em:30,  room:'main', title:'Senior Large Groups — Performances & Awards', meta:'America Loves to Dance Awards', dayKey:'sat' },
+];
+
+// ── PLACES TO EAT ──
+const EAT_WALKABLE = [
+  { name:"Vidalia's", cuisine:'Southern / American', distance:'In the Sheraton', price:'$$$',
+    address:'2101 N Oak St, Myrtle Beach, SC', map:'https://maps.google.com/?q=Vidalia+Restaurant+Sheraton+Myrtle+Beach',
+    menu:'', web:'https://www.marriott.com/en-us/hotels/myrsi-sheraton-myrtle-beach/dining/',
+    notes:'Full-service restaurant inside the hotel. Also has a lobby bar.' },
+  { name:"Kilwins", cuisine:'Ice Cream & Sweets', distance:'In the Sheraton', price:'$',
+    address:'2101 N Oak St, Myrtle Beach, SC', map:'https://maps.google.com/?q=Kilwins+Sheraton+Myrtle+Beach',
+    menu:'', web:'https://www.kilwins.com',
+    notes:'On-site in the hotel. Ice cream, chocolates, fudge — perfect post-performance treat.' },
+  { name:'Myrtle Beach Boardwalk Area', cuisine:'Various', distance:'~10–15 min walk',
+    price:'$–$$$', address:'Ocean Blvd, Myrtle Beach, SC',
+    map:'https://maps.google.com/?q=Myrtle+Beach+Boardwalk', menu:'', web:'https://www.visitmyrtlebeach.com/things-to-do/attractions/boardwalk',
+    notes:'Tons of casual spots along the boardwalk — seafood shacks, pizza, arcades. Better in the daytime.', walk:true },
+];
+const EAT_DRIVE = [
+  { name:'Fiesta Mexicana ⭐', cuisine:'Mexican', distance:'~8 min drive', price:'$$',
+    address:'Myrtle Beach, SC', map:'https://maps.google.com/?q=Fiesta+Mexicana+Myrtle+Beach+SC',
+    menu:'', web:'', notes:'Recommended by a local — reliable Mexican with good portions.' },
+  { name:"Ducati's Italian ⭐", cuisine:'Italian', distance:'~10 min drive', price:'$$$',
+    address:'Myrtle Beach, SC', map:'https://maps.google.com/?q=Ducati+Italian+Myrtle+Beach+SC',
+    menu:'', web:'', notes:'Local favorite for Italian.' },
+  { name:'Zeytin Carolina Forest ⭐', cuisine:'Breakfast / Lunch / Mediterranean', distance:'~12 min drive', price:'$$',
+    address:'Carolina Forest, Myrtle Beach, SC', map:'https://maps.google.com/?q=Zeytin+Carolina+Forest+Myrtle+Beach',
+    menu:'', web:'', notes:'Great for breakfast and lunch. Highly recommended by local residents.' },
+  { name:'Earth Cafe ⭐', cuisine:'Breakfast / Lunch / Healthy', distance:'~10 min drive', price:'$$',
+    address:'Myrtle Beach, SC', map:'https://maps.google.com/?q=Earth+Cafe+Myrtle+Beach+SC',
+    menu:'', web:'', notes:'Fresh bowls, wraps, good for a lighter meal.' },
+  { name:'Lekker Eats ⭐', cuisine:'Breakfast / Lunch / Global', distance:'~10 min drive', price:'$$',
+    address:'Myrtle Beach, SC', map:'https://maps.google.com/?q=Lekker+Eats+Myrtle+Beach+SC',
+    menu:'', web:'', notes:'Fresh bowls, wraps, and salads with global flavors. Dine-in spot.' },
+  { name:'Dirty Don\'s Oyster Bar & Grill', cuisine:'Seafood', distance:'~10 min (Market Common)', price:'$$',
+    address:'Market Common, Myrtle Beach, SC', map:'https://maps.google.com/?q=Dirty+Dons+Oyster+Bar+Market+Common+Myrtle+Beach',
+    menu:'', web:'', notes:'Key West-style seafood at Market Common. Oysters, seafood boils, pitchers.' },
+];
+const EAT_DESTINATIONS = [
+  { name:'Broadway at the Beach', cuisine:'Massive entertainment complex — dozens of restaurants', distance:'~10 min drive', price:'$–$$$',
+    address:'1325 Celebrity Circle, Myrtle Beach, SC', map:'https://maps.google.com/?q=Broadway+at+the+Beach+Myrtle+Beach',
+    menu:'', web:'https://www.broadwayatthebeach.com',
+    notes:'30th anniversary this year — fireworks over the lake nightly. Margaritaville, The Hangout, and lots more. Expect a wait on weekend evenings.' },
+  { name:'Barefoot Landing', cuisine:'16+ restaurants, waterfront dining on the Intracoastal Waterway', distance:'~15 min north',  price:'$–$$$',
+    address:'4898 Hwy 17 S, North Myrtle Beach, SC', map:'https://maps.google.com/?q=Barefoot+Landing+North+Myrtle+Beach',
+    menu:'', web:'https://www.bflanding.com',
+    notes:'More relaxed than Broadway at the Beach. House of Blues, LuLu\'s, Greg Norman\'s waterfront. Fireworks at 10 PM on July 4th.' },
+  { name:'Market Common', cuisine:'Walkable neighborhood with restaurants, boutiques & bike rentals', distance:'~10 min south', price:'$$–$$$',
+    address:'Farrow Pkwy, Myrtle Beach, SC', map:'https://maps.google.com/?q=The+Market+Common+Myrtle+Beach',
+    menu:'', web:'https://themarketcommon.com',
+    notes:'Upscale, walkable area. Electric bike rentals available to ride around the park. Dirty Don\'s, Tupelo Honey, and more. A favorite with locals.' },
+];
+
+// ── THINGS TO DO ──
+const TODOS = [
+  { name:'The Beach — Walk Right In 🏖️', desc:'You can walk to the beach from the hotel. The Myrtle Beach Boardwalk is about a mile away — a 1.2-mile oceanfront promenade from 14th Ave Pier to 2nd Ave Pier with shops, food, and the iconic SkyWheel. All beaches here are public access.',
+    distance:'~15–20 min walk or 5 min drive', free:true,
+    map:'https://maps.google.com/?q=Myrtle+Beach+Boardwalk', web:'https://www.visitmyrtlebeach.com/things-to-do/attractions/boardwalk',
+    lat:33.6946, lng:-78.8780 },
+  { name:'SkyWheel Myrtle Beach', desc:'Iconic 187-foot Ferris wheel right on the boardwalk, with climate-controlled gondolas. Great views of the ocean and coastline.',
+    distance:'5 min drive or 15 min walk', free:false,
+    map:'https://maps.google.com/?q=SkyWheel+Myrtle+Beach', web:'https://myrtlebeachskywheel.com',
+    lat:33.6946, lng:-78.8780 },
+  { name:'Barefoot Landing Race Boats 🚤', desc:'Rent tiny race boats and zoom around the waterways at Barefoot Landing. Genuinely fun for all ages — local families love it.',
+    distance:'~15 min north', free:false,
+    map:'https://maps.google.com/?q=Barefoot+Landing+North+Myrtle+Beach', web:'https://www.bflanding.com',
+    lat:33.8341, lng:-78.6894 },
+  { name:'Market Common — E-Bikes & Strolling', desc:'Rent electric bikes and cruise through this beautiful walkable neighborhood. Nice shops, great restaurants, beautiful homes. A favorite with locals and visitors who want something calmer than the boardwalk.',
+    distance:'~10 min south', free:false,
+    map:'https://maps.google.com/?q=The+Market+Common+Myrtle+Beach', web:'https://themarketcommon.com',
+    lat:33.6666, lng:-78.9197 },
+  { name:'Broadway at the Beach', desc:'Massive lakeside entertainment complex with 100+ shops, restaurants, mini golf, and attractions. The SkyWheel is here, plus Margaritaville, WonderWorks, and more. 30th birthday fireworks nightly over the lake this year.',
+    distance:'~10 min', free:false,
+    map:'https://maps.google.com/?q=Broadway+at+the+Beach+Myrtle+Beach', web:'https://www.broadwayatthebeach.com',
+    lat:33.7174, lng:-78.8874 },
+  { name:'Family Kingdom Amusement Park', desc:'Old-school beachfront amusement park with rides, a water park, and a classic wooden roller coaster. Close to the hotel and great for kids.',
+    distance:'~5 min drive', free:false,
+    map:'https://maps.google.com/?q=Family+Kingdom+Amusement+Park+Myrtle+Beach', web:'https://www.family-kingdom.com',
+    lat:33.6803, lng:-78.8910 },
+  { name:'Ripley\'s Aquarium', desc:'Walk-through underwater tunnels with sharks, stingrays, sea turtles, and thousands of marine creatures. Plus sloth and penguin encounters. Good rainy-day option.',
+    distance:'~10 min', free:false,
+    map:'https://maps.google.com/?q=Ripleys+Aquarium+Myrtle+Beach', web:'https://www.ripleyaquariums.com/myrtlebeach/',
+    lat:33.7162, lng:-78.8869 },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+const state = {
+  selectedDancers: [],
+  activeDayKey: 'mon',
+  activeRoom: 'all',
+  importOpen: false,
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILITY
+// ═══════════════════════════════════════════════════════════════
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function fmtTime(h, m) {
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${hh}:${pad(m)} ${ampm}`;
+}
+
+function fmtICSDate(d, h, m) {
+  const dt = new Date(d.year, d.month, d.day, h, m, 0);
+  return `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+}
+
+function getDayKey(dance) {
+  const { year, month, day } = dance.d;
+  if (month === 5 && day === 29) return 'mon';
+  if (month === 5 && day === 30) return 'tue';
+  if (month === 6 && day === 1)  return 'wed';
+  if (month === 6 && day === 2)  return 'thu';
+  if (month === 6 && day === 3)  return 'fri';
+  if (month === 6 && day === 4)  return 'sat';
+  return 'mon';
+}
+
+function dayLabel(key) {
+  return DAYS.find(d => d.key === key)?.label || key;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════════════════════════
+function addToCalendar(dance) {
+  const s = fmtICSDate(dance.d, dance.sh, dance.sm);
+  const e = fmtICSDate(dance.d, dance.eh, dance.em);
+  let title, details;
+  if (dance.type === 'awards') {
+    title = `Awards — Tate Academy (Room ${dance.room})`;
+    details = 'Showstopper East Coast Finals Awards Ceremony';
+  } else if (dance.type === 'event') {
+    title = dance.title;
+    details = dance.note || '';
+  } else if (dance.type === 'opening-number') {
+    title = `${dance.title} — Tate Academy All-Stars`;
+    details = dance.note || '';
+  } else {
+    title = `${dance.title} — Tate Academy`;
+    details = dance.dancers ? `Dancers: ${dance.dancers.join(', ')}` : '';
+  }
+  const p = new URLSearchParams({ action:'TEMPLATE', text:title, dates:`${s}/${e}`, location:VENUE, details });
+  window.open(`https://calendar.google.com/calendar/render?${p}`, '_blank');
+}
+
+function generateICSString(danceList, includeON) {
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Tate Academy//Nationals 2026//EN\r\n';
+  let uid = 0;
+  const events = [...danceList];
+  if (includeON) events.push(...ON_REHEARSALS);
+  events.sort((a,b) => {
+    const ta = new Date(a.d.year, a.d.month, a.d.day, a.sh, a.sm);
+    const tb = new Date(b.d.year, b.d.month, b.d.day, b.sh, b.sm);
+    return ta - tb;
+  });
+  events.forEach(d => {
+    if (d.type === 'awards' || d.type === 'altd' || d.type === 'event') return;
+    const s = fmtICSDate(d.d, d.sh, d.sm);
+    const e = fmtICSDate(d.d, d.eh, d.em);
+    const title = d.type === 'opening-number'
+      ? `${d.title} — Tate Academy All-Stars`
+      : `${d.title} — Tate Academy`;
+    const desc = d.dancers ? `Dancers: ${d.dancers.join(', ')}` : (d.note || '');
+    ics += `BEGIN:VEVENT\r\nUID:tate-nationals-${uid++}@tateacademy.com\r\n`;
+    ics += `DTSTART:${s}\r\nDTEND:${e}\r\n`;
+    ics += `SUMMARY:${title}\r\nLOCATION:${VENUE}\r\n`;
+    if (desc) ics += `DESCRIPTION:${desc}\r\n`;
+    ics += `END:VEVENT\r\n`;
+  });
+  ics += 'END:VCALENDAR';
+  return ics;
+}
+
+function downloadICS(icsStr, filename) {
+  // Use data: URI for iOS Safari compatibility
+  const encoded = encodeURIComponent(icsStr);
+  const a = document.createElement('a');
+  a.href = 'data:text/calendar;charset=utf-8,' + encoded;
+  a.download = filename;
+  a.click();
+}
+
+function downloadFullICS() {
+  const all = DANCES.filter(d => d.type !== 'awards' && d.type !== 'altd');
+  downloadICS(generateICSString(all, false), 'Tate_Nationals_2026_Full.ics');
+}
+
+function downloadMyScheduleICS() {
+  const filtered = getFilteredDances();
+  const isAllStar = state.selectedDancers.some(n => ALL_STARS.includes(n));
+  const icsStr = generateICSString(filtered, isAllStar);
+  const name = state.selectedDancers.length ? state.selectedDancers.join('_').replace(/\s/g,'') : 'Full';
+  downloadICS(icsStr, `Tate_Nationals_2026_${name}.ics`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MY SCHEDULE LOGIC
+// ═══════════════════════════════════════════════════════════════
+function getFilteredDances() {
+  if (state.selectedDancers.length === 0) return [];
+  return DANCES.filter(d => {
+    if (d.type === 'awards' || d.type === 'altd' || d.type === 'event') return false;
+    if (!d.dancers) return false;
+    return state.selectedDancers.some(name => d.dancers.includes(name));
+  });
+}
+
+function getDancerDances(name) {
+  return DANCES.filter(d => {
+    if (d.type === 'awards' || d.type === 'altd') return false;
+    if (!d.dancers) return false;
+    return d.dancers.includes(name);
+  });
+}
+
+function renderMySchedule() {
+  const chips = document.getElementById('dancerChips');
+  chips.innerHTML = '';
+
+  const allDancers = [];
+  DANCES.forEach(d => {
+    if (d.dancers) d.dancers.forEach(n => { if (!allDancers.includes(n)) allDancers.push(n); });
+  });
+  allDancers.sort((a,b) => a.split(' ').pop().localeCompare(b.split(' ').pop()));
+
+  allDancers.forEach(name => {
+    const chip = document.createElement('button');
+    chip.className = 'dancer-chip' + (state.selectedDancers.includes(name) ? ' selected' : '');
+    chip.textContent = name;
+    chip.onclick = () => toggleDancer(name);
+    chips.appendChild(chip);
+  });
+
+  renderMyScheduleList();
+}
+
+function renderMyScheduleList() {
+  const list = document.getElementById('myScheduleList');
+  if (state.selectedDancers.length === 0) {
+    list.innerHTML = '<div class="schedule-empty">Select one or more dancers above to see their schedule.<br><br>Select multiple names to combine schedules — great for watching teammates!</div>';
+    return;
+  }
+
+  // Gather dances + ON rehearsals for selected All-Stars
+  let events = getFilteredDances();
+  const hasAllStar = state.selectedDancers.some(n => ALL_STARS.includes(n));
+  if (hasAllStar) events = [...events, ...ON_REHEARSALS];
+
+  // Sort by date/time
+  events.sort((a,b) => {
+    const ta = new Date(a.d.year, a.d.month, a.d.day, a.sh, a.sm);
+    const tb = new Date(b.d.year, b.d.month, b.d.day, b.sh, b.sm);
+    return ta - tb;
+  });
+
+  if (events.length === 0) {
+    list.innerHTML = '<div class="schedule-empty">No confirmed dances yet for the selected dancers.</div>';
+    return;
+  }
+
+  // Group by day
+  const byDay = {};
+  events.forEach(ev => {
+    const key = getDayKey(ev);
+    if (!byDay[key]) byDay[key] = [];
+    byDay[key].push(ev);
+  });
+
+  let html = '';
+  DAYS.forEach(day => {
+    if (!byDay[day.key]) return;
+    html += `<div class="schedule-day-group">
+      <div class="schedule-day-label">${day.label}</div>`;
+    byDay[day.key].forEach(ev => {
+      html += renderDanceRow(ev, true);
+    });
+    html += `</div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function toggleDancer(name) {
+  if (state.selectedDancers.includes(name)) {
+    state.selectedDancers = state.selectedDancers.filter(n => n !== name);
+  } else {
+    state.selectedDancers.push(name);
+  }
+  renderMySchedule();
+}
+
+function selectAllDancers() {
+  const allDancers = [];
+  DANCES.forEach(d => {
+    if (d.dancers) d.dancers.forEach(n => { if (!allDancers.includes(n)) allDancers.push(n); });
+  });
+  state.selectedDancers = allDancers;
+  renderMySchedule();
+}
+
+function clearDancers() {
+  state.selectedDancers = [];
+  renderMySchedule();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DANCE ROW RENDERER
+// ═══════════════════════════════════════════════════════════════
+function renderDanceRow(dance, isMySchedule) {
+  if (dance.type === 'awards') {
+    return `<div class="dance-row awards">
+      <div class="dance-time">${fmtTime(dance.sh, dance.sm)}</div>
+      <div class="dance-info">
+        <div class="dance-title">🏆 Awards — Room ${dance.room}</div>
+      </div>
+      <button class="cal-btn" onclick='addToCalendar(${JSON.stringify(dance)})'>+ Cal</button>
+    </div>`;
+  }
+
+  if (dance.type === 'altd') {
+    return `<div class="dance-row altd">
+      <div class="dance-time">${fmtTime(dance.sh, dance.sm)}</div>
+      <div class="dance-info">
+        <div class="dance-title">${dance.title}</div>
+        <div class="dance-meta">${dance.meta || ''}</div>
+      </div>
+    </div>`;
+  }
+
+  if (dance.type === 'event') {
+    const calBtn = `<button class="cal-btn" onclick='addToCalendar(${JSON.stringify(dance)})'>+ Cal</button>`;
+    return `<div class="dance-row event">
+      <div class="dance-time">${fmtTime(dance.sh, dance.sm)}</div>
+      <div class="dance-info">
+        <div class="dance-title">${dance.title}</div>
+        <div class="dance-meta">${dance.meta}</div>
+        ${dance.note ? `<div class="on-note">ℹ️ ${dance.note}</div>` : ''}
+      </div>
+      ${calBtn}
+    </div>`;
+  }
+
+  if (dance.type === 'opening-number') {
+    const calBtn = `<button class="cal-btn" onclick='addToCalendar(${JSON.stringify(dance)})'>+ Cal</button>`;
+    return `<div class="dance-row opening-number">
+      <div class="dance-time">${fmtTime(dance.sh, dance.sm)}</div>
+      <div class="dance-info">
+        <div class="dance-title">${dance.title} <span class="allstar-badge">All-Star</span></div>
+        <div class="dance-meta">${dance.meta}</div>
+        ${dance.note ? `<div class="on-note">ℹ️ ${dance.note}</div>` : ''}
+      </div>
+      ${calBtn}
+    </div>`;
+  }
+
+  // Regular dance row
+  const isSolo = dance.type === 'solo';
+  const roomBadge = dance.room !== 'main' ? `<span class="room-badge">Room ${dance.room}</span>` : '';
+  const entryNum = dance.id ? `<span class="entry-num">#${dance.id}</span>` : '';
+  const dancerText = dance.dancers ? dance.dancers.join(', ') : 'Dancers: Coming soon';
+
+  // For My Schedule, show who in this dance is selected
+  let dancerDisplay = dancerText;
+  if (isMySchedule && dance.dancers && state.selectedDancers.length > 0) {
+    const watching = dance.dancers.filter(n => state.selectedDancers.includes(n));
+    const others = dance.dancers.filter(n => !state.selectedDancers.includes(n));
+    if (watching.length < dance.dancers.length) {
+      dancerDisplay = `<strong style="color:rgba(255,255,255,0.85)">${watching.join(', ')}</strong>` +
+        (others.length ? ` <span style="opacity:0.5">+ ${others.join(', ')}</span>` : '');
+    }
+  }
+
+  const calBtn = dance.type !== 'awards'
+    ? `<button class="cal-btn" onclick='addToCalendar(${JSON.stringify(dance)})'>+ Cal</button>`
+    : '';
+
+  return `<div class="dance-row ${dance.ageGroup || ''}">
+    <div class="dance-time">${fmtTime(dance.sh, dance.sm)}</div>
+    <div class="dance-info">
+      <div class="dance-title">${dance.title}${isSolo ? '<span class="solo-badge">Solo</span>' : ''}</div>
+      <div class="dance-meta">${roomBadge}${entryNum} · ${dancerDisplay}</div>
+    </div>
+    ${calBtn}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DANCE ORDER
+// ═══════════════════════════════════════════════════════════════
+function renderDayFilters() {
+  const wrap = document.getElementById('dayFilters');
+  wrap.innerHTML = '';
+  const todayKey = getTodayDayKey();
+  DAYS.forEach(day => {
+    const btn = document.createElement('button');
+    const isToday = day.key === todayKey;
+    btn.className = 'day-btn' + (day.key === state.activeDayKey ? ' active' : '');
+    btn.innerHTML = isToday ? `${day.label} <span style="font-size:0.6rem;background:#34d399;color:#111;border-radius:4px;padding:1px 5px;margin-left:3px;font-weight:800;vertical-align:middle;">TODAY</span>` : day.label;
+    btn.onclick = () => {
+      state.activeDayKey = day.key;
+      document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDanceOrder();
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+function filterRoom(room, btn) {
+  state.activeRoom = room;
+  document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDanceOrder();
+}
+
+function renderDanceOrder() {
+  const now = new Date();
+  const list = document.getElementById('danceOrderList');
+  const dayDances = DANCES.filter(d => getDayKey(d) === state.activeDayKey);
+  const filtered = state.activeRoom === 'all'
+    ? dayDances
+    : dayDances.filter(d => d.room === state.activeRoom || d.type === 'awards' || d.type === 'altd');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="schedule-empty">No Tate dances scheduled in this room on this day.</div>';
+    return;
+  }
+
+  // Determine if today is actually a competition day
+  const todayKey = getTodayDayKey();
+  const isCompDay = todayKey !== null;
+  const isToday = isCompDay && todayKey === state.activeDayKey;
+
+  // Find the first upcoming dance (for "up next" marker)
+  let upNextIndex = -1;
+  if (isToday) {
+    for (let i = 0; i < filtered.length; i++) {
+      const d = filtered[i];
+      const dStart = new Date(d.d.year, d.d.month, d.d.day, d.sh, d.sm);
+      if (dStart > now) { upNextIndex = i; break; }
+    }
+  }
+
+  let html = '';
+  filtered.forEach((d, i) => {
+    const dStart = new Date(d.d.year, d.d.month, d.d.day, d.sh, d.sm);
+    const isPast = isToday && dStart <= now;
+
+    // Insert "Up Next" label before the first upcoming dance
+    if (isToday && i === upNextIndex) {
+      html += `<div class="up-next-label">Up Next</div>`;
+    }
+
+    let rowHtml = renderDanceRow(d, false);
+    // Inject past class if needed
+    if (isPast) {
+      rowHtml = rowHtml.replace('class="dance-row', 'class="dance-row past');
+    }
+    html += rowHtml;
+  });
+
+  list.innerHTML = html;
+}
+
+// Returns the day key for today if we're in competition week, else null
+function getTodayDayKey() {
+  const now = new Date();
+  for (const day of DAYS) {
+    const d = new Date(day.d.year, day.d.month, day.d.day);
+    if (now.getFullYear() === d.getFullYear() &&
+        now.getMonth() === d.getMonth() &&
+        now.getDate() === d.getDate()) {
+      return day.key;
+    }
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PLACES TO EAT
+// ═══════════════════════════════════════════════════════════════
+function renderEat() {
+  function eatCard(r) {
+    const walkBadge = r.walk ? '<span class="walk-badge">Walkable</span>' : '';
+    return `<div class="eat-card">
+      <div class="eat-name">${r.name}${walkBadge}</div>
+      <div class="eat-meta">
+        <span>${r.cuisine}</span>
+        <span>${r.distance}</span>
+        <span>${r.price}</span>
+      </div>
+      ${r.notes ? `<div class="eat-notes">${r.notes}</div>` : ''}
+      <div class="card-actions">
+        <a class="btn-card" href="${r.map}" target="_blank">📍 Directions</a>
+        ${r.menu ? `<a class="btn-card" href="${r.menu}" target="_blank">🍽 Menu</a>` : ''}
+        ${r.web ? `<a class="btn-card" href="${r.web}" target="_blank">🌐 Website</a>` : ''}
+      </div>
+    </div>`;
+  }
+  document.getElementById('eatWalkable').innerHTML = EAT_WALKABLE.map(eatCard).join('');
+  document.getElementById('eatDrive').innerHTML = EAT_DRIVE.map(eatCard).join('');
+  document.getElementById('eatDestinations').innerHTML = EAT_DESTINATIONS.map(eatCard).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  THINGS TO DO
+// ═══════════════════════════════════════════════════════════════
+let todoMapReady = false;
+
+function initTodoMap() {
+  if (todoMapReady) return;
+  todoMapReady = true;
+  const hotelLat = 33.6961, hotelLng = -78.8954;
+  const map = L.map('todo-map').setView([hotelLat, hotelLng], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Hotel marker
+  L.marker([hotelLat, hotelLng])
+    .addTo(map)
+    .bindPopup('<strong>Sheraton Myrtle Beach</strong><br>Your home base')
+    .openPopup();
+
+  TODOS.forEach(t => {
+    L.marker([t.lat, t.lng])
+      .addTo(map)
+      .bindPopup(`<strong>${t.name}</strong><br>${t.distance}`);
+  });
+}
+
+function renderTodo() {
+  const list = document.getElementById('todoList');
+  list.innerHTML = TODOS.map(t => `
+    <div class="todo-card">
+      <div class="todo-name">${t.name}${t.free ? '<span class="free-badge">Free</span>' : ''}</div>
+      <div class="todo-desc">${t.desc}</div>
+      <div class="todo-meta">${t.distance}</div>
+      <div class="card-actions">
+        <a class="btn-card" href="${t.map}" target="_blank">📍 Directions</a>
+        ${t.web ? `<a class="btn-card" href="${t.web}" target="_blank">🌐 Website</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  IMPORT TOGGLE
+// ═══════════════════════════════════════════════════════════════
+function toggleImport(btn) {
+  state.importOpen = !state.importOpen;
+  btn.classList.toggle('open', state.importOpen);
+  document.getElementById('importBody').classList.toggle('expanded', state.importOpen);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'todo') initTodoMap();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-jump to today if we're in competition week
+  const todayKey = getTodayDayKey();
+  if (todayKey) state.activeDayKey = todayKey;
+
+  renderMySchedule();
+  renderDayFilters();
+  renderDanceOrder();
+  renderEat();
+  renderTodo();
+
+  // Refresh dance order every 60s so past rows dim in real time
+  setInterval(() => {
+    if (getTodayDayKey()) renderDanceOrder();
+  }, 60000);
+});
+</script>
+</body>
+</html>
