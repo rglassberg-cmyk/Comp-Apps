@@ -1,0 +1,13 @@
+{
+  "name": "Tate Academy — Nationals 2026",
+  "short_name": "Tate Nationals",
+  "description": "Showstopper East Coast Finals — Myrtle Beach, SC",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1b1d",
+  "theme_color": "#d5164d",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
