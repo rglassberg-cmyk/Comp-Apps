@@ -772,6 +772,112 @@ footer {
 }
 footer a { color: #d5164d; }
 
+/* ── ALTD FINALS CALLOUT ── */
+.altd-finals-callout {
+  background: linear-gradient(135deg, rgba(213,22,77,0.25) 0%, rgba(154,16,57,0.30) 100%);
+  border: 1.5px solid rgba(213,22,77,0.5);
+  border-radius: 14px;
+  padding: 0;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.altd-callout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 14px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.altd-callout-header-text { flex: 1; }
+.altd-callout-toggle {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.altd-callout-header:hover .altd-callout-toggle { background: rgba(255,255,255,0.18); }
+.altd-callout-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+  padding: 0 16px;
+}
+.altd-callout-body.expanded {
+  max-height: 9999px;
+  padding: 0 16px 16px;
+}
+.altd-finals-callout h2 {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.altd-finals-callout .altd-subtitle {
+  font-size: 0.76rem;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 14px;
+}
+.altd-group-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.altd-group-row:last-child { border-bottom: none; }
+.altd-order-num {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #d5164d;
+  min-width: 28px;
+  text-align: center;
+}
+.altd-group-info { flex: 1; min-width: 0; }
+.altd-group-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.altd-group-meta {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 1px;
+}
+.altd-tate-row { background: rgba(213,22,77,0.18); border-radius: 7px; margin: 2px -4px; padding-left: 4px; padding-right: 4px; }
+.altd-tate-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  background: #d5164d;
+  color: #fff;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.altd-time-block {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.07);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  text-align: right;
+}
+
 /* ── PAST / UP NEXT ── */
 .dance-row.past {
   opacity: 0.32;
@@ -860,10 +966,6 @@ footer a { color: #d5164d; }
      DANCE ORDER TAB
 ════════════════════════════════════════ -->
 <div id="danceOrder" class="tab-content active">
-
-  <div style="text-align:center;margin-bottom:14px;">
-    <a class="btn-results" href="https://www.goshowstopper.com" target="_blank">📺 Watch Live Stream →</a>
-  </div>
 
   <div class="ics-bar">
     <div class="ics-bar-label">📅 Download the full Tate schedule to your calendar</div>
@@ -1779,6 +1881,13 @@ function renderDayFilters() {
   });
 }
 
+function toggleAltdCallout(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.altd-callout-toggle');
+  const isExpanded = body.classList.toggle('expanded');
+  toggle.textContent = isExpanded ? '▲ Hide' : '▼ See order';
+}
+
 function filterRoom(room, btn) {
   state.activeRoom = room;
   document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
@@ -1794,8 +1903,102 @@ function renderDanceOrder() {
     ? dayDances
     : dayDances.filter(d => d.room === state.activeRoom || d.type === 'awards' || d.type === 'altd');
 
+  // ALTD callout — show on Friday (plan ahead) and Saturday (day of)
+  let calloutHtml = '';
+  if (state.activeDayKey === 'fri' || state.activeDayKey === 'sat') {
+    const isSat = state.activeDayKey === 'sat';
+    const field = (rows) => rows.map(r => `
+      <div class="altd-group-row${r.tate ? ' altd-tate-row' : ''}">
+        <div class="altd-order-num">${r.n}</div>
+        <div class="altd-group-info">
+          <div class="altd-group-title">${r.music}${r.tate ? ' <span class="altd-tate-badge">← Tate</span>' : ''}</div>
+          <div class="altd-group-meta">${r.studio} · ${r.city}</div>
+        </div>
+      </div>`).join('');
+    calloutHtml = `
+    <div class="altd-finals-callout">
+      <div class="altd-callout-header" onclick="toggleAltdCallout(this)">
+        <div class="altd-callout-header-text">
+          <h2>🏆 ${isSat ? 'Tate Is in the Finals Today!' : 'Tate Is in the Finals Tomorrow!'}</h2>
+          <div class="altd-subtitle">Saturday, July 4 · America Loves to Dance Awards · Doors open 6:45 AM</div>
+        </div>
+        <div class="altd-callout-toggle">${isSat ? '▲ Hide' : '▼ See order'}</div>
+      </div>
+      <div class="altd-callout-body${isSat ? ' expanded' : ''}">
+
+      <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:4px 0 6px;">Opening Number · 8:30 AM</div>
+      <div class="altd-group-row opening-number" style="border-radius:7px;">
+        <div class="altd-order-num" style="font-size:0.9rem;">🌟</div>
+        <div class="altd-group-info">
+          <div class="altd-group-title">Opening Number Performance</div>
+          <div class="altd-group-meta">Talia Glassberg · Robbie Palefski · Zoë Lebovitch · Ella Beharry · Eden Caffie</div>
+        </div>
+        <div class="altd-time-block">8:30 AM</div>
+      </div>
+
+      <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 6px;">Senior Small Groups · ~11:40 AM block</div>
+      ${field([
+        { n:1,  city:'Mansfield, OH',       music:'Rain In My Heart',        studio:'Studio 65',                     tate:false },
+        { n:2,  city:'Charlotte, NC',        music:'Sometimes',               studio:"Miss Donna's School of Dance",  tate:false },
+        { n:3,  city:'Front Royal, VA',      music:'Feelin Good',             studio:'Polaris Dance Institute',       tate:false },
+        { n:4,  city:'Tiverton, RI',         music:'Wicked Games',            studio:'Dance Fusion Studios',          tate:false },
+        { n:5,  city:'Winston Salem, NC',    music:'Running Up That Hill',    studio:'Institute of Divine Arts',      tate:false },
+        { n:6,  city:'Hilliard, OH',         music:'Suit &amp; Tie',          studio:'Dance Connection',              tate:false },
+        { n:7,  city:'Matthews, NC',         music:'Vienna',                  studio:'Rhythm Dance Studio',           tate:false },
+        { n:8,  city:'Mooresville, NC',      music:'Abracadabra',             studio:'Lake Norman Dance Gallery',     tate:false },
+        { n:9,  city:'Teaneck, NJ',          music:'Dead &amp; Done',         studio:'The Tate Academy',              tate:true  },
+        { n:10, city:'Albany, NY',           music:'Maybe This Time',         studio:"Tina Marie's Dance Academy",    tate:false },
+      ])}
+
+      <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 6px;">Junior Large Groups · ~3:20 PM block</div>
+      ${field([
+        { n:1,  city:'Matthews, NC',         music:'Fame',                    studio:'Rhythm Dance Studio',           tate:false },
+        { n:2,  city:'Lincolnton, NC',       music:'Love Shack',              studio:'Glamorous Productions',         tate:false },
+        { n:3,  city:'Albany, NY',           music:'9 to 5',                  studio:"Tina Marie's Dance Academy",    tate:false },
+        { n:4,  city:'Charlotte, NC',        music:'River Deep',              studio:"Miss Donna's School of Dance",  tate:false },
+        { n:5,  city:'Ijamsville, MD',       music:'Hero',                    studio:'Urbana Dance',                  tate:false },
+        { n:6,  city:'Winfield, WV',         music:"Baby I'm A Star",         studio:"Kelle Boggs' Dance Studio",     tate:false },
+        { n:7,  city:'Mooresville, NC',      music:'The Unveiling',           studio:'Lake Norman Dance Gallery',     tate:false },
+        { n:8,  city:'Teaneck, NJ',          music:'Whatcha Know About Me',   studio:'The Tate Academy',              tate:true  },
+        { n:9,  city:'Fort Washington, MD',  music:'Disco Inferno',           studio:'Artistic Dance Xpressions',     tate:false },
+        { n:10, city:'Holland, PA',          music:'Busta',                   studio:'The Dance Academy',             tate:false },
+      ])}
+
+      <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 6px;">Teen Large Groups · ~4:20 PM block</div>
+      ${field([
+        { n:1,  city:'Front Royal, VA',      music:'Hanging On',              studio:'Polaris Dance Institute',       tate:false },
+        { n:2,  city:'Roanoke, VA',          music:'Stick it to the Man',     studio:'Divine Dance Center',           tate:false },
+        { n:3,  city:'Charlotte, NC',        music:'An Evening',              studio:"Miss Donna's School of Dance",  tate:false },
+        { n:4,  city:'Mooresville, NC',      music:'Beyond The Grave',        studio:'Lake Norman Dance Gallery',     tate:false },
+        { n:5,  city:'Roanoke, VA',          music:'Motherhood',              studio:'Divine Dance Center',           tate:false },
+        { n:6,  city:'Salisbury, NC',        music:'Clock It',                studio:'Salisbury Dance Academy',       tate:false },
+        { n:7,  city:'Holland, PA',          music:'Asturias',                studio:'The Dance Academy',             tate:false },
+        { n:8,  city:'Matthews, NC',         music:"I'll Never Love Again",   studio:'Rhythm Dance Studio',           tate:false },
+        { n:9,  city:'Teaneck, NJ',          music:'End of Love',             studio:'The Tate Academy',              tate:true  },
+        { n:10, city:'Albany, NY',           music:"Don't Care",              studio:"Tina Marie's Dance Academy",    tate:false },
+      ])}
+
+      <div style="font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin:18px 0 6px;">Senior Large Groups · ~5:20 PM block</div>
+      ${field([
+        { n:1,  city:'Mooresville, NC',      music:'The Final Course Sequel', studio:'Lake Norman Dance Gallery',     tate:false },
+        { n:2,  city:'Tiverton, RI',         music:'Unchained Melody',        studio:'Dance Fusion Studios',          tate:false },
+        { n:3,  city:'Ijamsville, MD',       music:'Denim Jacket',            studio:'Urbana Dance',                  tate:false },
+        { n:4,  city:'Teaneck, NJ',          music:'Light of the 7',          studio:'The Tate Academy',              tate:true  },
+        { n:5,  city:'Holland, PA',          music:'Still',                   studio:'The Dance Academy',             tate:false },
+        { n:6,  city:'Charlotte, NC',        music:'Abracadabra',             studio:"Miss Donna's School of Dance",  tate:false },
+        { n:7,  city:'Hilliard, OH',         music:'Four Five Seconds',       studio:'Dance Connection',              tate:false },
+        { n:8,  city:'Matthews, NC',         music:'Ring the Alarm',          studio:'Rhythm Dance Studio',           tate:false },
+        { n:9,  city:'Roanoke, VA',          music:'Ashes',                   studio:'Divine Dance Center',           tate:false },
+        { n:10, city:'Winfield, WV',         music:'Sing Sang Sung',          studio:"Kelle Boggs' Dance Studio",     tate:false },
+      ])}
+
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:14px;font-style:italic;">Time blocks are approximate. Check the livestream at goshowstopper.com to follow along in real time.</div>
+      </div>
+    </div>`;
+  }
+
   if (filtered.length === 0) {
-    list.innerHTML = '<div class="schedule-empty">No Tate dances scheduled in this room on this day.</div>';
+    list.innerHTML = calloutHtml + '<div class="schedule-empty">No Tate dances scheduled in this room on this day.</div>';
     return;
   }
 
@@ -1832,7 +2035,7 @@ function renderDanceOrder() {
     html += rowHtml;
   });
 
-  list.innerHTML = html;
+  list.innerHTML = calloutHtml + html;
 }
 
 // Returns the day key for today if we're in competition week, else null
