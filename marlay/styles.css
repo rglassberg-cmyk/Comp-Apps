@@ -1,8 +1,8 @@
 :root {
   --pink: #d5164d;
   --pink-dark: #9a1039;
-  --pink-tint: rgba(213, 22, 77, 0.06);
-  --pink-tint-strong: rgba(213, 22, 77, 0.12);
+  --pink-tint: color-mix(in srgb, var(--pink) 6%, transparent);
+  --pink-tint-strong: color-mix(in srgb, var(--pink) 12%, transparent);
   --ink: #1a1b1d;
   --ink-soft: #55565a;
   --paper: #ffffff;

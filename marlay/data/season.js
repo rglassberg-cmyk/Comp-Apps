@@ -9,6 +9,10 @@
 // competition here is still awaiting its "At a Glance" schedule PDF, so `dances` is
 // an empty array for all of them; that's what drives the "coming soon" state on each
 // competition's detail page.
+//
+// This file is served publicly as part of the deployed site — don't put confirmation
+// numbers, personal names, or anything else in bookingInfo that isn't meant for every
+// visitor to read. It's only rendered when hotel is null (see openComp() in index.html).
 
 const SEASON = [
   {
@@ -30,7 +34,7 @@ const SEASON = [
       onSite: true
     },
     booked: true,
-    bookingInfo: "Conf# KMMT9NI7 · booked under Donny Baitner w/ Marriott # · Jan 8–10",
+    bookingInfo: "",
     dances: []
   },
   {
@@ -86,7 +90,7 @@ const SEASON = [
       onSite: true
     },
     booked: true,
-    bookingInfo: 'Conf# Z93PQOE1 · booked under "Aviva and Baitner" · check-in Apr 1',
+    bookingInfo: "",
     dances: []
   },
   {
@@ -109,7 +113,7 @@ const SEASON = [
       distanceNote: "~5 min drive — same Harmon Meadow complex as the venue"
     },
     booked: true,
-    bookingInfo: "Conf# 40023B26414401 · booked under Aviva Baitner, Member Rate",
+    bookingInfo: "",
     dances: []
   },
   {
