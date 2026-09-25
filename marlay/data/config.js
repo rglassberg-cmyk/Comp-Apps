@@ -26,6 +26,13 @@ const STUDIO = {
   suggestUpdatesFormUrl:
     "https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true",
 
+  // Public Google Calendar for the rehearsal schedule (from Tabitha). Sharing is
+  // already set to public, so a plain embed works with no auth.
+  rehearsalCalendar: {
+    id: "910dc55878656b0b832ca864e5e613c6d7389270d15e4d1c956eaa9185a4dc42@group.calendar.google.com",
+    timezone: "America/New_York"
+  },
+
   season: {
     label: "2026–2027 Season"
   }

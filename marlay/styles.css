@@ -272,6 +272,43 @@ p.view-lede {
 }
 .checklist li.group-title:first-child { margin-top: 0; }
 
+/* ---------- Calendar ---------- */
+
+.calendar-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.cal-toggle-btn {
+  appearance: none;
+  border: 1.5px solid var(--border);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.cal-toggle-btn.active {
+  border-color: var(--pink);
+  color: var(--pink);
+  background: var(--pink-tint);
+}
+
+.calendar-embed-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.calendar-embed-wrap iframe { display: block; }
+
 /* ---------- Footer ---------- */
 
 footer {
