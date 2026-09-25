@@ -35,6 +35,12 @@ const SEASON = [
     },
     booked: true,
     bookingInfo: "",
+    officialUrl: "https://www.tremainedance.com/",
+    driving: { distanceMi: 212, duration: "about 3.5 hours", route: "I-95 N through Connecticut and Rhode Island into Boston" },
+    hotelSuggestions: [
+      { name: "Boston Marriott Copley Place", address: "110 Huntington Ave, Boston, MA 02116", note: "Connected to the same Copley Place complex" },
+      { name: "The Lenox Hotel", address: "61 Exeter St, Boston, MA 02116", note: "Boutique option, short walk away" }
+    ],
     dances: []
   },
   {
@@ -52,6 +58,11 @@ const SEASON = [
     hotel: null,
     booked: false,
     bookingInfo: "",
+    officialUrl: "https://www.imaginedancechallenge.com/",
+    driving: { distanceMi: 52, duration: "about 1 hour 15 minutes", route: "Garden State Parkway South" },
+    hotelSuggestions: [
+      { name: "Radisson Hotel Freehold", address: "50 Gibson Pl, Freehold, NJ 07728", note: "About 1 mile from the venue" }
+    ],
     dances: []
   },
   {
@@ -69,6 +80,10 @@ const SEASON = [
     hotel: null,
     booked: false,
     bookingInfo: "Showstopper Travel books the official hotel block at the venue — on-site if booked there",
+    officialUrl: "https://www.goshowstopper.com/",
+    driving: { distanceMi: 165, duration: "about 2 hours 40 minutes", route: "I-95 N to Exit 92 in CT, then Route 2 West about 8 miles" },
+    hotelSuggestions: [],
+    hotelNote: "Foxwoods is the venue and the hotel — it has several towers (Grand Pequot Tower, Great Cedar Hotel, Fox Tower). Book directly through Foxwoods rather than looking elsewhere.",
     dances: []
   },
   {
@@ -91,6 +106,12 @@ const SEASON = [
     },
     booked: true,
     bookingInfo: "",
+    officialUrl: "https://deviatedance.com/",
+    driving: { distanceMi: 133, duration: "about 2.5 hours", route: "Garden State Parkway South to the Atlantic City Expressway" },
+    hotelSuggestions: [
+      { name: "Golden Nugget Atlantic City", address: "600 Huron Ave, Atlantic City, NJ 08401", note: "Marina District, close to Harrah's" },
+      { name: "Borgata Hotel Casino & Spa", address: "1 Borgata Way, Atlantic City, NJ 08401", note: "Marina District, close to Harrah's" }
+    ],
     dances: []
   },
   {
@@ -114,6 +135,12 @@ const SEASON = [
     },
     booked: true,
     bookingInfo: "",
+    officialUrl: "https://www.starpowertalent.com/",
+    driving: { distanceMi: 10, duration: "about 15-20 minutes", route: "NJ-3 E" },
+    hotelSuggestions: [
+      { name: "Courtyard by Marriott Secaucus Meadowlands", address: "455 Harmon Meadow Blvd, Secaucus, NJ 07094", note: "Short walk from the venue" },
+      { name: "Best Western Plus Meadowlands", address: "250 Harmon Meadow Blvd, Secaucus, NJ 07094", note: "Short walk from the venue" }
+    ],
     dances: []
   },
   {

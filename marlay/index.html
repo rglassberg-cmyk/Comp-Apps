@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925b">
+<link rel="stylesheet" href="styles.css?v=20260925c">
 </head>
 <body>
 
@@ -119,9 +119,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925b"></script>
-<script src="data/season.js?v=20260925b"></script>
-<script src="data/dancers.js?v=20260925b"></script>
+<script src="data/config.js?v=20260925c"></script>
+<script src="data/season.js?v=20260925c"></script>
+<script src="data/dancers.js?v=20260925c"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -237,6 +237,46 @@ function openComp(slug) {
     hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No hotel suggestion yet — check back as this firms up.'}</div></div>`;
   }
 
+  const mapsDir = address => 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(address);
+
+  const officialRow = comp.officialUrl ? `
+    <div class="card">
+      <div class="card-label">Official site</div>
+      <a class="btn" href="${comp.officialUrl}" target="_blank" rel="noopener">Visit ${comp.name} website</a>
+    </div>` : '';
+
+  let suggestionsRow = '';
+  if (comp.hotelSuggestions && comp.hotelSuggestions.length) {
+    suggestionsRow = `<div class="card-label section-label">Other hotels nearby</div>` + comp.hotelSuggestions.map(h => `
+      <div class="card">
+        <div class="comp-row-name">${h.name}</div>
+        <div class="comp-meta">${h.address}</div>
+        ${h.note ? `<div class="comp-meta" style="margin-top:4px;">${h.note}</div>` : ''}
+        <a class="btn btn-outline" href="${mapsDir(h.address)}" target="_blank" rel="noopener">Directions</a>
+      </div>`).join('');
+  } else if (comp.hotelNote) {
+    suggestionsRow = `<div class="card"><div class="coming-soon">${comp.hotelNote}</div></div>`;
+  }
+
+  let drivingRow = '';
+  if (comp.driving && comp.venue) {
+    const dirUrl = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(STUDIO.homeCity) +
+      '&destination=' + encodeURIComponent(comp.venue.address);
+    drivingRow = `
+      <div class="card">
+        <div class="card-label">Getting there</div>
+        <div class="info-row"><span class="label">Distance</span><span class="value">${comp.driving.distanceMi} miles from ${STUDIO.homeCity}</span></div>
+        <div class="info-row"><span class="label">Drive time</span><span class="value">${comp.driving.duration}</span></div>
+        <div class="info-row"><span class="label">Route</span><span class="value">${comp.driving.route}</span></div>
+        <a class="btn" href="${dirUrl}" target="_blank" rel="noopener">Get Directions</a>
+      </div>`;
+  }
+
+  const mapRow = comp.venue ? `
+    <div class="calendar-embed-wrap" style="margin-bottom:14px;">
+      <iframe src="https://www.google.com/maps?q=${encodeURIComponent(comp.venue.address)}&output=embed" width="100%" height="300" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map of ${comp.venue.name}"></iframe>
+    </div>` : '';
+
   container.innerHTML = `
     <div class="detail-header">
       <div class="detail-title">${comp.name}</div>
@@ -244,6 +284,10 @@ function openComp(slug) {
     </div>
     ${venueRow}
     ${hotelRow}
+    ${officialRow}
+    ${suggestionsRow}
+    ${drivingRow}
+    ${mapRow}
     <div class="card">
       <div class="coming-soon">Full dance order, personal schedules, and more will populate here once the competition's schedule is released — usually about a week out.</div>
     </div>
