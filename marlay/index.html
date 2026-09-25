@@ -32,8 +32,8 @@
   <section class="view active" id="view-home">
     <div class="hero">
       <div class="hero-logo-placeholder">TA</div>
-      <div class="hero-studio-name">Tate Academy</div>
-      <div class="hero-season">2026–2027 Season</div>
+      <div class="hero-studio-name" id="heroStudioName"></div>
+      <div class="hero-season" id="heroSeason"></div>
     </div>
 
     <div class="whats-next-card" id="whatsNextCard">
@@ -116,9 +116,13 @@
 <script src="data/dancers.js"></script>
 <script>
 // ---------- Setup from config ----------
+document.title = 'Marlay — ' + STUDIO.name;
 document.getElementById('studioSubtitle').textContent = STUDIO.name + ' · ' + STUDIO.season.label;
+document.getElementById('heroStudioName').textContent = STUDIO.name;
+document.getElementById('heroSeason').textContent = STUDIO.season.label;
 document.documentElement.style.setProperty('--pink', STUDIO.colors.primary);
 document.documentElement.style.setProperty('--pink-dark', STUDIO.colors.primaryDark);
+document.documentElement.style.setProperty('--ink', STUDIO.colors.ink);
 const footerLink = document.createElement('a');
 footerLink.href = STUDIO.builtBy.url;
 footerLink.target = '_blank';
@@ -267,6 +271,7 @@ function relativeDayLabel(date) {
   const diffDays = Math.round((startOfEvent - startOfToday) / 86400000);
   const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
   const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diffDays < 0) return 'Happening now';
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Tomorrow';
   if (diffDays > 1 && diffDays <= 7) {
@@ -287,7 +292,9 @@ async function computeWhatsNext() {
   SEASON.forEach(comp => {
     if (!comp.startDate) return;
     const start = new Date(comp.startDate.year, comp.startDate.month, comp.startDate.day);
-    if (start >= todayStart) {
+    const endSrc = comp.endDate || comp.startDate;
+    const end = new Date(endSrc.year, endSrc.month, endSrc.day);
+    if (end >= todayStart) {
       candidates.push({ type: 'competition', date: start, title: comp.name, meta: comp.location });
     }
   });
@@ -332,13 +339,27 @@ async function computeWhatsNext() {
 
   candidates.sort((a, b) => a.date - b.date);
   const next = candidates[0];
-  const typeTag = next.type === 'competition' ? '<span class="pill pill-convention">Competition</span>' : '';
 
-  body.innerHTML = `
-    <div class="whats-next-when">${relativeDayLabel(next.date)}</div>
-    <div class="whats-next-title">${next.title} ${typeTag}</div>
-    ${next.meta ? `<div class="whats-next-meta">${next.meta}</div>` : ''}
-  `;
+  // Calendar titles/locations come from an external source — build with textContent, not innerHTML
+  const when = document.createElement('div');
+  when.className = 'whats-next-when';
+  when.textContent = relativeDayLabel(next.date);
+  const title = document.createElement('div');
+  title.className = 'whats-next-title';
+  title.textContent = next.title;
+  if (next.type === 'competition') {
+    const tag = document.createElement('span');
+    tag.className = 'pill pill-convention';
+    tag.textContent = 'Competition';
+    title.append(' ', tag);
+  }
+  body.replaceChildren(when, title);
+  if (next.meta) {
+    const meta = document.createElement('div');
+    meta.className = 'whats-next-meta';
+    meta.textContent = next.meta;
+    body.append(meta);
+  }
 }
 
 // ---------- Init ----------
