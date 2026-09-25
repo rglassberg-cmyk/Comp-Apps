@@ -19,13 +19,6 @@
       <div class="brand-sub" id="studioSubtitle"></div>
     </div>
   </div>
-  <nav class="tab-bar" id="tabBar">
-    <button data-view="home" class="active">Home</button>
-    <button data-view="season">Season Overview</button>
-    <button data-view="dancebag">Dance Bag</button>
-    <button data-view="calendar">Calendar</button>
-    <button data-view="team">Meet the Team</button>
-  </nav>
 </header>
 
 <main>
@@ -108,6 +101,29 @@
 
 </main>
 
+<nav class="bottom-nav" id="tabBar">
+  <button data-view="home" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5L12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h4v-5h2v5h4a1 1 0 0 0 1-1v-9"/></svg>
+    <span>Home</span>
+  </button>
+  <button data-view="season">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1.4" fill="currentColor" stroke="none"/></svg>
+    <span>Season</span>
+  </button>
+  <button data-view="dancebag">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7V5.5A2.5 2.5 0 0 1 11.5 3h1A2.5 2.5 0 0 1 15 5.5V7"/><rect x="5" y="7" width="14" height="13" rx="2"/></svg>
+    <span>Dance Bag</span>
+  </button>
+  <button data-view="calendar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><line x1="3.5" y1="10" x2="20.5" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>
+    <span>Calendar</span>
+  </button>
+  <button data-view="team">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17" cy="9.5" r="2.3"/><path d="M15.2 14.3c1.9.4 3.3 2 3.3 4.2"/></svg>
+    <span>Team</span>
+  </button>
+</nav>
+
 <footer>
   <span id="footerText"></span>
 </footer>
@@ -136,7 +152,7 @@ document.getElementById('footerText').appendChild(footerLink);
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
-  document.querySelectorAll('nav.tab-bar button').forEach(b => {
+  document.querySelectorAll('#tabBar button').forEach(b => {
     b.classList.toggle('active', b.dataset.view === name);
   });
 }
@@ -225,7 +241,7 @@ function openComp(slug) {
         <div class="info-row"><span class="label">Address</span><span class="value">${comp.hotel.address}</span></div>
         ${comp.hotel.phone ? `<div class="info-row"><span class="label">Phone</span><span class="value">${comp.hotel.phone}</span></div>` : ''}
         ${comp.hotel.distanceNote ? `<div class="info-row"><span class="label">Distance from venue</span><span class="value">${comp.hotel.distanceNote}</span></div>` : ''}
-        <div class="coming-soon" style="margin-top:12px;">This is where our family is staying — not an official team block, just a suggestion in case it's helpful. Book here or anywhere else that works for you.</div>
+        <div class="coming-soon" style="margin-top:12px;">Suggested hotel — not an official team block. Feel free to book here or explore other options near the venue.</div>
       </div>`;
   } else {
     hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No hotel suggestion yet — check back as this firms up.'}</div></div>`;

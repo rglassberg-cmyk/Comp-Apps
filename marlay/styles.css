@@ -59,33 +59,28 @@ header.site-header {
   color: var(--ink-soft);
 }
 
-/* ---------- Tab nav ---------- */
+/* ---------- Bottom nav ---------- */
 
-nav.tab-bar {
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
   display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  background: var(--paper);
+  border-top: 1px solid var(--border);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
 }
-nav.tab-bar::-webkit-scrollbar { display: none; }
-
-nav.tab-bar button {
-  appearance: none;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink-soft);
-  padding: 10px 14px;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
+.bottom-nav button {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: none; background: none; font-family: inherit;
+  font-size: 11px; font-weight: 600; color: var(--ink-soft);
+  padding: 6px 2px; cursor: pointer;
 }
+.bottom-nav button svg { width: 22px; height: 22px; }
+.bottom-nav button.active { color: var(--pink); }
+.bottom-nav button:active { transform: scale(0.94); }
 
-nav.tab-bar button.active {
-  color: var(--pink);
-  border-bottom-color: var(--pink);
+.comp-featured:active, .home-tile:active, .comp-row:active {
+  transform: scale(0.97);
 }
 
 /* ---------- Layout ---------- */
@@ -93,7 +88,7 @@ nav.tab-bar button.active {
 main {
   max-width: 720px;
   margin: 0 auto;
-  padding: 24px 18px 60px;
+  padding: 24px 18px 84px;
 }
 
 .view { display: none; }
@@ -489,5 +484,5 @@ footer {
   text-align: center;
   font-size: 12px;
   color: var(--ink-soft);
-  padding: 30px 18px 40px;
+  padding: 0 18px calc(84px + env(safe-area-inset-bottom, 0px));
 }
