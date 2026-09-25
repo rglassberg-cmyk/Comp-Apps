@@ -285,6 +285,16 @@ p.view-lede {
   margin-right: 8px;
 }
 .btn:hover { background: var(--pink-dark); }
+
+.card-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pink-dark);
+  margin-bottom: 6px;
+}
+.section-label { margin: 22px 4px 8px; }
 .btn-outline {
   background: none;
   border: 1.5px solid var(--pink);
