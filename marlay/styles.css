@@ -1,0 +1,282 @@
+:root {
+  --pink: #d5164d;
+  --pink-dark: #9a1039;
+  --pink-tint: rgba(213, 22, 77, 0.06);
+  --pink-tint-strong: rgba(213, 22, 77, 0.12);
+  --ink: #1a1b1d;
+  --ink-soft: #55565a;
+  --paper: #ffffff;
+  --paper-soft: #faf9f8;
+  --border: rgba(26, 27, 29, 0.09);
+  --shadow: 0 2px 14px rgba(26, 27, 29, 0.06);
+  --shadow-hover: 0 6px 22px rgba(26, 27, 29, 0.1);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper-soft);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--pink); text-decoration: none; }
+
+/* ---------- Header ---------- */
+
+header.site-header {
+  background: var(--paper);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.brand-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+}
+
+.brand-name {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.brand-name .accent { color: var(--pink); }
+
+.brand-sub {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+/* ---------- Tab nav ---------- */
+
+nav.tab-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav.tab-bar::-webkit-scrollbar { display: none; }
+
+nav.tab-bar button {
+  appearance: none;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  padding: 10px 14px;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+nav.tab-bar button.active {
+  color: var(--pink);
+  border-bottom-color: var(--pink);
+}
+
+/* ---------- Layout ---------- */
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 18px 60px;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+h2.view-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+p.view-lede {
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+  font-size: 15px;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.comp-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.comp-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+
+.comp-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.comp-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.comp-meta {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pill-convention { background: var(--pink-tint-strong); color: var(--pink-dark); }
+.pill-booked { background: rgba(30, 130, 76, 0.1); color: #1e824c; }
+.pill-unbooked { background: rgba(26, 27, 29, 0.07); color: var(--ink-soft); }
+.pill-tba { background: rgba(26, 27, 29, 0.05); color: var(--ink-soft); font-style: italic; }
+
+.comp-card-chevron {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+
+/* ---------- Competition detail view ---------- */
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--ink-soft);
+  font-family: inherit;
+}
+.back-link:hover { color: var(--pink); }
+
+.detail-header {
+  margin-bottom: 20px;
+}
+
+.detail-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.detail-sub {
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .label { color: var(--ink-soft); }
+.info-row .value { text-align: right; font-weight: 600; }
+
+.coming-soon {
+  background: var(--pink-tint);
+  border: 1px dashed var(--pink-tint-strong);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 6px;
+}
+
+.btn {
+  display: inline-block;
+  background: var(--pink);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  margin-top: 10px;
+  margin-right: 8px;
+}
+.btn:hover { background: var(--pink-dark); }
+.btn-outline {
+  background: none;
+  border: 1.5px solid var(--pink);
+  color: var(--pink);
+}
+
+/* ---------- Dance Bag checklist ---------- */
+
+.checklist { list-style: none; margin: 0; padding: 0; }
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+.checklist li:last-child { border-bottom: none; }
+.checklist input[type="checkbox"] {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pink);
+}
+.checklist li.group-title {
+  display: block;
+  border-bottom: none;
+  padding: 0;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pink-dark);
+  margin: 22px 0 6px;
+}
+.checklist li.group-title:first-child { margin-top: 0; }
+
+/* ---------- Footer ---------- */
+
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 30px 18px 40px;
+}
