@@ -424,6 +424,7 @@ p.view-lede {
 }
 
 .home-tile {
+  font-family: inherit;
   background: var(--paper);
   border: 1px solid var(--border);
   border-radius: var(--radius);

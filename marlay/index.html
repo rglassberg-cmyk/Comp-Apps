@@ -330,7 +330,7 @@ async function computeWhatsNext() {
     const endSrc = comp.endDate || comp.startDate;
     const end = new Date(endSrc.year, endSrc.month, endSrc.day);
     if (end >= todayStart) {
-      candidates.push({ type: 'competition', date: start, title: comp.name, meta: comp.location });
+      candidates.push({ type: 'competition', compType: comp.type, date: start, title: comp.name, meta: comp.location });
     }
   });
 
@@ -385,7 +385,7 @@ async function computeWhatsNext() {
   if (next.type === 'competition') {
     const tag = document.createElement('span');
     tag.className = 'pill pill-convention';
-    tag.textContent = 'Competition';
+    tag.textContent = next.compType === 'convention' ? 'Convention' : 'Competition';
     title.append(' ', tag);
   }
   body.replaceChildren(when, title);
