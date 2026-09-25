@@ -146,8 +146,8 @@ document.getElementById('tabBar').addEventListener('click', e => {
 function statusPill(comp) {
   if (!comp.startDate) return '<span class="pill pill-tba">Dates TBA</span>';
   return comp.booked
-    ? '<span class="pill pill-booked">Group hotel confirmed</span>'
-    : '<span class="pill pill-unbooked">No group hotel yet</span>';
+    ? '<span class="pill pill-booked">Hotel suggestion available</span>'
+    : '<span class="pill pill-unbooked">No hotel suggestion yet</span>';
 }
 
 function renderSeasonList() {
@@ -190,7 +190,7 @@ function openComp(slug) {
         <div class="info-row"><span class="label">Address</span><span class="value">${comp.hotel.address}</span></div>
         ${comp.hotel.phone ? `<div class="info-row"><span class="label">Phone</span><span class="value">${comp.hotel.phone}</span></div>` : ''}
         ${comp.hotel.distanceNote ? `<div class="info-row"><span class="label">Distance from venue</span><span class="value">${comp.hotel.distanceNote}</span></div>` : ''}
-        <div class="coming-soon" style="margin-top:12px;">This is where the team is staying — call the hotel directly using the info above to book your own room.</div>
+        <div class="coming-soon" style="margin-top:12px;">This is where our family is staying — not an official team block, just a suggestion in case it's helpful. Book here or anywhere else that works for you.</div>
       </div>`;
   } else {
     hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No group hotel confirmed yet — check back as this firms up.'}</div></div>`;
