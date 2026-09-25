@@ -272,6 +272,103 @@ p.view-lede {
 }
 .checklist li.group-title:first-child { margin-top: 0; }
 
+/* ---------- Home ---------- */
+
+.hero {
+  text-align: center;
+  padding: 32px 20px 24px;
+  background: linear-gradient(180deg, var(--pink-tint), transparent);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+}
+
+.hero-logo-placeholder {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--pink-tint-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--pink);
+}
+
+.hero-studio-name {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hero-season {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.whats-next-card {
+  background: var(--paper);
+  border: 1.5px solid var(--pink-tint-strong);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.whats-next-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pink-dark);
+  margin-bottom: 6px;
+}
+
+.whats-next-when {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+
+.whats-next-title {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.whats-next-meta {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.home-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.home-tile {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 16px;
+  text-align: left;
+  cursor: pointer;
+}
+.home-tile:hover { box-shadow: var(--shadow-hover); }
+
+.home-tile-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.home-tile-sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
 /* ---------- Calendar ---------- */
 
 .calendar-toggle {

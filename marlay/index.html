@@ -18,7 +18,8 @@
     </div>
   </div>
   <nav class="tab-bar" id="tabBar">
-    <button data-view="season" class="active">Season Overview</button>
+    <button data-view="home" class="active">Home</button>
+    <button data-view="season">Season Overview</button>
     <button data-view="dancebag">Dance Bag</button>
     <button data-view="calendar">Calendar</button>
     <button data-view="team">Meet the Team</button>
@@ -27,8 +28,41 @@
 
 <main>
 
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <div class="hero-logo-placeholder">TA</div>
+      <div class="hero-studio-name">Tate Academy</div>
+      <div class="hero-season">2026–2027 Season</div>
+    </div>
+
+    <div class="whats-next-card" id="whatsNextCard">
+      <div class="whats-next-label">What's next</div>
+      <div class="whats-next-body" id="whatsNextBody">Loading…</div>
+    </div>
+
+    <div class="home-tiles">
+      <button class="home-tile" onclick="showView('season')">
+        <div class="home-tile-title">Season Overview</div>
+        <div class="home-tile-sub">Competitions &amp; housing</div>
+      </button>
+      <button class="home-tile" onclick="showView('dancebag')">
+        <div class="home-tile-title">Dance Bag</div>
+        <div class="home-tile-sub">Packing checklist</div>
+      </button>
+      <button class="home-tile" onclick="showView('calendar')">
+        <div class="home-tile-title">Calendar</div>
+        <div class="home-tile-sub">Rehearsal schedule</div>
+      </button>
+      <button class="home-tile" onclick="showView('team')">
+        <div class="home-tile-title">Meet the Team</div>
+        <div class="home-tile-sub">Coming soon</div>
+      </button>
+    </div>
+  </section>
+
   <!-- SEASON OVERVIEW -->
-  <section class="view active" id="view-season">
+  <section class="view" id="view-season">
     <h2 class="view-title">This Season</h2>
     <p class="view-lede">Every competition we're attending, where we're staying, and what's confirmed so far. Tap a competition for details.</p>
     <div id="seasonList"></div>
@@ -108,8 +142,8 @@ document.getElementById('tabBar').addEventListener('click', e => {
 function statusPill(comp) {
   if (!comp.startDate) return '<span class="pill pill-tba">Dates TBA</span>';
   return comp.booked
-    ? '<span class="pill pill-booked">Housing booked</span>'
-    : '<span class="pill pill-unbooked">Not booked yet</span>';
+    ? '<span class="pill pill-booked">Group hotel confirmed</span>'
+    : '<span class="pill pill-unbooked">No group hotel yet</span>';
 }
 
 function renderSeasonList() {
@@ -152,9 +186,10 @@ function openComp(slug) {
         <div class="info-row"><span class="label">Address</span><span class="value">${comp.hotel.address}</span></div>
         ${comp.hotel.phone ? `<div class="info-row"><span class="label">Phone</span><span class="value">${comp.hotel.phone}</span></div>` : ''}
         ${comp.hotel.distanceNote ? `<div class="info-row"><span class="label">Distance from venue</span><span class="value">${comp.hotel.distanceNote}</span></div>` : ''}
+        <div class="coming-soon" style="margin-top:12px;">This is where the team is staying — call the hotel directly using the info above to book your own room.</div>
       </div>`;
-  } else if (comp.bookingInfo) {
-    hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo}</div></div>`;
+  } else {
+    hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No group hotel confirmed yet — check back as this firms up.'}</div></div>`;
   }
 
   container.innerHTML = `
@@ -224,10 +259,93 @@ function setCalendarMode(mode) {
   document.querySelectorAll('.cal-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
 }
 
+// ---------- What's Next (Home) ----------
+function relativeDayLabel(date) {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfEvent = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffDays = Math.round((startOfEvent - startOfToday) / 86400000);
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+  const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays > 1 && diffDays <= 7) {
+    const day = date.getDay();
+    if (day === 0 || day === 6) return 'This weekend';
+    return `This ${weekday}`;
+  }
+  return `${weekday}, ${monthDay}`;
+}
+
+async function computeWhatsNext() {
+  const body = document.getElementById('whatsNextBody');
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const candidates = [];
+
+  // Upcoming competitions from season.js
+  SEASON.forEach(comp => {
+    if (!comp.startDate) return;
+    const start = new Date(comp.startDate.year, comp.startDate.month, comp.startDate.day);
+    if (start >= todayStart) {
+      candidates.push({ type: 'competition', date: start, title: comp.name, meta: comp.location });
+    }
+  });
+
+  // Live events from Tabitha's calendar — best-effort; competitions above still
+  // show even if this fails (bad key, offline, API hiccup, etc.)
+  try {
+    const params = new URLSearchParams({
+      key: STUDIO.rehearsalCalendar.apiKey,
+      timeMin: now.toISOString(),
+      maxResults: '10',
+      singleEvents: 'true',
+      orderBy: 'startTime'
+    });
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(STUDIO.rehearsalCalendar.id)}/events?${params.toString()}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      (data.items || []).forEach(ev => {
+        let start;
+        if (ev.start && ev.start.dateTime) {
+          start = new Date(ev.start.dateTime);
+        } else if (ev.start && ev.start.date) {
+          // All-day event — explicit constructor, per the date-bug rule (avoids
+          // new Date("YYYY-MM-DD") parsing as UTC and shifting a day in some timezones)
+          const [y, m, d] = ev.start.date.split('-').map(Number);
+          start = new Date(y, m - 1, d);
+        } else {
+          return;
+        }
+        candidates.push({ type: 'event', date: start, title: ev.summary || 'Untitled event', meta: ev.location || '' });
+      });
+    }
+  } catch (e) {
+    // Silent fallback to competitions-only — network/CORS/key issues shouldn't break the page
+  }
+
+  if (candidates.length === 0) {
+    body.innerHTML = `<div class="whats-next-title">Nothing scheduled yet</div>`;
+    return;
+  }
+
+  candidates.sort((a, b) => a.date - b.date);
+  const next = candidates[0];
+  const typeTag = next.type === 'competition' ? '<span class="pill pill-convention">Competition</span>' : '';
+
+  body.innerHTML = `
+    <div class="whats-next-when">${relativeDayLabel(next.date)}</div>
+    <div class="whats-next-title">${next.title} ${typeTag}</div>
+    ${next.meta ? `<div class="whats-next-meta">${next.meta}</div>` : ''}
+  `;
+}
+
 // ---------- Init ----------
 renderSeasonList();
 renderDanceBag();
 setCalendarMode('AGENDA');
+computeWhatsNext();
 </script>
 
 </body>
