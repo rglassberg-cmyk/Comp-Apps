@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Marlay — Tate Academy</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -31,8 +33,7 @@
   <!-- HOME -->
   <section class="view active" id="view-home">
     <div class="hero">
-      <div class="hero-logo-placeholder">TA</div>
-      <div class="hero-studio-name" id="heroStudioName"></div>
+      <img class="hero-logo" id="heroLogo" alt="">
       <div class="hero-season" id="heroSeason"></div>
     </div>
 
@@ -118,7 +119,9 @@
 // ---------- Setup from config ----------
 document.title = 'Marlay — ' + STUDIO.name;
 document.getElementById('studioSubtitle').textContent = STUDIO.name + ' · ' + STUDIO.season.label;
-document.getElementById('heroStudioName').textContent = STUDIO.name;
+const heroLogo = document.getElementById('heroLogo');
+heroLogo.src = STUDIO.logo;
+heroLogo.alt = STUDIO.name;
 document.getElementById('heroSeason').textContent = STUDIO.season.label;
 document.documentElement.style.setProperty('--pink', STUDIO.colors.primary);
 document.documentElement.style.setProperty('--pink-dark', STUDIO.colors.primaryDark);
@@ -150,20 +153,52 @@ function statusPill(comp) {
     : '<span class="pill pill-unbooked">No hotel suggestion yet</span>';
 }
 
+function conventionTag(comp) {
+  return comp.type === 'convention' ? ' <span class="pill pill-convention">Convention</span>' : '';
+}
+
 function renderSeasonList() {
   const container = document.getElementById('seasonList');
-  container.innerHTML = SEASON.map(comp => `
-    <button class="card comp-card" onclick="openComp('${comp.slug}')">
-      <div class="comp-card-top">
-        <div>
-          <div class="comp-name">${comp.name}${comp.type === 'convention' ? ' <span class="pill pill-convention">Convention</span>' : ''}</div>
-          <div class="comp-meta">${comp.dateLabel} · ${comp.location}</div>
-        </div>
-        <div class="comp-card-chevron">&rsaquo;</div>
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const featured = SEASON
+    .filter(comp => {
+      if (!comp.startDate) return false;
+      const e = comp.endDate || comp.startDate;
+      return new Date(e.year, e.month, e.day) >= todayStart;
+    })
+    .sort((a, b) =>
+      new Date(a.startDate.year, a.startDate.month, a.startDate.day) -
+      new Date(b.startDate.year, b.startDate.month, b.startDate.day))[0];
+  const rest = SEASON.filter(comp => comp !== featured);
+
+  const featuredHtml = featured ? `
+    <button class="card comp-featured" onclick="openComp('${featured.slug}')">
+      <div class="comp-featured-label">Up next</div>
+      <div class="comp-featured-name">${featured.name}${conventionTag(featured)}</div>
+      <div class="comp-featured-date">${featured.dateLabel}</div>
+      <div class="comp-featured-meta">${featured.venue ? featured.venue.name + ' · ' : ''}${featured.location}</div>
+      <div class="comp-featured-footer">
+        ${statusPill(featured)}
+        <span class="comp-card-chevron">&rsaquo;</span>
       </div>
-      <div style="margin-top:10px;">${statusPill(comp)}</div>
-    </button>
-  `).join('');
+    </button>` : '';
+
+  const restHtml = rest.length ? `
+    <div class="card comp-list">
+      ${rest.map(comp => `
+        <button class="comp-row" onclick="openComp('${comp.slug}')">
+          <div class="comp-row-main">
+            <div class="comp-row-name">${comp.name}${conventionTag(comp)}</div>
+            <div class="comp-meta">${comp.location} · ${comp.dateLabel}</div>
+          </div>
+          <div class="comp-row-status">${statusPill(comp)}</div>
+          <span class="comp-card-chevron">&rsaquo;</span>
+        </button>
+      `).join('')}
+    </div>` : '';
+
+  container.innerHTML = featuredHtml + restHtml;
 }
 
 // ---------- Competition detail ----------
@@ -193,7 +228,7 @@ function openComp(slug) {
         <div class="coming-soon" style="margin-top:12px;">This is where our family is staying — not an official team block, just a suggestion in case it's helpful. Book here or anywhere else that works for you.</div>
       </div>`;
   } else {
-    hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No group hotel confirmed yet — check back as this firms up.'}</div></div>`;
+    hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No hotel suggestion yet — check back as this firms up.'}</div></div>`;
   }
 
   container.innerHTML = `
