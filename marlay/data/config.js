@@ -27,10 +27,14 @@ const STUDIO = {
     "https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true",
 
   // Public Google Calendar for the rehearsal schedule (from Tabitha). Sharing is
-  // already set to public, so a plain embed works with no auth.
+  // already set to public, so a plain embed works with no auth. The API key below
+  // is restricted (Calendar API only, GitHub Pages referrer only) via gcloud — see
+  // learnings.md for how it was created. It's necessarily visible in page source
+  // since this is a static site; the restrictions are the real protection, not secrecy.
   rehearsalCalendar: {
     id: "910dc55878656b0b832ca864e5e613c6d7389270d15e4d1c956eaa9185a4dc42@group.calendar.google.com",
-    timezone: "America/New_York"
+    timezone: "America/New_York",
+    apiKey: "AIzaSyAsdCuPTiwBx2KMA_Y62AGMwf4gjEwKmno"
   },
 
   season: {
