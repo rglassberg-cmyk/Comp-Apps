@@ -8,18 +8,9 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925">
+<link rel="stylesheet" href="styles.css?v=20260925b">
 </head>
 <body>
-
-<header class="site-header">
-  <div class="brand-row">
-    <div>
-      <div class="brand-name"><span class="accent">Marlay</span></div>
-      <div class="brand-sub" id="studioSubtitle"></div>
-    </div>
-  </div>
-</header>
 
 <main>
 
@@ -128,13 +119,12 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925"></script>
-<script src="data/season.js?v=20260925"></script>
-<script src="data/dancers.js?v=20260925"></script>
+<script src="data/config.js?v=20260925b"></script>
+<script src="data/season.js?v=20260925b"></script>
+<script src="data/dancers.js?v=20260925b"></script>
 <script>
 // ---------- Setup from config ----------
-document.title = 'Marlay — ' + STUDIO.name;
-document.getElementById('studioSubtitle').textContent = STUDIO.name + ' · ' + STUDIO.season.label;
+document.title = STUDIO.name + ' | Marlay';
 const heroLogo = document.getElementById('heroLogo');
 heroLogo.src = STUDIO.logo;
 heroLogo.alt = STUDIO.name;
