@@ -1,0 +1,9 @@
+{
+  "name": "Marlay — Tate Academy",
+  "short_name": "Marlay",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d5164d",
+  "icons": []
+}

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marlay — Tate Academy</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand-row">
+    <div>
+      <div class="brand-name"><span class="accent">Marlay</span></div>
+      <div class="brand-sub" id="studioSubtitle"></div>
+    </div>
+  </div>
+  <nav class="tab-bar" id="tabBar">
+    <button data-view="season" class="active">Season Overview</button>
+    <button data-view="dancebag">Dance Bag</button>
+    <button data-view="calendar">Calendar</button>
+    <button data-view="team">Meet the Team</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- SEASON OVERVIEW -->
+  <section class="view active" id="view-season">
+    <h2 class="view-title">This Season</h2>
+    <p class="view-lede">Every competition we're attending, where we're staying, and what's confirmed so far. Tap a competition for details.</p>
+    <div id="seasonList"></div>
+  </section>
+
+  <!-- COMPETITION DETAIL (populated dynamically) -->
+  <section class="view" id="view-comp">
+    <button class="back-link" onclick="showView('season')">&larr; Back to Season</button>
+    <div id="compDetail"></div>
+  </section>
+
+  <!-- DANCE BAG -->
+  <section class="view" id="view-dancebag">
+    <h2 class="view-title">Dance Bag Checklist</h2>
+    <p class="view-lede">A general packing list to start with — check things off as you pack. Competition-specific additions (weather, venue quirks) will get added here once we're closer to each event.</p>
+    <div class="card">
+      <ul class="checklist" id="dancebagList"></ul>
+    </div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="view" id="view-calendar">
+    <h2 class="view-title">Rehearsal Calendar</h2>
+    <p class="view-lede">The team's rehearsal schedule, in one place.</p>
+    <div class="card">
+      <div class="coming-soon">Calendar embed coming soon — waiting to confirm the right sharing settings on Tabitha's calendar so it displays correctly here.</div>
+    </div>
+  </section>
+
+  <!-- MEET THE TEAM -->
+  <section class="view" id="view-team">
+    <h2 class="view-title">Meet the Team</h2>
+    <p class="view-lede">Photos and a bit about each dancer, coming this season.</p>
+    <div class="card">
+      <div class="coming-soon">Coming soon — this page is waiting on photos and details from Tabitha.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span id="footerText"></span>
+</footer>
+
+<script src="data/config.js"></script>
+<script src="data/season.js"></script>
+<script src="data/dancers.js"></script>
+<script>
+// ---------- Setup from config ----------
+document.getElementById('studioSubtitle').textContent = STUDIO.name + ' · ' + STUDIO.season.label;
+document.documentElement.style.setProperty('--pink', STUDIO.colors.primary);
+document.documentElement.style.setProperty('--pink-dark', STUDIO.colors.primaryDark);
+const footerLink = document.createElement('a');
+footerLink.href = STUDIO.builtBy.url;
+footerLink.target = '_blank';
+footerLink.textContent = STUDIO.builtBy.label;
+document.getElementById('footerText').appendChild(footerLink);
+
+// ---------- Tab navigation ----------
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('nav.tab-bar button').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === name);
+  });
+}
+document.getElementById('tabBar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-view]');
+  if (btn) showView(btn.dataset.view);
+});
+
+// ---------- Season Overview ----------
+function statusPill(comp) {
+  if (!comp.startDate) return '<span class="pill pill-tba">Dates TBA</span>';
+  return comp.booked
+    ? '<span class="pill pill-booked">Housing booked</span>'
+    : '<span class="pill pill-unbooked">Not booked yet</span>';
+}
+
+function renderSeasonList() {
+  const container = document.getElementById('seasonList');
+  container.innerHTML = SEASON.map(comp => `
+    <button class="card comp-card" onclick="openComp('${comp.slug}')">
+      <div class="comp-card-top">
+        <div>
+          <div class="comp-name">${comp.name}${comp.type === 'convention' ? ' <span class="pill pill-convention">Convention</span>' : ''}</div>
+          <div class="comp-meta">${comp.dateLabel} · ${comp.location}</div>
+        </div>
+        <div class="comp-card-chevron">&rsaquo;</div>
+      </div>
+      <div style="margin-top:10px;">${statusPill(comp)}</div>
+    </button>
+  `).join('');
+}
+
+// ---------- Competition detail ----------
+function openComp(slug) {
+  const comp = SEASON.find(c => c.slug === slug);
+  if (!comp) return;
+  const container = document.getElementById('compDetail');
+
+  let venueRow = '';
+  if (comp.venue) {
+    venueRow = `
+      <div class="card">
+        <div class="info-row"><span class="label">Venue</span><span class="value">${comp.venue.name}</span></div>
+        <div class="info-row"><span class="label">Address</span><span class="value">${comp.venue.address}</span></div>
+        ${comp.venue.phone ? `<div class="info-row"><span class="label">Phone</span><span class="value">${comp.venue.phone}</span></div>` : ''}
+      </div>`;
+  }
+
+  let hotelRow = '';
+  if (comp.hotel) {
+    hotelRow = `
+      <div class="card">
+        <div class="info-row"><span class="label">Hotel</span><span class="value">${comp.hotel.name}${comp.hotel.onSite ? ' <span class="pill pill-booked" style="margin-left:4px;">On-site</span>' : ''}</span></div>
+        <div class="info-row"><span class="label">Address</span><span class="value">${comp.hotel.address}</span></div>
+        ${comp.hotel.phone ? `<div class="info-row"><span class="label">Phone</span><span class="value">${comp.hotel.phone}</span></div>` : ''}
+        ${comp.hotel.distanceNote ? `<div class="info-row"><span class="label">Distance from venue</span><span class="value">${comp.hotel.distanceNote}</span></div>` : ''}
+      </div>`;
+  } else if (comp.bookingInfo) {
+    hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo}</div></div>`;
+  }
+
+  container.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-title">${comp.name}</div>
+      <div class="detail-sub">${comp.dateLabel} · ${comp.location}</div>
+    </div>
+    ${venueRow}
+    ${hotelRow}
+    <div class="card">
+      <div class="coming-soon">Full dance order, personal schedules, and more will populate here once the competition's schedule is released — usually about a week out.</div>
+    </div>
+  `;
+  showView('comp');
+}
+
+// ---------- Dance Bag ----------
+const DANCEBAG = [
+  { group: 'Shoes & Costumes', items: [
+    'Dance shoes for every style/routine',
+    'Costumes on hangers, labeled by routine',
+    'Extra tights (at least one backup pair per style)',
+    'Safety pins & small sewing kit',
+  ]},
+  { group: 'Hair & Makeup', items: [
+    'Bobby pins, hair ties, hairnet',
+    'Hairspray & hair gel',
+    'Makeup per team requirements',
+    'Makeup remover wipes',
+  ]},
+  { group: 'Comfort & Logistics', items: [
+    'Water bottle & snacks',
+    'Phone charger / portable battery',
+    'Comfortable travel outfit',
+    'Blanket or pillow for the hotel',
+    'Band-aids & moleskin',
+    'Hand sanitizer',
+    'Printed copy of the weekend schedule',
+  ]},
+];
+
+function renderDanceBag() {
+  const list = document.getElementById('dancebagList');
+  list.innerHTML = DANCEBAG.map(group => `
+    <li class="group-title">${group.group}</li>
+    ${group.items.map(item => `
+      <li><input type="checkbox"><span>${item}</span></li>
+    `).join('')}
+  `).join('');
+}
+
+// ---------- Init ----------
+renderSeasonList();
+renderDanceBag();
+</script>
+
+</body>
+</html>
