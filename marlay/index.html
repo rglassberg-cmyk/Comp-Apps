@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260926f">
+<link rel="stylesheet" href="styles.css?v=20260926g">
 </head>
 <body>
 
@@ -181,9 +181,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260926f"></script>
-<script src="data/season.js?v=20260926f"></script>
-<script src="data/dancers.js?v=20260926f"></script>
+<script src="data/config.js?v=20260926g"></script>
+<script src="data/season.js?v=20260926g"></script>
+<script src="data/dancers.js?v=20260926g"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -382,17 +382,33 @@ function openComp(slug) {
       </div>`;
   }
 
-  const listCard = (label, items) => (items && items.length) ? `
+  // Directions go to the entry's own address when it has one. Otherwise its name plus
+  // the venue's city/ZIP (e.g. "Carnegie Diner & Cafe, Secaucus, NJ 07094"), which Maps
+  // resolves to the actual place — the bare venue address would send drivers to the
+  // venue instead.
+  const venueArea = comp.venue ? comp.venue.address.split(', ').slice(1).join(', ') : comp.location;
+  const placeCard = (item, descText) => `
     <div class="card">
-      <div class="card-label">${label}</div>
-      ${items.map(item => `
-        <div class="place-item">
-          <div class="comp-row-name">${item.name}${item.free ? ' <span class="pill pill-booked">Free</span>' : ''}</div>
-          ${item.note ? `<div class="comp-meta">${item.note}</div>` : ''}
-        </div>`).join('')}
-    </div>` : '';
-  const eatRow = listCard('Places to eat', comp.placesToEat);
-  const doRow = listCard('Things to do', comp.thingsToDo);
+      <div class="comp-row-name">${item.name}${item.free ? ' <span class="pill pill-booked">Free</span>' : ''}</div>
+      ${descText ? `<div class="place-desc">${descText}</div>` : ''}
+      ${item.distanceNote ? `<div class="comp-meta">${item.distanceNote}</div>` : ''}
+      <a class="btn btn-outline" href="${mapsDir(item.address || `${item.name}, ${venueArea}`)}" target="_blank" rel="noopener">Directions</a>
+      ${item.website ? `<a class="btn btn-outline" href="${item.website}" target="_blank" rel="noopener">Website</a>` : ''}
+    </div>`;
+  const groupedPanel = (items, describe, emptyText) => {
+    if (!items || !items.length) return `<div class="card"><div class="coming-soon">${emptyText}</div></div>`;
+    const group = (label, list) => list.length
+      ? `<div class="card-label section-label">${label}</div>` + list.map(item => placeCard(item, describe(item))).join('')
+      : '';
+    return group('Walkable', items.filter(i => i.walkable === true)) +
+           group('Short Drive', items.filter(i => i.walkable !== true));
+  };
+  const eatPanel = groupedPanel(comp.placesToEat,
+    i => [i.cuisine, i.notes].filter(Boolean).join(' · '),
+    'Food suggestions for this competition are coming soon.');
+  const doPanel = groupedPanel(comp.thingsToDo, i => i.desc,
+    'Activity suggestions for this competition are coming soon.');
+  const scheduleSoon = what => `<div class="card"><div class="coming-soon">${what} will populate here once the competition's schedule is released — usually about a week out.</div></div>`;
 
   const mapRow = comp.venue ? `
     <div class="calendar-embed-wrap" style="margin-bottom:14px;">
@@ -404,21 +420,38 @@ function openComp(slug) {
       <div class="detail-title">${comp.name}</div>
       <div class="detail-sub">${comp.dateLabel} · ${comp.location}</div>
     </div>
-    ${venueRow}
-    ${hotelRow}
-    ${officialRow}
-    ${suggestionsRow}
-    ${drivingRow}
-    ${eatRow}
-    ${doRow}
-    ${mapRow}
-    <div class="card">
-      <div class="coming-soon">Full dance order, personal schedules, and more will populate here once the competition's schedule is released — usually about a week out.</div>
+    <div class="comp-tabs" id="compTabs">
+      <button class="comp-tab-btn active" data-comp-tab="weekend">Weekend Info</button>
+      <button class="comp-tab-btn" data-comp-tab="eat">Places to Eat</button>
+      <button class="comp-tab-btn" data-comp-tab="todo">Things to Do</button>
+      <button class="comp-tab-btn" data-comp-tab="dances">Dance Order</button>
+      <button class="comp-tab-btn" data-comp-tab="schedule">My Schedule</button>
     </div>
+    <div class="comp-panel active" data-comp-panel="weekend">
+      ${venueRow}
+      ${hotelRow}
+      ${mapRow}
+      ${officialRow}
+      ${suggestionsRow}
+      ${drivingRow}
+    </div>
+    <div class="comp-panel" data-comp-panel="eat">${eatPanel}</div>
+    <div class="comp-panel" data-comp-panel="todo">${doPanel}</div>
+    <div class="comp-panel" data-comp-panel="dances">${scheduleSoon('The full dance order')}</div>
+    <div class="comp-panel" data-comp-panel="schedule">${scheduleSoon('Personal schedules for each dancer')}</div>
   `;
   showView('comp');
   window.scrollTo(0, 0);
 }
+
+function showCompTab(name) {
+  document.querySelectorAll('#compDetail .comp-panel').forEach(p => p.classList.toggle('active', p.dataset.compPanel === name));
+  document.querySelectorAll('#compTabs .comp-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.compTab === name));
+}
+document.getElementById('compDetail').addEventListener('click', e => {
+  const btn = e.target.closest('[data-comp-tab]');
+  if (btn) showCompTab(btn.dataset.compTab);
+});
 
 // ---------- Dance Bag ----------
 const DANCEBAG = [
