@@ -409,6 +409,10 @@ p.view-lede {
   border: 1.5px solid var(--pink);
   color: var(--pink);
 }
+.btn-outline:hover { background: var(--pink-tint); }
+button.btn { font-family: inherit; cursor: pointer; }
+button.btn:disabled { opacity: 0.4; cursor: default; }
+button.btn-outline:disabled:hover { background: none; }
 
 /* ---------- Dance Bag checklist ---------- */
 
