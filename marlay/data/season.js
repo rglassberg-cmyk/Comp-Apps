@@ -79,11 +79,11 @@ const SEASON = [
     },
     hotel: null,
     booked: false,
-    bookingInfo: "Showstopper Travel books the official hotel block at the venue — on-site if booked there",
+    bookingInfo: "",
     officialUrl: "https://www.goshowstopper.com/",
     driving: { distanceMi: 165, duration: "about 2 hours 40 minutes", route: "I-95 N to Exit 92 in CT, then Route 2 West about 8 miles" },
     hotelSuggestions: [],
-    hotelNote: "Foxwoods is the venue and the hotel — it has several towers (Grand Pequot Tower, Great Cedar Hotel, Fox Tower). Book directly through Foxwoods rather than looking elsewhere.",
+    hotelNote: "Showstopper Travel books the official hotel block at the venue. Foxwoods is the venue and the hotel — it has several towers (Grand Pequot Tower, Great Cedar Hotel, Fox Tower). Book directly through Foxwoods rather than looking elsewhere.",
     dances: []
   },
   {
