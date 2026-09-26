@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925n">
+<link rel="stylesheet" href="styles.css?v=20260925o">
 </head>
 <body>
 
@@ -90,6 +90,7 @@
     <div class="card">
       <ul class="checklist" id="dancebagList"></ul>
     </div>
+    <button class="btn btn-outline" id="dancebagClear" disabled>Clear list</button>
   </section>
 
   <!-- CALENDAR -->
@@ -170,9 +171,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925n"></script>
-<script src="data/season.js?v=20260925n"></script>
-<script src="data/dancers.js?v=20260925n"></script>
+<script src="data/config.js?v=20260925o"></script>
+<script src="data/season.js?v=20260925o"></script>
+<script src="data/dancers.js?v=20260925o"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -719,7 +720,20 @@ if ('serviceWorker' in navigator) {
 renderSeasonList();
 renderDanceBag();
 let danceBagComplete = danceBagAllChecked();
+const danceBagClearBtn = document.getElementById('dancebagClear');
+function updateDanceBagClear() {
+  danceBagClearBtn.disabled = !document.querySelector('#dancebagList input:checked');
+}
+updateDanceBagClear();
+danceBagClearBtn.addEventListener('click', () => {
+  if (!confirm('Uncheck everything on the Dance Bag list?')) return;
+  document.querySelectorAll('#dancebagList input').forEach(b => { b.checked = false; });
+  saveDanceBagChecked();
+  danceBagComplete = false;
+  updateDanceBagClear();
+});
 document.getElementById('dancebagList').addEventListener('change', saveDanceBagChecked);
+document.getElementById('dancebagList').addEventListener('change', updateDanceBagClear);
 document.getElementById('dancebagList').addEventListener('change', () => {
   const allChecked = danceBagAllChecked();
   if (allChecked && !danceBagComplete) fireConfetti();
