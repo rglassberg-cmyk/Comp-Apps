@@ -78,7 +78,7 @@ const SEASON = [
       { name: "Game Time Bar & Grill", cuisine: "American / Boardwalk-style", walkable: true, distanceNote: "On-site at the venue" }
     ],
     thingsToDo: [
-      { name: "iPlay America itself", desc: "Go-karts, laser tag, arcade, Topgolf Swing Suite, 4D theater — always free to enter, pay per activity", walkable: true, distanceNote: "It's the venue", free: true, website: "https://www.iplayamerica.com/" },
+      { name: "iPlay America", desc: "Go-karts, laser tag, arcade, Topgolf Swing Suite, 4D theater — always free to enter, pay per activity", walkable: true, distanceNote: "It's the venue", free: true, website: "https://www.iplayamerica.com/" },
       { name: "Freehold Raceway Mall", desc: "Shopping and more dining options", walkable: false, distanceNote: "About a 10 min drive" }
     ],
     dances: []
