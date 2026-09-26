@@ -3,14 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Marlay — Tate Academy</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925f">
+<link rel="stylesheet" href="styles.css?v=20260925g">
 </head>
 <body>
+
+<button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+</button>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="drawer-title" id="drawerTitle"></div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <button class="drawer-link" data-drawer-view="suggest">Suggest an Update</button>
+  <button class="drawer-link" data-drawer-view="about">About</button>
+</aside>
 
 <main>
 
@@ -23,7 +41,10 @@
 
     <div class="whats-next-card" id="whatsNextCard">
       <div class="whats-next-label">What's next</div>
-      <div class="whats-next-body" id="whatsNextBody">Loading…</div>
+      <div class="whats-next-body" id="whatsNextBody" aria-busy="true">
+        <div class="skeleton skeleton-short"></div>
+        <div class="skeleton skeleton-long"></div>
+      </div>
     </div>
 
     <div class="home-tiles">
@@ -90,6 +111,25 @@
     </div>
   </section>
 
+  <!-- SUGGEST AN UPDATE (from the menu) -->
+  <section class="view" id="view-suggest">
+    <h2 class="view-title">Suggest an Update</h2>
+    <p class="view-lede">Spot something wrong or missing? Let us know.</p>
+    <div class="calendar-embed-wrap">
+      <iframe id="suggestFrame" width="100%" height="834" frameborder="0" title="Suggest an update form">Loading…</iframe>
+    </div>
+  </section>
+
+  <!-- ABOUT (from the menu) -->
+  <section class="view" id="view-about">
+    <h2 class="view-title">About</h2>
+    <div class="card">
+      <p class="about-text" id="aboutText"></p>
+      <p class="about-text" id="aboutSeason"></p>
+      <p class="about-text" id="aboutCredit"></p>
+    </div>
+  </section>
+
 </main>
 
 <nav class="bottom-nav" id="tabBar">
@@ -115,13 +155,21 @@
   </button>
 </nav>
 
+<div class="install-banner" id="installBanner" hidden>
+  <span class="install-text" id="installText"></span>
+  <button class="btn install-btn" id="installBtn" hidden>Install</button>
+  <button class="install-close" id="installClose" aria-label="Dismiss">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+</div>
+
 <footer>
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925f"></script>
-<script src="data/season.js?v=20260925f"></script>
-<script src="data/dancers.js?v=20260925f"></script>
+<script src="data/config.js?v=20260925g"></script>
+<script src="data/season.js?v=20260925g"></script>
+<script src="data/dancers.js?v=20260925g"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -132,11 +180,18 @@ document.getElementById('heroSeason').textContent = STUDIO.season.label;
 document.documentElement.style.setProperty('--pink', STUDIO.colors.primary);
 document.documentElement.style.setProperty('--pink-dark', STUDIO.colors.primaryDark);
 document.documentElement.style.setProperty('--ink', STUDIO.colors.ink);
-const footerLink = document.createElement('a');
-footerLink.href = STUDIO.builtBy.url;
-footerLink.target = '_blank';
-footerLink.textContent = STUDIO.builtBy.label;
-document.getElementById('footerText').appendChild(footerLink);
+function builtByLink() {
+  const a = document.createElement('a');
+  a.href = STUDIO.builtBy.url;
+  a.target = '_blank';
+  a.textContent = STUDIO.builtBy.label;
+  return a;
+}
+document.getElementById('footerText').appendChild(builtByLink());
+document.getElementById('drawerTitle').textContent = STUDIO.name;
+document.getElementById('aboutText').textContent = `This is the ${STUDIO.name} season hub — competitions, hotels, packing, and the rehearsal calendar, all in one place.`;
+document.getElementById('aboutSeason').textContent = STUDIO.season.label;
+document.getElementById('aboutCredit').appendChild(builtByLink());
 
 // ---------- Tab navigation ----------
 function showView(name) {
@@ -149,6 +204,32 @@ function showView(name) {
 document.getElementById('tabBar').addEventListener('click', e => {
   const btn = e.target.closest('button[data-view]');
   if (btn) showView(btn.dataset.view);
+});
+
+// ---------- Menu drawer ----------
+const drawer = document.getElementById('drawer');
+const drawerOverlay = document.getElementById('drawerOverlay');
+const menuBtn = document.getElementById('menuBtn');
+
+function setDrawer(open) {
+  drawer.classList.toggle('open', open);
+  drawerOverlay.classList.toggle('open', open);
+  drawer.setAttribute('aria-hidden', String(!open));
+  menuBtn.setAttribute('aria-expanded', String(open));
+}
+menuBtn.addEventListener('click', () => setDrawer(true));
+drawerOverlay.addEventListener('click', () => setDrawer(false));
+document.getElementById('drawerClose').addEventListener('click', () => setDrawer(false));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
+drawer.addEventListener('click', e => {
+  const link = e.target.closest('[data-drawer-view]');
+  if (!link) return;
+  const name = link.dataset.drawerView;
+  const frame = document.getElementById('suggestFrame');
+  if (name === 'suggest' && !frame.src) frame.src = STUDIO.suggestUpdatesFormUrl;
+  setDrawer(false);
+  showView(name);
+  window.scrollTo(0, 0);
 });
 
 // ---------- Season Overview ----------
@@ -418,6 +499,7 @@ async function computeWhatsNext() {
     // Silent fallback to competitions-only — network/CORS/key issues shouldn't break the page
   }
 
+  body.removeAttribute('aria-busy');
   if (candidates.length === 0) {
     body.innerHTML = `<div class="whats-next-title">Nothing scheduled yet</div>`;
     return;
@@ -446,6 +528,58 @@ async function computeWhatsNext() {
     meta.textContent = next.meta;
     body.append(meta);
   }
+}
+
+// ---------- Add to Home Screen prompt ----------
+const INSTALL_DISMISSED_KEY = 'marlay-install-dismissed';
+const installBanner = document.getElementById('installBanner');
+const installBtn = document.getElementById('installBtn');
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+let deferredInstallPrompt = null;
+
+function installDismissed() {
+  try { return localStorage.getItem(INSTALL_DISMISSED_KEY) === '1'; } catch (e) { return false; }
+}
+function rememberInstallDismissed() {
+  try { localStorage.setItem(INSTALL_DISMISSED_KEY, '1'); } catch (e) {}
+}
+function showInstallBanner(text, withButton) {
+  if (isStandalone || installDismissed()) return;
+  document.getElementById('installText').textContent = text;
+  installBtn.hidden = !withButton;
+  installBanner.hidden = false;
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showInstallBanner('Add this app to your home screen for quick access.', true);
+});
+installBtn.addEventListener('click', async () => {
+  installBanner.hidden = true;
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+});
+document.getElementById('installClose').addEventListener('click', () => {
+  installBanner.hidden = true;
+  rememberInstallDismissed();
+});
+window.addEventListener('appinstalled', () => {
+  installBanner.hidden = true;
+  rememberInstallDismissed();
+});
+
+// iOS Safari has no beforeinstallprompt — show manual instructions instead.
+const ua = navigator.userAgent;
+const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isIOSSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA/.test(ua);
+if (isIOSSafari) showInstallBanner('Tap Share, then Add to Home Screen.', false);
+
+// ---------- Offline support ----------
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
 // ---------- Init ----------
