@@ -11,9 +11,11 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925p">
+<link rel="stylesheet" href="styles.css?v=20260926a">
 </head>
 <body>
+
+<img class="corner-mark" id="cornerMark" alt="">
 
 <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
@@ -37,9 +39,14 @@
 
   <!-- HOME -->
   <section class="view active" id="view-home">
-    <div class="hero">
-      <img class="hero-logo" id="heroLogo" alt="">
-      <div class="hero-season" id="heroSeason"></div>
+    <div class="hero" id="hero">
+      <div class="hero-top">
+        <div class="hero-brand">
+          <img class="hero-brand-mark" id="heroBrandMark" alt="">
+          <span id="heroStudioName"></span>
+        </div>
+        <div class="hero-season" id="heroSeason"></div>
+      </div>
       <div class="countdown" id="countdown" hidden></div>
     </div>
 
@@ -129,6 +136,7 @@
   <section class="view" id="view-about">
     <h2 class="view-title">About</h2>
     <div class="card">
+      <img class="brand-logo" id="aboutLogo" alt="">
       <p class="about-text" id="aboutText"></p>
       <p class="about-text" id="aboutSeason"></p>
       <p class="about-text" id="aboutCredit"></p>
@@ -172,16 +180,20 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925p"></script>
-<script src="data/season.js?v=20260925p"></script>
-<script src="data/dancers.js?v=20260925p"></script>
+<script src="data/config.js?v=20260926a"></script>
+<script src="data/season.js?v=20260926a"></script>
+<script src="data/dancers.js?v=20260926a"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
-const heroLogo = document.getElementById('heroLogo');
-heroLogo.src = STUDIO.logo;
-heroLogo.alt = STUDIO.name;
+document.getElementById('hero').style.backgroundImage = `url("${STUDIO.heroBackground}")`;
+document.getElementById('heroBrandMark').src = STUDIO.heroLogoLight;
+document.getElementById('heroStudioName').textContent = STUDIO.name;
 document.getElementById('heroSeason').textContent = STUDIO.season.label;
+document.getElementById('cornerMark').src = STUDIO.markIcon;
+const aboutLogo = document.getElementById('aboutLogo');
+aboutLogo.src = STUDIO.logo;
+aboutLogo.alt = STUDIO.name;
 document.documentElement.style.setProperty('--pink', STUDIO.colors.primary);
 document.documentElement.style.setProperty('--pink-dark', STUDIO.colors.primaryDark);
 document.documentElement.style.setProperty('--ink', STUDIO.colors.ink);
