@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925d">
+<link rel="stylesheet" href="styles.css?v=20260925f">
 </head>
 <body>
 
@@ -119,9 +119,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925d"></script>
-<script src="data/season.js?v=20260925d"></script>
-<script src="data/dancers.js?v=20260925d"></script>
+<script src="data/config.js?v=20260925f"></script>
+<script src="data/season.js?v=20260925f"></script>
+<script src="data/dancers.js?v=20260925f"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -154,9 +154,9 @@ document.getElementById('tabBar').addEventListener('click', e => {
 // ---------- Season Overview ----------
 function statusPill(comp) {
   if (!comp.startDate) return '<span class="pill pill-tba">Dates TBA</span>';
-  return comp.booked
-    ? '<span class="pill pill-booked">Hotel suggestion available</span>'
-    : '<span class="pill pill-unbooked">No hotel suggestion yet</span>';
+  if (comp.booked) return '<span class="pill pill-booked">Hotel suggestion available</span>';
+  if (comp.hotelSuggestions && comp.hotelSuggestions.length) return '<span class="pill pill-booked">Hotel options nearby</span>';
+  return '<span class="pill pill-unbooked">No hotel suggestion yet</span>';
 }
 
 function conventionTag(comp) {
@@ -233,7 +233,7 @@ function openComp(slug) {
         ${comp.hotel.distanceNote ? `<div class="info-row"><span class="label">Distance from venue</span><span class="value">${comp.hotel.distanceNote}</span></div>` : ''}
         <div class="coming-soon" style="margin-top:12px;">Suggested hotel — not an official team block. Feel free to book here or explore other options near the venue.</div>
       </div>`;
-  } else {
+  } else if (comp.bookingInfo || (!comp.hotelNote && !(comp.hotelSuggestions && comp.hotelSuggestions.length))) {
     hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No hotel suggestion yet — check back as this firms up.'}</div></div>`;
   }
 
