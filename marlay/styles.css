@@ -76,8 +76,10 @@ a { color: var(--pink); text-decoration: none; }
 
 .corner-mark {
   position: fixed;
-  top: calc(17px + env(safe-area-inset-top, 0px));
-  right: 16px;
+  /* Offsets account for the transparent margin inside the mark image, so its visible
+     edge sits 12px from the right and centers on the menu button's 32px midline. */
+  top: calc(15.2px + env(safe-area-inset-top, 0px));
+  right: 8.4px;
   z-index: 40;
   height: 30px;
   width: auto;
@@ -467,15 +469,29 @@ button.btn-outline:disabled:hover { background: none; }
   gap: 20px;
   min-height: 340px;
   padding: 20px 20px 14px;
+  position: relative;
   text-align: center;
   color: #fff;
   background-color: var(--ink);
-  background-size: cover;
-  background-position: center;
   border-radius: var(--radius);
   overflow: hidden;
+  isolation: isolate;
   margin-bottom: 18px;
 }
+
+.hero-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -15%;
+  height: 115%;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+
+.hero-top, .hero .countdown { position: relative; z-index: 1; }
 
 .hero-brand {
   display: flex;
