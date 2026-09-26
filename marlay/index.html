@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925m">
+<link rel="stylesheet" href="styles.css?v=20260925n">
 </head>
 <body>
 
@@ -170,9 +170,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925m"></script>
-<script src="data/season.js?v=20260925m"></script>
-<script src="data/dancers.js?v=20260925m"></script>
+<script src="data/config.js?v=20260925n"></script>
+<script src="data/season.js?v=20260925n"></script>
+<script src="data/dancers.js?v=20260925n"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -453,6 +453,26 @@ function fireConfetti() {
   }
 }
 
+// Checked items are saved by their text, not position, so edits to DANCEBAG don't
+// shift saved ticks onto the wrong item.
+const DANCEBAG_STORAGE_KEY = 'marlay-dancebag-checked';
+
+function loadDanceBagChecked() {
+  try { return new Set(JSON.parse(localStorage.getItem(DANCEBAG_STORAGE_KEY)) || []); } catch (e) { return new Set(); }
+}
+
+function saveDanceBagChecked() {
+  const checked = [...document.querySelectorAll('#dancebagList li')]
+    .filter(li => li.querySelector('input:checked'))
+    .map(li => li.querySelector('span').textContent);
+  try { localStorage.setItem(DANCEBAG_STORAGE_KEY, JSON.stringify(checked)); } catch (e) {}
+}
+
+function danceBagAllChecked() {
+  const boxes = [...document.querySelectorAll('#dancebagList input[type="checkbox"]')];
+  return boxes.length > 0 && boxes.every(b => b.checked);
+}
+
 function renderDanceBag() {
   const list = document.getElementById('dancebagList');
   list.innerHTML = DANCEBAG.map(group => `
@@ -461,6 +481,11 @@ function renderDanceBag() {
       <li><input type="checkbox"><span>${item}</span></li>
     `).join('')}
   `).join('');
+  const saved = loadDanceBagChecked();
+  list.querySelectorAll('li').forEach(li => {
+    const box = li.querySelector('input');
+    if (box) box.checked = saved.has(li.querySelector('span').textContent);
+  });
 }
 
 // ---------- Calendar ----------
@@ -693,10 +718,10 @@ if ('serviceWorker' in navigator) {
 // ---------- Init ----------
 renderSeasonList();
 renderDanceBag();
-let danceBagComplete = false;
+let danceBagComplete = danceBagAllChecked();
+document.getElementById('dancebagList').addEventListener('change', saveDanceBagChecked);
 document.getElementById('dancebagList').addEventListener('change', () => {
-  const boxes = [...document.querySelectorAll('#dancebagList input[type="checkbox"]')];
-  const allChecked = boxes.length > 0 && boxes.every(b => b.checked);
+  const allChecked = danceBagAllChecked();
   if (allChecked && !danceBagComplete) fireConfetti();
   danceBagComplete = allChecked;
 });
