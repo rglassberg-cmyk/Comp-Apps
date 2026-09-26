@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925g">
+<link rel="stylesheet" href="styles.css?v=20260925h">
 </head>
 <body>
 
@@ -167,9 +167,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925g"></script>
-<script src="data/season.js?v=20260925g"></script>
-<script src="data/dancers.js?v=20260925g"></script>
+<script src="data/config.js?v=20260925h"></script>
+<script src="data/season.js?v=20260925h"></script>
+<script src="data/dancers.js?v=20260925h"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -235,7 +235,8 @@ drawer.addEventListener('click', e => {
 // ---------- Season Overview ----------
 function statusPill(comp) {
   if (!comp.startDate) return '<span class="pill pill-tba">Dates TBA</span>';
-  if (comp.booked) return '<span class="pill pill-booked">Hotel suggestion available</span>';
+  if (comp.hotel) return '<span class="pill pill-booked">Hotel suggestion available</span>';
+  if (comp.hotelNote) return '<span class="pill pill-booked">Book at venue</span>';
   if (comp.hotelSuggestions && comp.hotelSuggestions.length) return '<span class="pill pill-booked">Hotel options nearby</span>';
   return '<span class="pill pill-unbooked">No hotel suggestion yet</span>';
 }
