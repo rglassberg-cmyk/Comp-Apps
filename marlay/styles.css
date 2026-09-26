@@ -144,6 +144,12 @@ a { color: var(--pink); text-decoration: none; }
 }
 .drawer-link:active { background: var(--pink-tint); }
 
+.drawer-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 8px;
+}
+
 /* ---------- Layout ---------- */
 
 main {

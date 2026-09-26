@@ -25,6 +25,13 @@ const STUDIO = {
     url: "https://lhasa.app"
   },
 
+  // External studio links shown at the top of the menu drawer.
+  resourceLinks: {
+    community: { label: "Parent WhatsApp Group", url: "https://chat.whatsapp.com/Da33bYtJvhy0Q6tWQdX3h0?mode=gi_t" },
+    bookPrivate: { label: "Book a Private Lesson", url: "https://calendly.com/tatedanceacademy" },
+    instagram: { label: "Instagram", url: "https://www.instagram.com/thetateacademy/" }
+  },
+
   // Reused across every competition's Weekend Info tab and the Suggest Updates tab.
   suggestUpdatesFormUrl:
     "https://docs.google.com/forms/d/e/1FAIpQLSefWNQmR1zrbsQm2bZhKqnckJ7aAL-YDBaPKBkqjuaB26NAIQ/viewform?embedded=true",
