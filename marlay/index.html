@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925j">
+<link rel="stylesheet" href="styles.css?v=20260925k">
 </head>
 <body>
 
@@ -26,6 +26,8 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
   </div>
+  <div id="drawerResources"></div>
+  <div class="drawer-divider"></div>
   <button class="drawer-link" data-drawer-view="suggest">Suggest an Update</button>
   <button class="drawer-link" data-drawer-view="about">About</button>
 </aside>
@@ -167,9 +169,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925j"></script>
-<script src="data/season.js?v=20260925j"></script>
-<script src="data/dancers.js?v=20260925j"></script>
+<script src="data/config.js?v=20260925k"></script>
+<script src="data/season.js?v=20260925k"></script>
+<script src="data/dancers.js?v=20260925k"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -189,6 +191,15 @@ function builtByLink() {
 }
 document.getElementById('footerText').appendChild(builtByLink());
 document.getElementById('drawerTitle').textContent = STUDIO.name;
+document.getElementById('drawerResources').append(...Object.values(STUDIO.resourceLinks).map(link => {
+  const a = document.createElement('a');
+  a.className = 'drawer-link';
+  a.href = link.url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.textContent = link.label;
+  return a;
+}));
 document.getElementById('aboutText').textContent = `This is the ${STUDIO.name} season hub — competitions, hotels, packing, and the rehearsal calendar, all in one place.`;
 document.getElementById('aboutSeason').textContent = STUDIO.season.label;
 document.getElementById('aboutCredit').appendChild(builtByLink());
