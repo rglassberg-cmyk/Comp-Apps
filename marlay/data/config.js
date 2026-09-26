@@ -49,5 +49,8 @@ const STUDIO = {
 
   season: {
     label: "2026–2027 Season"
-  }
+  },
+
+  // Descriptive sentence on the About view (opened from the menu drawer).
+  aboutBlurb: "One place for everything Tate, so 'wait, when's Tremaine again?' never has to be a group text."
 };

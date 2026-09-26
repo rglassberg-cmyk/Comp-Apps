@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925l">
+<link rel="stylesheet" href="styles.css?v=20260925m">
 </head>
 <body>
 
@@ -86,7 +86,7 @@
   <!-- DANCE BAG -->
   <section class="view" id="view-dancebag">
     <h2 class="view-title">Dance Bag Checklist</h2>
-    <p class="view-lede">A general packing list to start with — check things off as you pack. Competition-specific additions (weather, venue quirks) will get added here once we're closer to each event.</p>
+    <p class="view-lede">Everything you need, minus the last-minute panic.</p>
     <div class="card">
       <ul class="checklist" id="dancebagList"></ul>
     </div>
@@ -110,7 +110,7 @@
     <h2 class="view-title">Meet the Team</h2>
     <p class="view-lede">Photos and a bit about each dancer, coming this season.</p>
     <div class="card">
-      <div class="coming-soon">Coming soon — this page is waiting on photos and details from Tabitha.</div>
+      <div class="coming-soon">This year's crew is worth the wait — check back soon.</div>
     </div>
   </section>
 
@@ -170,9 +170,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925l"></script>
-<script src="data/season.js?v=20260925l"></script>
-<script src="data/dancers.js?v=20260925l"></script>
+<script src="data/config.js?v=20260925m"></script>
+<script src="data/season.js?v=20260925m"></script>
+<script src="data/dancers.js?v=20260925m"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -201,7 +201,7 @@ document.getElementById('drawerResources').append(...Object.values(STUDIO.resour
   a.textContent = link.label;
   return a;
 }));
-document.getElementById('aboutText').textContent = `This is the ${STUDIO.name} season hub — competitions, hotels, packing, and the rehearsal calendar, all in one place.`;
+document.getElementById('aboutText').textContent = STUDIO.aboutBlurb;
 document.getElementById('aboutSeason').textContent = STUDIO.season.label;
 document.getElementById('aboutCredit').appendChild(builtByLink());
 
@@ -415,6 +415,44 @@ const DANCEBAG = [
   ]},
 ];
 
+// Confetti burst when the last Dance Bag item gets checked. Skipped entirely under
+// prefers-reduced-motion.
+function fireConfetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const styles = getComputedStyle(document.documentElement);
+  const colors = [styles.getPropertyValue('--pink'), styles.getPropertyValue('--pink-dark'), '#ffffff', styles.getPropertyValue('--pink-tint-strong')];
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+  document.body.append(layer);
+  const count = 56;
+  let remaining = count;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const size = 6 + Math.random() * 6;
+    piece.style.width = size + 'px';
+    piece.style.height = (Math.random() < 0.5 ? size : size * 0.6) + 'px';
+    piece.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
+    piece.style.background = colors[i % colors.length];
+    piece.style.left = Math.random() * 100 + '%';
+    layer.append(piece);
+    const drift = (Math.random() - 0.5) * 160;
+    const spin = (Math.random() - 0.5) * 720;
+    piece.animate([
+      { transform: 'translate(0, -20px) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${drift}px, 110vh) rotate(${spin}deg)`, opacity: 0.9 }
+    ], {
+      duration: 1800 + Math.random() * 900,
+      delay: Math.random() * 300,
+      easing: 'cubic-bezier(0.25, 0.6, 0.5, 1)',
+      fill: 'forwards'
+    }).onfinish = () => {
+      piece.remove();
+      if (--remaining === 0) layer.remove();
+    };
+  }
+}
+
 function renderDanceBag() {
   const list = document.getElementById('dancebagList');
   list.innerHTML = DANCEBAG.map(group => `
@@ -515,7 +553,7 @@ async function computeWhatsNext() {
 
   body.removeAttribute('aria-busy');
   if (candidates.length === 0) {
-    body.innerHTML = `<div class="whats-next-title">Nothing scheduled yet</div>`;
+    body.innerHTML = `<div class="whats-next-title">Nothing on deck right now. Enjoy the quiet while it lasts.</div>`;
     return;
   }
 
@@ -655,6 +693,13 @@ if ('serviceWorker' in navigator) {
 // ---------- Init ----------
 renderSeasonList();
 renderDanceBag();
+let danceBagComplete = false;
+document.getElementById('dancebagList').addEventListener('change', () => {
+  const boxes = [...document.querySelectorAll('#dancebagList input[type="checkbox"]')];
+  const allChecked = boxes.length > 0 && boxes.every(b => b.checked);
+  if (allChecked && !danceBagComplete) fireConfetti();
+  danceBagComplete = allChecked;
+});
 setCalendarMode('AGENDA');
 computeWhatsNext();
 </script>

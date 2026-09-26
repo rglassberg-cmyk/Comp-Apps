@@ -457,6 +457,16 @@ p.view-lede {
   max-width: 70%;
   height: auto;
   margin: 0 auto 8px;
+  animation: hero-float 4s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo { animation: none; }
 }
 
 .hero-season {
@@ -651,6 +661,17 @@ p.view-lede {
   cursor: pointer;
 }
 .install-close svg { width: 20px; height: 20px; }
+
+/* ---------- Confetti ---------- */
+
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti-piece { position: absolute; top: 0; }
 
 /* ---------- Footer ---------- */
 
