@@ -108,7 +108,7 @@ const SEASON = [
     ],
     thingsToDo: [
       { name: "Tanger Outlets Foxwoods", note: "On-site, 70+ stores" },
-      { name: "Mashantucket Pequot Museum", note: "On-site at the resort, cultural exhibits" }
+      { name: "Mashantucket Pequot Museum", note: "About 5 minutes away by car or shuttle, cultural exhibits" }
     ],
     dances: []
   },
