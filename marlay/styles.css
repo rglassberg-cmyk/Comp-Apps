@@ -483,11 +483,13 @@ button.btn-outline:disabled:hover { background: none; }
   position: absolute;
   left: 0;
   right: 0;
-  top: -15%;
-  height: 115%;
+  /* Kept to 106%: the photo's cover scale is set by height, so every extra percent of
+     parallax travel crops more width. 57% horizontal keeps the whole group in frame. */
+  top: -6%;
+  height: 106%;
   z-index: 0;
   background-size: cover;
-  background-position: center;
+  background-position: 57% center;
   will-change: transform;
 }
 
