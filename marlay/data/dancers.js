@@ -9,9 +9,14 @@
 // PDF is out — per the entry-numbers rule, routine/entry data is always sourced
 // fresh per competition and never carried over, even for a repeat number.
 //
+// Naming: first name plus last initial only (e.g. "Talia G"). Add more of the last
+// name only when two dancers share both first name and initial (e.g. "Talia Gl" /
+// "Talia Gr"). This site is public, so full names wait until a later phase adds
+// login/access control.
+//
 // Shape:
 // {
-//   name: "Full Name",
+//   name: "Talia G",
 //   ageGroup: "age-12-14",   // matches the age-group tokens in styles.css
 //   routines: [
 //     // { competitionSlug: "believe-poughkeepsie", danceId: 757, title: "...", type: "solo" }
