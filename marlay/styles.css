@@ -383,6 +383,12 @@ p.view-lede {
   font-size: 14px;
 }
 .info-row:last-child { border-bottom: none; }
+
+.place-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.place-item:last-child { border-bottom: none; padding-bottom: 0; }
 .info-row .label { color: var(--ink-soft); }
 .info-row .value { text-align: right; font-weight: 600; }
 
