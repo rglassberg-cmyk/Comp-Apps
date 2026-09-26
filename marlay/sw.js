@@ -4,7 +4,7 @@
 //
 // Bump CACHE_VERSION whenever the PRECACHE list changes (files added, removed, or
 // renamed) — the activate step deletes every cache that doesn't match it.
-const CACHE_VERSION = 'marlay-v7';
+const CACHE_VERSION = 'marlay-v8';
 
 const PRECACHE = [
   'index.html',
