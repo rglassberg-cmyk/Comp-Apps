@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925h">
+<link rel="stylesheet" href="styles.css?v=20260925i">
 </head>
 <body>
 
@@ -167,9 +167,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925h"></script>
-<script src="data/season.js?v=20260925h"></script>
-<script src="data/dancers.js?v=20260925h"></script>
+<script src="data/config.js?v=20260925i"></script>
+<script src="data/season.js?v=20260925i"></script>
+<script src="data/dancers.js?v=20260925i"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -463,7 +463,7 @@ async function computeWhatsNext() {
     const endSrc = comp.endDate || comp.startDate;
     const end = new Date(endSrc.year, endSrc.month, endSrc.day);
     if (end >= todayStart) {
-      candidates.push({ type: 'competition', compType: comp.type, date: start, title: comp.name, meta: comp.location });
+      candidates.push({ type: 'competition', compType: comp.type, date: start, hasTime: false, title: comp.name, meta: comp.location });
     }
   });
 
@@ -483,7 +483,8 @@ async function computeWhatsNext() {
       const data = await res.json();
       (data.items || []).forEach(ev => {
         let start;
-        if (ev.start && ev.start.dateTime) {
+        const hasTime = !!(ev.start && ev.start.dateTime);
+        if (hasTime) {
           start = new Date(ev.start.dateTime);
         } else if (ev.start && ev.start.date) {
           // All-day event — explicit constructor, per the date-bug rule (avoids
@@ -493,7 +494,7 @@ async function computeWhatsNext() {
         } else {
           return;
         }
-        candidates.push({ type: 'event', date: start, title: ev.summary || 'Untitled event', meta: ev.location || '' });
+        candidates.push({ type: 'event', date: start, hasTime, title: ev.summary || 'Untitled event', meta: ev.location || '' });
       });
     }
   } catch (e) {
@@ -509,26 +510,81 @@ async function computeWhatsNext() {
   candidates.sort((a, b) => a.date - b.date);
   const next = candidates[0];
 
+  // Cluster window: a Fri/Sat/Sun first item pulls in that whole Fri–Sun weekend;
+  // a Mon–Thu first item stands alone on its day.
+  const dayStart = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const firstDay = dayStart(next.date);
+  const dow = firstDay.getDay();
+  let windowStart = firstDay, windowEnd = firstDay;
+  if (dow === 5 || dow === 6 || dow === 0) {
+    const backToFriday = dow === 5 ? 0 : dow === 6 ? 1 : 2;
+    windowStart = new Date(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate() - backToFriday);
+    windowEnd = new Date(windowStart.getFullYear(), windowStart.getMonth(), windowStart.getDate() + 2);
+  }
+  const cluster = candidates.filter(c => {
+    const d = dayStart(c.date);
+    return d >= windowStart && d <= windowEnd;
+  });
+
   // Calendar titles/locations come from an external source — build with textContent, not innerHTML
+  const typeTag = c => {
+    const tag = document.createElement('span');
+    tag.className = 'pill pill-convention';
+    tag.textContent = c.compType === 'convention' ? 'Convention' : 'Competition';
+    return tag;
+  };
   const when = document.createElement('div');
   when.className = 'whats-next-when';
   when.textContent = relativeDayLabel(next.date);
-  const title = document.createElement('div');
-  title.className = 'whats-next-title';
-  title.textContent = next.title;
-  if (next.type === 'competition') {
-    const tag = document.createElement('span');
-    tag.className = 'pill pill-convention';
-    tag.textContent = next.compType === 'convention' ? 'Convention' : 'Competition';
-    title.append(' ', tag);
+
+  if (cluster.length === 1) {
+    const title = document.createElement('div');
+    title.className = 'whats-next-title';
+    title.textContent = next.title;
+    if (next.type === 'competition') title.append(' ', typeTag(next));
+    body.replaceChildren(when, title);
+    if (next.meta) {
+      const meta = document.createElement('div');
+      meta.className = 'whats-next-meta';
+      meta.textContent = next.meta;
+      body.append(meta);
+    }
+    return;
   }
-  body.replaceChildren(when, title);
-  if (next.meta) {
-    const meta = document.createElement('div');
-    meta.className = 'whats-next-meta';
-    meta.textContent = next.meta;
-    body.append(meta);
-  }
+
+  const multiDay = new Set(cluster.map(c => dayStart(c.date).getTime())).size > 1;
+  const anyTimeCell = multiDay || cluster.some(c => c.hasTime);
+  const list = document.createElement('div');
+  list.className = 'whats-next-list';
+  cluster.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'whats-next-row';
+    if (anyTimeCell) {
+      const time = document.createElement('div');
+      time.className = 'whats-next-row-time';
+      const parts = [];
+      if (multiDay) parts.push(c.date.toLocaleDateString('en-US', { weekday: 'short' }));
+      if (c.hasTime) parts.push(c.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
+      time.textContent = parts.join(' ');
+      row.append(time);
+    }
+    const main = document.createElement('div');
+    main.className = 'whats-next-row-main';
+    const title = document.createElement('div');
+    title.className = 'whats-next-row-title';
+    title.textContent = c.title;
+    if (c.type === 'competition') title.append(' ', typeTag(c));
+    main.append(title);
+    if (c.meta) {
+      const meta = document.createElement('div');
+      meta.className = 'comp-meta';
+      meta.textContent = c.meta;
+      main.append(meta);
+    }
+    row.append(main);
+    list.append(row);
+  });
+  body.replaceChildren(when, list);
 }
 
 // ---------- Add to Home Screen prompt ----------
