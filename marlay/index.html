@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260926c">
+<link rel="stylesheet" href="styles.css?v=20260926d">
 </head>
 <body>
 
@@ -181,9 +181,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260926c"></script>
-<script src="data/season.js?v=20260926c"></script>
-<script src="data/dancers.js?v=20260926c"></script>
+<script src="data/config.js?v=20260926d"></script>
+<script src="data/season.js?v=20260926d"></script>
+<script src="data/dancers.js?v=20260926d"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -538,8 +538,13 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     if (!homeView.classList.contains('active')) return;
     const rect = hero.getBoundingClientRect();
     if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
-    const maxShift = heroBg.offsetHeight - hero.offsetHeight;
-    heroBg.style.transform = `translate3d(0, ${Math.min(window.scrollY * 0.3, maxShift)}px, 0)`;
+    // The layer's spare height is all above the hero (its bottom is flush), so the shift
+    // must stay within [0, spare]. The lower bound matters on iOS, where scrollY goes
+    // negative during the rubber-band bounce at the top and would lift the layer's
+    // bottom edge above the hero's.
+    const maxShift = Math.floor(heroBg.getBoundingClientRect().height - rect.height);
+    const shift = Math.min(Math.max(window.scrollY * 0.3, 0), maxShift);
+    heroBg.style.transform = `translate3d(0, ${shift}px, 0)`;
   };
   requestHeroParallax = () => {
     if (frameQueued) return;
