@@ -9,8 +9,13 @@ const STUDIO = {
   // Starting point for road-trip guides on each competition's Weekend Info view.
   homeAddress: "Tate Academy, Teaneck, NJ",
 
-  // Full logo with wordmark, shown in the Home hero.
+  // Full-color logo with wordmark, shown on the About view.
   logo: "assets/tate-logo-full.png",
+  // Home hero photo, the white dancer shown next to the studio name on it, and the
+  // small pink mark pinned top-right on every view.
+  heroBackground: "assets/hero-bg.jpg",
+  heroLogoLight: "assets/dancer-white.png",
+  markIcon: "assets/dancer-mark.png",
 
   // Brand
   colors: {
