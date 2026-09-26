@@ -41,6 +41,16 @@ const SEASON = [
       { name: "Boston Marriott Copley Place", address: "110 Huntington Ave, Boston, MA 02116", note: "Connected to the same Copley Place complex" },
       { name: "The Lenox Hotel", address: "61 Exeter St, Boston, MA 02116", note: "Boutique option, short walk away" }
     ],
+    placesToEat: [
+      { name: "Legal Sea Foods", note: "Connected via walkway inside Copley Place" },
+      { name: "The Capital Grille", note: "Short walk, upscale steakhouse" },
+      { name: "Atlantic Fish Co.", note: "Short walk, seafood, 761 Boylston St" }
+    ],
+    thingsToDo: [
+      { name: "Boston Public Library", note: "Free, historic, right on Copley Square", free: true },
+      { name: "Prudential Center Skywalk Observatory", note: "Short walk, city views" },
+      { name: "Newbury Street", note: "Short walk, shopping district" }
+    ],
     dances: []
   },
   {
@@ -63,6 +73,14 @@ const SEASON = [
     hotelSuggestions: [
       { name: "Radisson Hotel Freehold", address: "50 Gibson Pl, Freehold, NJ 07728", note: "About 1 mile from the venue" }
     ],
+    placesToEat: [
+      { name: "The Bistro at iPlay America", note: "On-site at the venue" },
+      { name: "Game Time Bar & Grill", note: "On-site, boardwalk-style food" }
+    ],
+    thingsToDo: [
+      { name: "iPlay America itself", note: "Go-karts, laser tag, arcade, Topgolf Swing Suite — always free to enter, pay per activity", free: true },
+      { name: "Freehold Raceway Mall", note: "Short drive, shopping and more dining" }
+    ],
     dances: []
   },
   {
@@ -84,6 +102,14 @@ const SEASON = [
     driving: { distanceMi: 165, duration: "about 2 hours 40 minutes", route: "I-95 N to Exit 92 in CT, then Route 2 West about 8 miles" },
     hotelSuggestions: [],
     hotelNote: "Showstopper Travel books the official hotel block at the venue. Foxwoods is the venue and the hotel — it has several towers (Grand Pequot Tower, Great Cedar Hotel, Fox Tower). Book directly through Foxwoods rather than looking elsewhere.",
+    placesToEat: [
+      { name: "Hard Rock Cafe Foxwoods", note: "On-site at the resort" },
+      { name: "Guy Fieri's Kitchen", note: "On-site at the resort" }
+    ],
+    thingsToDo: [
+      { name: "Tanger Outlets Foxwoods", note: "On-site, 70+ stores" },
+      { name: "Mashantucket Pequot Museum", note: "On-site at the resort, cultural exhibits" }
+    ],
     dances: []
   },
   {
@@ -111,6 +137,15 @@ const SEASON = [
     hotelSuggestions: [
       { name: "Golden Nugget Atlantic City", address: "600 Huron Ave, Atlantic City, NJ 08401", note: "Marina District, close to Harrah's" },
       { name: "Borgata Hotel Casino & Spa", address: "1 Borgata Way, Atlantic City, NJ 08401", note: "Marina District, close to Harrah's" }
+    ],
+    placesToEat: [
+      { name: "Bobby's Burgers by Bobby Flay", note: "At Harrah's" },
+      { name: "Gordon Ramsay Steak", note: "At Harrah's, special-occasion" },
+      { name: "McCormick & Schmick's", note: "Near Harrah's, seafood" }
+    ],
+    thingsToDo: [
+      { name: "Steel Pier Amusement Park", note: "Short drive, boardwalk rides" },
+      { name: "Tanger Outlets The Walk", note: "Short drive, shopping" }
     ],
     dances: []
   },
@@ -140,6 +175,14 @@ const SEASON = [
     hotelSuggestions: [
       { name: "Courtyard by Marriott Secaucus Meadowlands", address: "455 Harmon Meadow Blvd, Secaucus, NJ 07094", note: "Short walk from the venue" },
       { name: "Best Western Plus Meadowlands", address: "250 Harmon Meadow Blvd, Secaucus, NJ 07094", note: "Short walk from the venue" }
+    ],
+    placesToEat: [
+      { name: "Outback Steakhouse", note: "455 Harmon Meadow Blvd, about a 4-minute walk" },
+      { name: "Houlihan's", note: "700 Plaza Dr, about a 6-minute walk" },
+      { name: "Carnegie Diner & Cafe", note: "Nearby, casual" }
+    ],
+    thingsToDo: [
+      { name: "American Dream", note: "About 10 minutes away — Nickelodeon Universe, LEGOLAND, DreamWorks Water Park" }
     ],
     dances: []
   },

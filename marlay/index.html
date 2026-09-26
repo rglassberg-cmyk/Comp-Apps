@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260926d">
+<link rel="stylesheet" href="styles.css?v=20260926e">
 </head>
 <body>
 
@@ -181,9 +181,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260926d"></script>
-<script src="data/season.js?v=20260926d"></script>
-<script src="data/dancers.js?v=20260926d"></script>
+<script src="data/config.js?v=20260926e"></script>
+<script src="data/season.js?v=20260926e"></script>
+<script src="data/dancers.js?v=20260926e"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -382,6 +382,18 @@ function openComp(slug) {
       </div>`;
   }
 
+  const listCard = (label, items) => (items && items.length) ? `
+    <div class="card">
+      <div class="card-label">${label}</div>
+      ${items.map(item => `
+        <div class="place-item">
+          <div class="comp-row-name">${item.name}${item.free ? ' <span class="pill pill-booked">Free</span>' : ''}</div>
+          ${item.note ? `<div class="comp-meta">${item.note}</div>` : ''}
+        </div>`).join('')}
+    </div>` : '';
+  const eatRow = listCard('Places to eat', comp.placesToEat);
+  const doRow = listCard('Things to do', comp.thingsToDo);
+
   const mapRow = comp.venue ? `
     <div class="calendar-embed-wrap" style="margin-bottom:14px;">
       <iframe src="https://www.google.com/maps?q=${encodeURIComponent(comp.venue.address)}&output=embed" width="100%" height="300" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map of ${comp.venue.name}"></iframe>
@@ -397,6 +409,8 @@ function openComp(slug) {
     ${officialRow}
     ${suggestionsRow}
     ${drivingRow}
+    ${eatRow}
+    ${doRow}
     ${mapRow}
     <div class="card">
       <div class="coming-soon">Full dance order, personal schedules, and more will populate here once the competition's schedule is released — usually about a week out.</div>
