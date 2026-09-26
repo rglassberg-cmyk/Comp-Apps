@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260925o">
+<link rel="stylesheet" href="styles.css?v=20260925p">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
     <div class="hero">
       <img class="hero-logo" id="heroLogo" alt="">
       <div class="hero-season" id="heroSeason"></div>
+      <div class="countdown" id="countdown" hidden></div>
     </div>
 
     <div class="whats-next-card" id="whatsNextCard">
@@ -171,9 +172,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260925o"></script>
-<script src="data/season.js?v=20260925o"></script>
-<script src="data/dancers.js?v=20260925o"></script>
+<script src="data/config.js?v=20260925p"></script>
+<script src="data/season.js?v=20260925p"></script>
+<script src="data/dancers.js?v=20260925p"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -507,6 +508,34 @@ function setCalendarMode(mode) {
   document.querySelectorAll('.cal-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
 }
 
+// ---------- Countdown (Home hero) ----------
+function renderCountdown() {
+  const el = document.getElementById('countdown');
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const toDate = d => new Date(d.year, d.month, d.day);
+  const next = SEASON
+    .filter(comp => comp.startDate && toDate(comp.endDate || comp.startDate) >= todayStart)
+    .sort((a, b) => toDate(a.startDate) - toDate(b.startDate))[0];
+  if (!next) { el.hidden = true; return; }
+
+  const days = Math.round((toDate(next.startDate) - todayStart) / 86400000);
+  const number = document.createElement('div');
+  number.className = 'countdown-number';
+  const label = document.createElement('div');
+  label.className = 'countdown-label';
+  if (days > 0) {
+    number.textContent = days;
+    label.textContent = `${days === 1 ? 'day' : 'days'} until ${next.name}`;
+  } else {
+    number.classList.add('countdown-now');
+    number.textContent = days === 0 ? 'Today!' : 'Happening now';
+    label.textContent = next.name;
+  }
+  el.replaceChildren(number, label);
+  el.hidden = false;
+}
+
 // ---------- What's Next (Home) ----------
 function relativeDayLabel(date) {
   const now = new Date();
@@ -717,6 +746,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // ---------- Init ----------
+renderCountdown();
 renderSeasonList();
 renderDanceBag();
 let danceBagComplete = danceBagAllChecked();
