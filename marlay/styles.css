@@ -256,7 +256,9 @@ p.view-lede {
 
 /* Featured "Up next" competition */
 .comp-featured {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   text-align: left;
   font-family: inherit;
@@ -298,13 +300,7 @@ p.view-lede {
   margin-top: 4px;
 }
 
-.comp-featured-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 14px;
-}
+.comp-featured-main { flex: 1; min-width: 0; }
 
 /* Compact list of the remaining competitions */
 .comp-list { padding: 4px 16px; }
@@ -334,13 +330,8 @@ p.view-lede {
   margin-bottom: 2px;
 }
 
-.comp-row-status { flex-shrink: 0; }
 
-@media (max-width: 420px) {
-  .comp-row { flex-wrap: wrap; }
-  .comp-row-main { flex-basis: calc(100% - 28px); }
-  .comp-row-status { order: 3; width: 100%; }
-}
+
 
 /* ---------- Competition detail view ---------- */
 

@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260926h">
+<link rel="stylesheet" href="styles.css?v=20260928a">
 </head>
 <body>
 
@@ -181,9 +181,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260926h"></script>
-<script src="data/season.js?v=20260926h"></script>
-<script src="data/dancers.js?v=20260926h"></script>
+<script src="data/config.js?v=20260928a"></script>
+<script src="data/season.js?v=20260928a"></script>
+<script src="data/dancers.js?v=20260928a"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -261,14 +261,6 @@ drawer.addEventListener('click', e => {
 });
 
 // ---------- Season Overview ----------
-function statusPill(comp) {
-  if (!comp.startDate) return '<span class="pill pill-tba">Dates TBA</span>';
-  if (comp.hotel) return '<span class="pill pill-booked">Hotel suggestion available</span>';
-  if (comp.hotelNote) return '<span class="pill pill-booked">Book at venue</span>';
-  if (comp.hotelSuggestions && comp.hotelSuggestions.length) return '<span class="pill pill-booked">Hotel options nearby</span>';
-  return '<span class="pill pill-unbooked">No hotel suggestion yet</span>';
-}
-
 function conventionTag(comp) {
   return comp.type === 'convention' ? ' <span class="pill pill-convention">Convention</span>' : '';
 }
@@ -290,14 +282,13 @@ function renderSeasonList() {
 
   const featuredHtml = featured ? `
     <button class="card comp-featured" onclick="openComp('${featured.slug}')">
-      <div class="comp-featured-label">Up next</div>
-      <div class="comp-featured-name">${featured.name}${conventionTag(featured)}</div>
-      <div class="comp-featured-date">${featured.dateLabel}</div>
-      <div class="comp-featured-meta">${featured.venue ? featured.venue.name + ' · ' : ''}${featured.location}</div>
-      <div class="comp-featured-footer">
-        ${statusPill(featured)}
-        <span class="comp-card-chevron">&rsaquo;</span>
+      <div class="comp-featured-main">
+        <div class="comp-featured-label">Up next</div>
+        <div class="comp-featured-name">${featured.name}${conventionTag(featured)}</div>
+        <div class="comp-featured-date">${featured.dateLabel}</div>
+        <div class="comp-featured-meta">${featured.venue ? featured.venue.name + ' · ' : ''}${featured.location}</div>
       </div>
+      <span class="comp-card-chevron">&rsaquo;</span>
     </button>` : '';
 
   const restHtml = rest.length ? `
@@ -308,7 +299,6 @@ function renderSeasonList() {
             <div class="comp-row-name">${comp.name}${conventionTag(comp)}</div>
             <div class="comp-meta">${comp.location} · ${comp.dateLabel}</div>
           </div>
-          <div class="comp-row-status">${statusPill(comp)}</div>
           <span class="comp-card-chevron">&rsaquo;</span>
         </button>
       `).join('')}
