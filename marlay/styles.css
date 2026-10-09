@@ -683,6 +683,10 @@ button.btn-outline:disabled:hover { background: none; }
 .comp-tabs::-webkit-scrollbar { display: none; }
 .comp-tab-btn { flex-shrink: 0; white-space: nowrap; }
 
+.dancer-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.dance-who { font-size: 14px; margin-top: 6px; line-height: 1.45; }
+.dance-notes { margin-top: 8px; }
+
 .cal-toggle-btn, .comp-tab-btn {
   appearance: none;
   border: 1.5px solid var(--border);

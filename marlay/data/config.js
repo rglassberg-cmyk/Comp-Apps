@@ -46,6 +46,10 @@ const STUDIO = {
   // is restricted (Calendar API only, GitHub Pages referrer only) via gcloud — see
   // learnings.md for how it was created. It's necessarily visible in page source
   // since this is a static site; the restrictions are the real protection, not secrecy.
+  // Dances and roster, read live from the private "Dances Info" Google Sheet through its
+  // Apps Script web app (marlay/apps-script/Code.gs). Returns display names only.
+  dancesFeedUrl: "https://script.google.com/macros/s/AKfycbyxeqhpq0YDmnZo0Y24ZAduFN-k_rnYmtoMrUWH_wkOxUDtRUakscBwoGIQTCWqFkjVyQ/exec",
+
   rehearsalCalendar: {
     id: "910dc55878656b0b832ca864e5e613c6d7389270d15e4d1c956eaa9185a4dc42@group.calendar.google.com",
     timezone: "America/New_York",
