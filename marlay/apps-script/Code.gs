@@ -18,7 +18,8 @@
  * not one that reads from a range, so refreshDancerDropdown() rebuilds that list from
  * the Roster. Run setup() once from the editor; after that it re-runs on every Roster
  * edit. The "Marlay" menu in the sheet can also run it by hand. This needs the Google
- * Sheets API advanced service added in the editor (Services + → Google Sheets API).
+ * Sheets API advanced service added in the editor (Services + → Google Sheets API),
+ * which turns the Sheets API on for the script's project.
  */
 
 const GROUPS = ['Petite', 'Mini', 'Junior', 'Teen', 'Senior'];
@@ -42,8 +43,11 @@ function onRosterEdit(e) {
   if (e && e.range.getSheet().getName() === 'Roster') refreshDancerDropdown();
 }
 
-// SpreadsheetApp's validation builder has no multiple-selections option, so this goes
-// through the Sheets API advanced service (editor: Services + → Google Sheets API).
+// SpreadsheetApp's validation builder has no multiple-selections option, and the
+// Sheets advanced service silently drops `allowMultipleSelections` too, so this calls
+// the Sheets REST API directly with the script's own sign-in. The advanced service
+// still has to stay added (Services + → Google Sheets API): that's what turns the
+// Sheets API on for the script's project.
 function refreshDancerDropdown() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const options = GROUPS.map(g => g + ' group')
@@ -68,7 +72,12 @@ function refreshDancerDropdown() {
       }
     }
   };
-  Sheets.Spreadsheets.batchUpdate({ requests: [request] }, ss.getId());
+  UrlFetchApp.fetch('https://sheets.googleapis.com/v4/spreadsheets/' + ss.getId() + ':batchUpdate', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    payload: JSON.stringify({ requests: [request] })
+  });
 }
 
 function doGet() {
