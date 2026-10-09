@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260928a">
+<link rel="stylesheet" href="styles.css?v=20261009a">
 </head>
 <body>
 
@@ -72,9 +72,9 @@
         <div class="home-tile-title">Calendar</div>
         <div class="home-tile-sub">Rehearsal schedule</div>
       </button>
-      <button class="home-tile" onclick="showView('team')">
-        <div class="home-tile-title">Meet the Team</div>
-        <div class="home-tile-sub">Coming soon</div>
+      <button class="home-tile" onclick="showView('dances')">
+        <div class="home-tile-title">Dances</div>
+        <div class="home-tile-sub">Routines &amp; dancers</div>
       </button>
     </div>
   </section>
@@ -115,12 +115,20 @@
     </div>
   </section>
 
-  <!-- MEET THE TEAM -->
-  <section class="view" id="view-team">
-    <h2 class="view-title">Meet the Team</h2>
-    <p class="view-lede">Photos and a bit about each dancer, coming this season.</p>
-    <div class="card">
-      <div class="coming-soon">This year's crew is worth the wait — check back soon.</div>
+  <!-- DANCES -->
+  <section class="view" id="view-dances">
+    <h2 class="view-title">Dances</h2>
+    <p class="view-lede">This season's routines and who's in them.</p>
+    <div class="comp-tabs" id="danceTabs">
+      <button class="comp-tab-btn active" data-dance-tab="routines">By dance</button>
+      <button class="comp-tab-btn" data-dance-tab="dancers">By dancer</button>
+    </div>
+    <div class="comp-panel active" data-dance-panel="routines" id="danceRoutines">
+      <div class="card"><div class="skeleton skeleton-short"></div><div class="skeleton skeleton-long"></div></div>
+    </div>
+    <div class="comp-panel" data-dance-panel="dancers">
+      <div id="dancerPicker"></div>
+      <div id="dancerDances"></div>
     </div>
   </section>
 
@@ -163,9 +171,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><line x1="3.5" y1="10" x2="20.5" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg>
     <span>Calendar</span>
   </button>
-  <button data-view="team">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><circle cx="17" cy="9.5" r="2.3"/><path d="M15.2 14.3c1.9.4 3.3 2 3.3 4.2"/></svg>
-    <span>Team</span>
+  <button data-view="dances">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+    <span>Dances</span>
   </button>
 </nav>
 
@@ -181,9 +189,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20260928a"></script>
-<script src="data/season.js?v=20260928a"></script>
-<script src="data/dancers.js?v=20260928a"></script>
+<script src="data/config.js?v=20261009a"></script>
+<script src="data/season.js?v=20261009a"></script>
+<script src="data/dancers.js?v=20261009a"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -828,9 +836,116 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 
+// ---------- Dances ----------
+// Live from the Dances Info sheet (see STUDIO.dancesFeedUrl). The last good copy is kept
+// on the device so the tab still works offline. Sheet text is inserted with
+// textContent / esc(), never as raw HTML.
+const DANCES_CACHE_KEY = 'marlay-dances-feed';
+const SELECTED_DANCER_KEY = 'marlay-selected-dancer';
+const GROUP_ORDER = ['Senior', 'Teen', 'Junior', 'Mini', 'Petite'];
+let dancesFeed = null;
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function danceDetails(d) {
+  const notes = [['Costume', d.costumeNotes], ['Makeup', d.makeupNotes], ['Notes', d.otherNotes]]
+    .filter(([, v]) => v)
+    .map(([label, v]) => `<div class="info-row"><span class="label">${label}</span><span class="value">${esc(v)}</span></div>`).join('');
+  const links = [['Music', d.musicLink], ['Rehearsal video', d.rehearsalVideoLink]]
+    .filter(([, v]) => /^https?:\/\//.test(v || ''))
+    .map(([label, v]) => `<a class="btn btn-outline" href="${esc(v)}" target="_blank" rel="noopener">${label}</a>`).join('');
+  return (notes ? `<div class="dance-notes">${notes}</div>` : '') + links;
+}
+
+function danceCard(d, opts = {}) {
+  const meta = [d.ageGroup, d.genre].filter(Boolean).map(esc).join(' · ');
+  const who = opts.hideDancers ? '' : (d.groups.length
+    ? `<div class="dance-who"><strong>${d.groups.map(g => esc(g) + ' group').join(' + ')}</strong> · ${d.dancers.map(esc).join(', ')}</div>`
+    : `<div class="dance-who">${d.dancers.map(esc).join(', ')}</div>`);
+  return `
+    <div class="card">
+      <div class="comp-row-name">${esc(d.name)}</div>
+      ${meta ? `<div class="comp-meta">${meta}</div>` : ''}
+      ${who}
+      ${danceDetails(d)}
+    </div>`;
+}
+
+function renderDanceRoutines() {
+  const el = document.getElementById('danceRoutines');
+  if (!dancesFeed) {
+    el.innerHTML = `<div class="card"><div class="coming-soon">Couldn't load the dances right now. Check your connection and try again.</div></div>`;
+    return;
+  }
+  el.innerHTML = dancesFeed.dances.length
+    ? dancesFeed.dances.map(d => danceCard(d)).join('')
+    : `<div class="card"><div class="coming-soon">Dances will show up here as they're added.</div></div>`;
+}
+
+function getSelectedDancer() {
+  try { return localStorage.getItem(SELECTED_DANCER_KEY); } catch (e) { return null; }
+}
+
+function renderDancerPicker() {
+  const picker = document.getElementById('dancerPicker');
+  if (!dancesFeed) { picker.innerHTML = ''; return; }
+  const selected = getSelectedDancer();
+  picker.innerHTML = GROUP_ORDER.map(group => {
+    const names = dancesFeed.roster.filter(r => r.group === group).map(r => r.name);
+    if (!names.length) return '';
+    return `<div class="card-label section-label">${esc(group)}</div>
+      <div class="dancer-chips">${names.map(n => `<button class="comp-tab-btn${n === selected ? ' active' : ''}" data-dancer="${esc(n)}">${esc(n)}</button>`).join('')}</div>`;
+  }).join('');
+  renderDancerDances();
+}
+
+function renderDancerDances() {
+  const el = document.getElementById('dancerDances');
+  const name = getSelectedDancer();
+  if (!dancesFeed || !name || !dancesFeed.roster.some(r => r.name === name)) {
+    el.innerHTML = dancesFeed ? `<div class="card"><div class="coming-soon">Tap a name to see their dances.</div></div>` : '';
+    return;
+  }
+  const theirs = dancesFeed.dances.filter(d => d.dancers.includes(name));
+  el.innerHTML = `<div class="card-label section-label">${esc(name)}'s dances</div>` + (theirs.length
+    ? theirs.map(d => danceCard(d, { hideDancers: true })).join('')
+    : `<div class="card"><div class="coming-soon">No dances listed for ${esc(name)} yet.</div></div>`);
+}
+
+document.getElementById('danceTabs').addEventListener('click', e => {
+  const btn = e.target.closest('[data-dance-tab]');
+  if (!btn) return;
+  document.querySelectorAll('#danceTabs .comp-tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+  document.querySelectorAll('[data-dance-panel]').forEach(p => p.classList.toggle('active', p.dataset.dancePanel === btn.dataset.danceTab));
+});
+
+document.getElementById('dancerPicker').addEventListener('click', e => {
+  const btn = e.target.closest('[data-dancer]');
+  if (!btn) return;
+  try { localStorage.setItem(SELECTED_DANCER_KEY, btn.dataset.dancer); } catch (err) {}
+  document.querySelectorAll('#dancerPicker [data-dancer]').forEach(b => b.classList.toggle('active', b === btn));
+  renderDancerDances();
+});
+
+async function loadDances() {
+  try {
+    const res = await fetch(STUDIO.dancesFeedUrl);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    dancesFeed = await res.json();
+    try { localStorage.setItem(DANCES_CACHE_KEY, JSON.stringify(dancesFeed)); } catch (e) {}
+  } catch (err) {
+    try { dancesFeed = JSON.parse(localStorage.getItem(DANCES_CACHE_KEY)); } catch (e) { dancesFeed = null; }
+  }
+  renderDanceRoutines();
+  renderDancerPicker();
+}
+
 // ---------- Init ----------
 renderCountdown();
 renderSeasonList();
+loadDances();
 renderDanceBag();
 let danceBagComplete = danceBagAllChecked();
 const danceBagClearBtn = document.getElementById('dancebagClear');
