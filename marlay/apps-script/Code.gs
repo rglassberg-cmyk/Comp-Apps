@@ -14,71 +14,20 @@
  * Roster is dropped (counted in `unmatchedCount`) rather than passed through, in case
  * someone types a full name by mistake.
  *
- * Dancers dropdown: Google only allows multiple selections on a fixed-list dropdown,
- * not one that reads from a range, so refreshDancerDropdown() rebuilds that list from
- * the Roster. Run setup() once from the editor; after that it re-runs on every Roster
- * edit. The "Marlay" menu in the sheet can also run it by hand. This needs the Google
- * Sheets API advanced service added in the editor (Services + → Google Sheets API),
- * which turns the Sheets API on for the script's project.
+ * Dancers dropdown: the Dances tab's Dancers column is a multi-select chip dropdown
+ * (groups plus Roster display names). It is NOT rebuilt by this script: Google's public
+ * Sheets API (used by Apps Script, UrlFetchApp and the Sheets advanced service alike)
+ * silently drops `allowMultipleSelections` and `customUiMode`, so any script rebuild
+ * turns multi-select off. Names typed into a Dancers cell still reach the site as long
+ * as they're on the Roster; the dropdown list itself is refreshed outside this script
+ * (the Google Sheets connector honors both settings).
  */
 
 const GROUPS = ['Petite', 'Mini', 'Junior', 'Teen', 'Senior'];
 
-function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Marlay')
-    .addItem('Refresh dancer dropdown', 'refreshDancerDropdown')
-    .addToUi();
-}
-
-// Run once from the Apps Script editor (Run → setup) to turn on the automatic refresh.
-function setup() {
-  ScriptApp.getProjectTriggers()
-    .filter(t => t.getHandlerFunction() === 'onRosterEdit')
-    .forEach(t => ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger('onRosterEdit').forSpreadsheet(SpreadsheetApp.getActive()).onEdit().create();
-  refreshDancerDropdown();
-}
-
-function onRosterEdit(e) {
-  if (e && e.range.getSheet().getName() === 'Roster') refreshDancerDropdown();
-}
-
-// SpreadsheetApp's validation builder has no multiple-selections option, and the
-// Sheets advanced service silently drops `allowMultipleSelections` too, so this calls
-// the Sheets REST API directly with the script's own sign-in. The advanced service
-// still has to stay added (Services + → Google Sheets API): that's what turns the
-// Sheets API on for the script's project.
-function refreshDancerDropdown() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const options = GROUPS.map(g => g + ' group')
-    .concat(readRoster(ss.getSheetByName('Roster')).map(d => d.name));
-  const dances = ss.getSheetByName('Dances');
-  const col = dances.getRange(1, 1, 1, dances.getLastColumn()).getValues()[0]
-    .map(h => String(h).trim()).indexOf('Dancers');
-  if (col < 0) throw new Error('No "Dancers" column on the Dances tab');
-  const request = {
-    setDataValidation: {
-      range: { sheetId: dances.getSheetId(), startRowIndex: 1, startColumnIndex: col, endColumnIndex: col + 1 },
-      rule: {
-        condition: {
-          type: 'ONE_OF_LIST',
-          allowMultipleSelections: true,
-          values: options.map(v => ({ userEnteredValue: v }))
-        },
-        strict: false,
-        showCustomUi: true,
-        customUiMode: 'CHIP',
-        inputMessage: 'Pick a whole group (e.g. Senior group) or individual dancers. The list updates from the Roster tab.'
-      }
-    }
-  };
-  UrlFetchApp.fetch('https://sheets.googleapis.com/v4/spreadsheets/' + ss.getId() + ':batchUpdate', {
-    method: 'post',
-    contentType: 'application/json',
-    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
-    payload: JSON.stringify({ requests: [request] })
-  });
-}
+// An installable onEdit trigger from an earlier version still points here. It used to
+// rebuild the Dancers dropdown; it now does nothing (see the note above).
+function onRosterEdit(e) {}
 
 function doGet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
