@@ -187,17 +187,59 @@ const SEASON = [
     dances: []
   },
   {
-    slug: "nationals-tba",
+    slug: "nationals-myrtle-beach",
     name: "Nationals",
     type: "competition",
-    location: "TBA",
-    dateLabel: "Dates TBA",
-    startDate: null,
-    endDate: null,
-    venue: null,
-    hotel: null,
-    booked: false,
+    location: "Myrtle Beach, SC",
+    dateLabel: "Jun 28 – Jul 3, 2027",
+    startDate: { year: 2027, month: 5, day: 28 },
+    endDate: { year: 2027, month: 6, day: 3 },
+    venue: {
+      name: "Myrtle Beach Convention Center",
+      address: "2101 N Oak St, Myrtle Beach, SC 29577"
+    },
+    hotel: {
+      name: "Sheraton Myrtle Beach",
+      address: "2101 N Oak St, Myrtle Beach, SC 29577",
+      phone: "(843) 918-5000",
+      onSite: true,
+      bookingUrl: "https://www.marriott.com/event-reservations/reservation-link.mi?id=1787065828317&key=GRP&app=resvlink",
+      bookingDeadline: "Thursday, May 27, 2027",
+      note: "Showstopper's official hotel block. The Sheraton connects directly to the convention center, and the ocean is minutes away."
+    },
+    booked: true,
     bookingInfo: "",
+    officialUrl: "https://www.goshowstopper.com/competitions_cpt/east-coast-finals/",
+    driving: {
+      distanceMi: 620,
+      duration: "about 9.5–10.5 hours",
+      route: "I-95 S to Dillon, SC, then US-501 E. Before Conway, switch to SC-22 E to skip the traffic through town",
+      note: "Flying instead? Myrtle Beach International (MYR) is about 10 minutes from the hotel."
+    },
+    // Restaurants and activities carried over from the 2026 Nationals site (same venue).
+    placesToEat: [
+      { name: "Vidalia's", cuisine: "Southern / American", walkable: true, distanceNote: "In the Sheraton", address: "2101 N Oak St, Myrtle Beach, SC 29577", website: "https://www.marriott.com/en-us/hotels/myrsi-sheraton-myrtle-beach/dining/", notes: "Full-service restaurant inside the hotel. Also has a lobby bar." },
+      { name: "Kilwins", cuisine: "Ice cream & sweets", walkable: true, distanceNote: "In the Sheraton", address: "2101 N Oak St, Myrtle Beach, SC 29577", website: "https://www.kilwins.com", notes: "Ice cream, chocolates, fudge. A good post-performance treat." },
+      { name: "Myrtle Beach Boardwalk", cuisine: "Various", walkable: true, distanceNote: "About a 10–15 min walk", address: "Ocean Blvd, Myrtle Beach, SC", notes: "Lots of casual spots along the boardwalk: seafood shacks, pizza, arcades. Better in the daytime." },
+      { name: "Fiesta Mexicana", cuisine: "Mexican", walkable: false, distanceNote: "About an 8 min drive", address: "410 70th Ave N, Myrtle Beach, SC 29572", website: "https://www.fiestamexicanacantina.com", notes: "Recommended by Tate families who know the area. Family-owned since 1999: fajitas, ceviche, handmade margaritas." },
+      { name: "Ducati's Pizzeria & Trattoria", cuisine: "Italian / Pizza", walkable: false, distanceNote: "About a 10 min drive", address: "960 Cipriana Dr Suite B4, Myrtle Beach, SC 29572", website: "https://ducatispizzatrattoria.com", notes: "Recommended by Tate families who know the area. Pizza, pasta, and Italian-American classics; dine-in and takeout." },
+      { name: "Zeytin Carolina Forest", cuisine: "Mediterranean breakfast & lunch", walkable: false, distanceNote: "About a 12 min drive", address: "224 Fresh Dr Unit A, Myrtle Beach, SC 29579", website: "https://zeytinmb.com", notes: "Recommended by Tate families who know the area. Turkish-Mediterranean café: shakshuka, honey feta, fresh simit, Turkish coffee." },
+      { name: "Earth Cafe", cuisine: "Healthy breakfast & lunch", walkable: false, distanceNote: "About an 8 min drive", address: "3811 N Kings Hwy Suite 31, Myrtle Beach, SC 29577", website: "https://www.facebook.com/earthcafemb/", notes: "Recommended by Tate families who know the area. Fresh, organic, vegan-friendly: avocado toast, acai bowls, smoothies." },
+      { name: "Lekker Eats", cuisine: "Global / healthy breakfast & lunch", walkable: false, distanceNote: "About a 10 min drive", address: "3751 Robert Grissom Pkwy Suite 101, Myrtle Beach, SC 29577", website: "https://lekkereatssc.com", notes: "Recommended by Tate families who know the area. South African-inspired bowls, smoothies, sandwiches." },
+      { name: "Dirty Don's Oyster Bar & Grill", cuisine: "Seafood", walkable: false, distanceNote: "About a 10 min drive (Market Common)", address: "4017 Deville St, Myrtle Beach, SC 29577", website: "https://dirtydonsoysterbar.com", notes: "Key West-style seafood: oysters, seafood boils, a good patio." },
+      { name: "Broadway at the Beach", cuisine: "Dozens of restaurants in one complex", walkable: false, distanceNote: "About a 10 min drive", address: "1325 Celebrity Circle, Myrtle Beach, SC", website: "https://www.broadwayatthebeach.com", notes: "Margaritaville, The Hangout, and lots more. Expect a wait on weekend evenings." },
+      { name: "Barefoot Landing", cuisine: "Waterfront dining on the Intracoastal Waterway", walkable: false, distanceNote: "About a 15 min drive north", address: "4898 Hwy 17 S, North Myrtle Beach, SC", website: "https://www.bflanding.com", notes: "More relaxed than Broadway at the Beach. House of Blues, LuLu's, Greg Norman's." },
+      { name: "Market Common", cuisine: "Restaurants, boutiques & bike rentals", walkable: false, distanceNote: "About a 10 min drive south", address: "Farrow Pkwy, Myrtle Beach, SC", website: "https://themarketcommon.com", notes: "Upscale, walkable neighborhood popular with locals. Dirty Don's, Tupelo Honey, and more." }
+    ],
+    thingsToDo: [
+      { name: "The beach", desc: "Walk to the beach from the hotel. The boardwalk is about a mile away: a 1.2-mile oceanfront promenade with shops, food, and the SkyWheel. All beaches here are public.", walkable: true, distanceNote: "About a 15–20 min walk", free: true, address: "Myrtle Beach Boardwalk, Myrtle Beach, SC" },
+      { name: "SkyWheel Myrtle Beach", desc: "187-foot Ferris wheel on the boardwalk with climate-controlled gondolas and ocean views.", walkable: true, distanceNote: "About a 15 min walk or 5 min drive", website: "https://myrtlebeachskywheel.com" },
+      { name: "Barefoot Landing race boats", desc: "Rent small race boats and zoom around the waterways. Fun for all ages; local families love it.", walkable: false, distanceNote: "About a 15 min drive north", address: "4898 Hwy 17 S, North Myrtle Beach, SC", website: "https://www.bflanding.com" },
+      { name: "Market Common e-bikes", desc: "Rent electric bikes and cruise this walkable neighborhood of shops and restaurants. Calmer than the boardwalk.", walkable: false, distanceNote: "About a 10 min drive south", address: "Farrow Pkwy, Myrtle Beach, SC", website: "https://themarketcommon.com" },
+      { name: "Broadway at the Beach", desc: "Lakeside complex with 100+ shops, restaurants, mini golf, Margaritaville, WonderWorks, and more.", walkable: false, distanceNote: "About a 10 min drive", address: "1325 Celebrity Circle, Myrtle Beach, SC", website: "https://www.broadwayatthebeach.com" },
+      { name: "Family Kingdom Amusement Park", desc: "Old-school beachfront amusement park with rides, a water park, and a classic wooden roller coaster. Great for kids.", walkable: false, distanceNote: "About a 5 min drive", website: "https://www.family-kingdom.com" },
+      { name: "Ripley's Aquarium", desc: "Underwater tunnels with sharks, stingrays, and sea turtles, plus sloth and penguin encounters. A good rainy-day option.", walkable: false, distanceNote: "About a 10 min drive", website: "https://www.ripleyaquariums.com/myrtlebeach/" }
+    ],
     dances: []
   }
 ];

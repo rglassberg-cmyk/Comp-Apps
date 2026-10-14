@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261009a">
+<link rel="stylesheet" href="styles.css?v=20261014a">
 </head>
 <body>
 
@@ -189,9 +189,9 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261009a"></script>
-<script src="data/season.js?v=20261009a"></script>
-<script src="data/dancers.js?v=20261009a"></script>
+<script src="data/config.js?v=20261014a"></script>
+<script src="data/season.js?v=20261014a"></script>
+<script src="data/dancers.js?v=20261014a"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
@@ -257,15 +257,19 @@ menuBtn.addEventListener('click', () => setDrawer(true));
 drawerOverlay.addEventListener('click', () => setDrawer(false));
 document.getElementById('drawerClose').addEventListener('click', () => setDrawer(false));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
-drawer.addEventListener('click', e => {
-  const link = e.target.closest('[data-drawer-view]');
-  if (!link) return;
-  const name = link.dataset.drawerView;
+function openMenuView(name) {
   const frame = document.getElementById('suggestFrame');
   if (name === 'suggest' && !frame.src) frame.src = STUDIO.suggestUpdatesFormUrl;
   setDrawer(false);
   showView(name);
   window.scrollTo(0, 0);
+}
+drawer.addEventListener('click', e => {
+  const link = e.target.closest('[data-drawer-view]');
+  if (link) openMenuView(link.dataset.drawerView);
+});
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-open-suggest]')) openMenuView('suggest');
 });
 
 // ---------- Season Overview ----------
@@ -339,7 +343,9 @@ function openComp(slug) {
         <div class="info-row"><span class="label">Address</span><span class="value">${comp.hotel.address}</span></div>
         ${comp.hotel.phone ? `<div class="info-row"><span class="label">Phone</span><span class="value">${comp.hotel.phone}</span></div>` : ''}
         ${comp.hotel.distanceNote ? `<div class="info-row"><span class="label">Distance from venue</span><span class="value">${comp.hotel.distanceNote}</span></div>` : ''}
-        <div class="coming-soon" style="margin-top:12px;">Suggested hotel — not an official team block. Feel free to book here or explore other options near the venue.</div>
+        ${comp.hotel.bookingDeadline ? `<div class="info-row"><span class="label">Book by</span><span class="value">${comp.hotel.bookingDeadline}</span></div>` : ''}
+        <div class="coming-soon" style="margin-top:12px;">${comp.hotel.note || 'Suggested hotel — not an official team block. Feel free to book here or explore other options near the venue.'}</div>
+        ${comp.hotel.bookingUrl ? `<a class="btn" href="${comp.hotel.bookingUrl}" target="_blank" rel="noopener">Book hotel</a>` : ''}
       </div>`;
   } else if (comp.bookingInfo || (!comp.hotelNote && !(comp.hotelSuggestions && comp.hotelSuggestions.length))) {
     hotelRow = `<div class="card"><div class="coming-soon">${comp.bookingInfo || 'No hotel suggestion yet — check back as this firms up.'}</div></div>`;
@@ -376,6 +382,7 @@ function openComp(slug) {
         <div class="info-row"><span class="label">Distance</span><span class="value">${comp.driving.distanceMi} miles from ${STUDIO.homeCity}</span></div>
         <div class="info-row"><span class="label">Drive time</span><span class="value">${comp.driving.duration}</span></div>
         <div class="info-row"><span class="label">Route</span><span class="value">${comp.driving.route}</span></div>
+        ${comp.driving.note ? `<div class="comp-meta" style="margin-top:8px;">${comp.driving.note}</div>` : ''}
         <a class="btn" href="${dirUrl}" target="_blank" rel="noopener">Get Directions</a>
       </div>`;
   }
@@ -393,13 +400,19 @@ function openComp(slug) {
       <a class="btn btn-outline" href="${mapsDir(item.address || `${item.name}, ${venueArea}`)}" target="_blank" rel="noopener">Directions</a>
       ${item.website ? `<a class="btn btn-outline" href="${item.website}" target="_blank" rel="noopener">Website</a>` : ''}
     </div>`;
+  const recommendCard = `
+    <div class="card">
+      <div class="comp-meta">Know a great spot near the venue? Tell us and we'll add it.</div>
+      <button class="btn btn-outline" data-open-suggest>Recommend a spot</button>
+    </div>`;
   const groupedPanel = (items, describe, emptyText) => {
-    if (!items || !items.length) return `<div class="card"><div class="coming-soon">${emptyText}</div></div>`;
+    if (!items || !items.length) return `<div class="card"><div class="coming-soon">${emptyText}</div></div>` + recommendCard;
     const group = (label, list) => list.length
       ? `<div class="card-label section-label">${label}</div>` + list.map(item => placeCard(item, describe(item))).join('')
       : '';
     return group('Walkable', items.filter(i => i.walkable === true)) +
-           group('Short Drive', items.filter(i => i.walkable !== true));
+           group('Short Drive', items.filter(i => i.walkable !== true)) +
+           recommendCard;
   };
   const eatPanel = groupedPanel(comp.placesToEat,
     i => [i.cuisine, i.notes].filter(Boolean).join(' · '),
