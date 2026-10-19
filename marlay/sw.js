@@ -4,10 +4,11 @@
 //
 // Bump CACHE_VERSION whenever the PRECACHE list changes (files added, removed, or
 // renamed) — the activate step deletes every cache that doesn't match it.
-const CACHE_VERSION = 'marlay-v13';
+const CACHE_VERSION = 'marlay-v14';
 
 const PRECACHE = [
   'index.html',
+  'auth.js',
   'styles.css',
   'data/config.js',
   'data/season.js',

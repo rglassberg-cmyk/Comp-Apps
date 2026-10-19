@@ -5,17 +5,21 @@
  *   Execute as: Me    Who has access: Anyone
  * The site fetches the /exec URL and gets JSON back. The sheet itself stays private.
  *
- * This copy is kept in the Comp-Apps repo for history. After editing it in the sheet,
- * redeploy (Deploy → Manage deployments → edit → Version: New version → Deploy), or
- * the /exec URL keeps serving the old code — then copy the new version back here.
+ * This copy is kept in the Comp-Apps repo. It's pushed to the sheet with clasp (script ID
+ * 1dTozdydHMoyiHjYDggbvFe6aVFKT3AAZ2iBCLdOFTLR8xOi6fqgMBw5J), with __FIREBASE_WEB_KEY__
+ * swapped for STUDIO.auth.firebase.apiKey from data/config.js on the way. The /exec URL
+ * keeps serving the old code until a new version is deployed to the existing deployment
+ * (clasp deploy -i <deployment ID>, or Deploy → Manage deployments → New version).
  *
- * Privacy: the /exec URL is public, so this returns display names only. The Roster's
+ * Privacy: the /exec URL is public, so this returns display names only (and, once
+ * LOGIN_REQUIRED is on, nothing at all without a signed-in, listed parent). The Roster's
  * "Full name" column is never read, and any name in a Dancers cell that isn't on the
  * Roster is dropped (counted in `unmatchedCount`) rather than passed through, in case
  * someone types a full name by mistake.
  *
  * Dancers dropdown: the Dances tab's Dancers column is a multi-select chip dropdown
- * (groups plus Roster display names). It is NOT rebuilt by this script: Google's public
+ * (Roster display names; "X group" options were dropped because a group pulls in dancers
+ * who join later). It is NOT rebuilt by this script: Google's public
  * Sheets API (used by Apps Script, UrlFetchApp and the Sheets advanced service alike)
  * silently drops `allowMultipleSelections` and `customUiMode`, so any script rebuild
  * turns multi-select off. Names typed into a Dancers cell still reach the site as long
@@ -29,16 +33,75 @@ const GROUPS = ['Petite', 'Mini', 'Junior', 'Teen', 'Senior'];
 // rebuild the Dancers dropdown; it now does nothing (see the note above).
 function onRosterEdit(e) {}
 
+// Parent login. The site signs people in with Firebase (Google or an emailed link) and
+// POSTs the resulting ID token here; doPost checks it with Firebase and looks the email up
+// in the "Parents" tab (Email, Dancers, Role). Until launch, LOGIN_REQUIRED stays false
+// and the plain GET keeps serving the open feed the current site uses. At launch: set it
+// to true, push, and deploy a new version, and set STUDIO.auth.required in the site config.
+const LOGIN_REQUIRED = false;
+// The site's Firebase web key (also in the site's public config.js). It's restricted to the
+// sign-in APIs and to the site's referrers, so the lookup below sends the site as Referer.
+const FIREBASE_WEB_KEY = '__FIREBASE_WEB_KEY__';
+const SITE_ORIGIN = 'https://rglassberg-cmyk.github.io/';
+
 function doGet() {
+  if (LOGIN_REQUIRED) return json({ authorized: false, reason: 'signin' });
+  return json(feed());
+}
+
+function doPost(e) {
+  let token = '';
+  try { token = JSON.parse(e.postData.contents).token || ''; } catch (err) {}
+  const email = verifiedEmail(token);
+  if (!email) return json({ authorized: false, reason: 'signin' });
+  const entry = readParents(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Parents'))
+    .find(p => p.email === email);
+  if (!entry) return json({ authorized: false, reason: 'not-listed', email: email });
+  const body = feed();
+  body.authorized = true;
+  body.email = email;
+  body.role = entry.role;
+  body.myDancers = entry.dancers.filter(n => body.roster.some(r => r.name === n));
+  return json(body);
+}
+
+function json(body) {
+  return ContentService.createTextOutput(JSON.stringify(body)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function feed() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const roster = readRoster(ss.getSheetByName('Roster'));
   const dances = readDances(ss.getSheetByName('Dances'), roster);
-  const body = {
+  return {
     updated: new Date().toISOString(),
     roster: roster.map(d => ({ name: d.name, group: d.group })),
     dances: dances
   };
-  return ContentService.createTextOutput(JSON.stringify(body)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// Firebase ID token → its verified email (lowercase), or null. Results are cached for the
+// token's remaining life (ID tokens last an hour) so a page load costs one lookup at most.
+function verifiedEmail(token) {
+  if (!token || token.length > 4096) return null;
+  const cache = CacheService.getScriptCache();
+  const key = 'tok:' + Utilities.base64EncodeWebSafe(
+    Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, token));
+  const hit = cache.get(key);
+  if (hit) return hit;
+  const res = UrlFetchApp.fetch('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + FIREBASE_WEB_KEY, {
+    method: 'post',
+    contentType: 'application/json',
+    headers: { Referer: SITE_ORIGIN },
+    payload: JSON.stringify({ idToken: token }),
+    muteHttpExceptions: true
+  });
+  if (res.getResponseCode() !== 200) return null;
+  const user = (JSON.parse(res.getContentText()).users || [])[0];
+  if (!user || !user.email || !user.emailVerified) return null;
+  const email = user.email.trim().toLowerCase();
+  cache.put(key, email, 3000); // 50 minutes, inside the token's 1-hour life
+  return email;
 }
 
 // One-time setup, run by hand from the Apps Script editor (Run → createParentForm).
@@ -122,6 +185,19 @@ function readRoster(sheet) {
   return readRows(sheet)
     .filter(r => r['Display name'])
     .map(r => ({ name: r['Display name'], group: r['Group'] }));
+}
+
+// Parents tab: one row per email. Dancers is a comma-separated list of Roster display
+// names (siblings get several); Role is Parent or Staff.
+function readParents(sheet) {
+  if (!sheet) return [];
+  return readRows(sheet)
+    .filter(r => r['Email'])
+    .map(r => ({
+      email: r['Email'].toLowerCase(),
+      dancers: (r['Dancers'] || '').split(',').map(s => s.trim()).filter(Boolean),
+      role: r['Role'] || 'Parent'
+    }));
 }
 
 function readDances(sheet, roster) {
