@@ -11,9 +11,10 @@ const STUDIO = {
 
   // Full-color logo with wordmark, shown on the About view.
   logo: "assets/tate-logo-full.png",
-  // Home hero photo, the white dancer shown next to the studio name on it, and the
+  // This season's team photo, shown full width on the Home hero (it's very wide, so the
+  // hero shows it uncropped), the white dancer shown next to the studio name, and the
   // small pink mark pinned top-right on every view.
-  heroBackground: "assets/hero-bg.jpg",
+  heroPhoto: { src: "assets/team-2026-27.jpg", alt: "The Tate Academy competition team, 2026–2027" },
   heroLogoLight: "assets/dancer-white.png",
   markIcon: "assets/dancer-mark.png",
 
@@ -58,6 +59,13 @@ const STUDIO = {
 
   season: {
     label: "2026–2027 Season"
+  },
+
+  // Last season's team photo, shown on the About view.
+  aboutPhoto: {
+    src: "assets/team-nationals-2026.jpg",
+    alt: "The Tate Academy team at Nationals, 2026",
+    caption: "Last season's team at Nationals, 2026"
   },
 
   // Descriptive sentence on the About view (opened from the menu drawer).

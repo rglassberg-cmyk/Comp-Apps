@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261014a">
+<link rel="stylesheet" href="styles.css?v=20261019a">
 </head>
 <body>
 
@@ -40,7 +40,6 @@
   <!-- HOME -->
   <section class="view active" id="view-home">
     <div class="hero" id="hero">
-      <div class="hero-bg" id="heroBg"></div>
       <div class="hero-top">
         <div class="hero-brand">
           <img class="hero-brand-mark" id="heroBrandMark" alt="">
@@ -48,6 +47,7 @@
         </div>
         <div class="hero-season" id="heroSeason"></div>
       </div>
+      <img class="hero-photo" id="heroPhoto">
       <div class="countdown" id="countdown" hidden></div>
     </div>
 
@@ -147,6 +147,10 @@
     <div class="card">
       <img class="brand-logo" id="aboutLogo" alt="">
       <p class="about-text" id="aboutText"></p>
+      <figure class="about-photo" id="aboutPhoto" hidden>
+        <img id="aboutPhotoImg">
+        <figcaption id="aboutPhotoCaption"></figcaption>
+      </figure>
       <p class="about-text" id="aboutSeason"></p>
       <p class="about-text" id="aboutCredit"></p>
     </div>
@@ -189,13 +193,14 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261014a"></script>
-<script src="data/season.js?v=20261014a"></script>
-<script src="data/dancers.js?v=20261014a"></script>
+<script src="data/config.js?v=20261019a"></script>
+<script src="data/season.js?v=20261019a"></script>
+<script src="data/dancers.js?v=20261019a"></script>
 <script>
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
-document.getElementById('heroBg').style.backgroundImage = `url("${STUDIO.heroBackground}")`;
+document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
+document.getElementById('heroPhoto').alt = STUDIO.heroPhoto.alt;
 document.getElementById('heroBrandMark').src = STUDIO.heroLogoLight;
 document.getElementById('heroStudioName').textContent = STUDIO.name;
 document.getElementById('heroSeason').textContent = STUDIO.season.label;
@@ -226,13 +231,18 @@ document.getElementById('drawerResources').append(...Object.values(STUDIO.resour
 }));
 document.getElementById('aboutText').textContent = STUDIO.aboutBlurb;
 document.getElementById('aboutSeason').textContent = STUDIO.season.label;
+if (STUDIO.aboutPhoto) {
+  document.getElementById('aboutPhotoImg').src = STUDIO.aboutPhoto.src;
+  document.getElementById('aboutPhotoImg').alt = STUDIO.aboutPhoto.alt;
+  document.getElementById('aboutPhotoCaption').textContent = STUDIO.aboutPhoto.caption;
+  document.getElementById('aboutPhoto').hidden = false;
+}
 document.getElementById('aboutCredit').appendChild(builtByLink());
 
 // ---------- Tab navigation ----------
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
-  if (name === 'home' && typeof requestHeroParallax === 'function') requestHeroParallax();
   document.querySelectorAll('#tabBar button').forEach(b => {
     b.classList.toggle('active', b.dataset.view === name);
   });
@@ -578,38 +588,6 @@ function setCalendarMode(mode) {
   });
   document.getElementById('calendarFrame').src = 'https://calendar.google.com/calendar/embed?' + params.toString();
   document.querySelectorAll('.cal-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-}
-
-// ---------- Hero parallax ----------
-// The photo layer is 106% of the hero's height and drifts down at 30% of the scroll
-// distance, so it moves slower than the page. Work is batched into one
-// requestAnimationFrame per frame, and skipped when Home isn't showing or the hero is
-// off screen. Under prefers-reduced-motion no listener is attached at all.
-let requestHeroParallax = null;
-if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const hero = document.getElementById('hero');
-  const heroBg = document.getElementById('heroBg');
-  const homeView = document.getElementById('view-home');
-  let frameQueued = false;
-  const update = () => {
-    frameQueued = false;
-    if (!homeView.classList.contains('active')) return;
-    const rect = hero.getBoundingClientRect();
-    if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
-    // The layer's spare height is all above the hero (its bottom is flush), so the shift
-    // must stay within [0, spare]. The lower bound matters on iOS, where scrollY goes
-    // negative during the rubber-band bounce at the top and would lift the layer's
-    // bottom edge above the hero's.
-    const maxShift = Math.floor(heroBg.getBoundingClientRect().height - rect.height);
-    const shift = Math.min(Math.max(window.scrollY * 0.3, 0), maxShift);
-    heroBg.style.transform = `translate3d(0, ${shift}px, 0)`;
-  };
-  requestHeroParallax = () => {
-    if (frameQueued) return;
-    frameQueued = true;
-    requestAnimationFrame(update);
-  };
-  window.addEventListener('scroll', requestHeroParallax, { passive: true });
 }
 
 // ---------- Countdown (Home hero) ----------

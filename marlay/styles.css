@@ -463,9 +463,8 @@ button.btn-outline:disabled:hover { background: none; }
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  min-height: 340px;
-  padding: 20px 20px 14px;
+  gap: 16px;
+  padding: 18px 20px 16px;
   position: relative;
   text-align: center;
   color: #fff;
@@ -476,18 +475,14 @@ button.btn-outline:disabled:hover { background: none; }
   margin-bottom: 18px;
 }
 
-.hero-bg {
-  position: absolute;
-  left: 0;
-  right: 0;
-  /* Kept to 106%: the photo's cover scale is set by height, so every extra percent of
-     parallax travel crops more width. 57% horizontal keeps the whole group in frame. */
-  top: -6%;
-  bottom: 0;
-  z-index: 0;
-  background-size: cover;
-  background-position: 57% center;
-  will-change: transform;
+/* The team photo is very wide (about 2.5:1), so it runs edge to edge at its own shape
+   instead of being cropped to fill the hero; cropping would cut dancers off both ends. */
+.hero-photo {
+  display: block;
+  width: calc(100% + 40px);
+  margin: 0 -20px;
+  height: auto;
+  aspect-ratio: 2000 / 799;
 }
 
 .hero-top, .hero .countdown { position: relative; z-index: 1; }
@@ -720,6 +715,10 @@ button.btn-outline:disabled:hover { background: none; }
 
 .about-text { margin: 0 0 10px; font-size: 15px; }
 .about-text:last-child { margin-bottom: 0; }
+.about-photo { margin: 16px 0 14px; }
+.about-photo[hidden] { display: none; }
+.about-photo img { display: block; width: 100%; height: auto; border-radius: 10px; }
+.about-photo figcaption { margin-top: 6px; font-size: 13px; color: var(--ink-soft); text-align: center; }
 
 /* ---------- Install banner ---------- */
 
