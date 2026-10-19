@@ -11,9 +11,48 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261019a">
+<link rel="stylesheet" href="styles.css?v=20261019b">
 </head>
 <body>
+
+<!-- SIGN-IN (only when STUDIO.auth.required, or ?login=1 while testing) -->
+<div class="signin" id="signin" hidden>
+  <div class="signin-card">
+    <img class="signin-logo" id="signinLogo" alt="">
+    <div data-signin-state="start">
+      <h1 class="signin-title">Welcome, Tate families</h1>
+      <p class="signin-text">Sign in with the email you gave on the parent form.</p>
+      <button class="btn signin-google" id="signinGoogle">Sign in with Google</button>
+      <div class="signin-or"><span>or</span></div>
+      <form id="signinEmailForm">
+        <input class="signin-input" id="signinEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button class="btn btn-outline" type="submit">Email me a sign-in link</button>
+      </form>
+    </div>
+    <div data-signin-state="sent" hidden>
+      <h1 class="signin-title">Check your email</h1>
+      <p class="signin-text">We sent a sign-in link to <strong id="signinSentTo"></strong>. Tap it on this device to come right in. (Check spam if it's not there in a minute.)</p>
+      <button class="btn btn-outline" data-signin-back>Use a different email</button>
+    </div>
+    <div data-signin-state="confirm" hidden>
+      <h1 class="signin-title">Almost in</h1>
+      <p class="signin-text">Type the email the link was sent to, to finish signing in.</p>
+      <form id="signinConfirmForm">
+        <input class="signin-input" id="signinConfirmEmail" type="email" autocomplete="email" required>
+        <button class="btn" type="submit">Finish signing in</button>
+      </form>
+    </div>
+    <div data-signin-state="checking" hidden>
+      <p class="signin-text">Signing you in…</p>
+    </div>
+    <div data-signin-state="not-listed" hidden>
+      <h1 class="signin-title">Almost there</h1>
+      <p class="signin-text">You're signed in as <strong id="signinNotListedEmail"></strong>, but that email isn't on the Tate parent list yet. Ask Becca to add it, or try another email.</p>
+      <button class="btn btn-outline" data-signin-signout>Use a different email</button>
+    </div>
+    <p class="signin-error" id="signinError" hidden></p>
+  </div>
+</div>
 
 <img class="corner-mark" id="cornerMark" alt="">
 
@@ -33,6 +72,11 @@
   <div class="drawer-divider"></div>
   <button class="drawer-link" data-drawer-view="suggest">Suggest an Update</button>
   <button class="drawer-link" data-drawer-view="about">About</button>
+  <div id="drawerAccount" hidden>
+    <div class="drawer-divider"></div>
+    <div class="drawer-account" id="drawerAccountEmail"></div>
+    <button class="drawer-link" data-signin-signout>Sign out</button>
+  </div>
 </aside>
 
 <main>
@@ -193,10 +237,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261019a"></script>
-<script src="data/season.js?v=20261019a"></script>
-<script src="data/dancers.js?v=20261019a"></script>
+<script src="data/config.js?v=20261019b"></script>
+<script src="data/season.js?v=20261019b"></script>
+<script src="data/dancers.js?v=20261019b"></script>
 <script>
+const ASSET_VERSION = '20261019b'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -920,7 +965,19 @@ document.getElementById('dancerPicker').addEventListener('click', e => {
   renderDancerDances();
 });
 
+function renderDancesFeed() {
+  // A signed-in family's own dancer is picked by default (the first one, for siblings).
+  // Signing out clears the pick, so the next family starts on their own dancer.
+  const mine = (dancesFeed && dancesFeed.myDancers) || [];
+  if (mine.length && !getSelectedDancer()) {
+    try { localStorage.setItem(SELECTED_DANCER_KEY, mine[0]); } catch (e) {}
+  }
+  renderDanceRoutines();
+  renderDancerPicker();
+}
+
 async function loadDances() {
+  if (LOGIN_ON) return loadDancesSignedIn();
   try {
     const res = await fetch(STUDIO.dancesFeedUrl);
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -929,8 +986,129 @@ async function loadDances() {
   } catch (err) {
     try { dancesFeed = JSON.parse(localStorage.getItem(DANCES_CACHE_KEY)); } catch (e) { dancesFeed = null; }
   }
-  renderDanceRoutines();
-  renderDancerPicker();
+  renderDancesFeed();
+}
+
+// ---------- Parent login ----------
+// Off until launch (STUDIO.auth.required); ?login=1 turns it on for testing. Signing in
+// happens in auth.js; whether this person gets in is the sheet script's answer, so the
+// whole page stays behind the sign-in screen until the feed says "authorized".
+const LOGIN_ON = !!(STUDIO.auth && STUDIO.auth.required) || new URLSearchParams(location.search).get('login') === '1';
+const signinEl = document.getElementById('signin');
+
+function showSignin(state, opts = {}) {
+  document.body.classList.toggle('locked', !!state);
+  signinEl.hidden = !state;
+  signinEl.querySelectorAll('[data-signin-state]').forEach(el => { el.hidden = el.dataset.signinState !== state; });
+  const err = document.getElementById('signinError');
+  err.hidden = !opts.error;
+  err.textContent = opts.error || '';
+}
+
+function forgetSignedInData() {
+  dancesFeed = null;
+  try { localStorage.removeItem(DANCES_CACHE_KEY); localStorage.removeItem(SELECTED_DANCER_KEY); } catch (e) {}
+  document.getElementById('drawerAccount').hidden = true;
+}
+
+async function loadDancesSignedIn() {
+  const auth = window.marlayAuth;
+  if (!auth || !auth.user) return;
+  showSignin('checking');
+  try {
+    const res = await fetch(STUDIO.dancesFeedUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // keeps it a "simple" request (no CORS preflight)
+      body: JSON.stringify({ token: await auth.token() })
+    });
+    const body = await res.json();
+    if (!body.authorized) {
+      forgetSignedInData();
+      if (body.reason === 'not-listed') {
+        document.getElementById('signinNotListedEmail').textContent = body.email;
+        return showSignin('not-listed');
+      }
+      return showSignin('start', { error: 'That sign-in didn\'t work. Please try again.' });
+    }
+    dancesFeed = body;
+    try { localStorage.setItem(DANCES_CACHE_KEY, JSON.stringify(body)); } catch (e) {}
+  } catch (err) {
+    // Offline: a family who got in before can keep using their last copy.
+    try { dancesFeed = JSON.parse(localStorage.getItem(DANCES_CACHE_KEY)); } catch (e) { dancesFeed = null; }
+    if (!dancesFeed) return showSignin('start', { error: 'Couldn\'t reach the sign-in check. Check your connection and try again.' });
+  }
+  document.getElementById('drawerAccountEmail').textContent = 'Signed in as ' + auth.user.email;
+  document.getElementById('drawerAccount').hidden = false;
+  showSignin(null);
+  renderDancesFeed();
+}
+
+function friendlyAuthError(err) {
+  const code = (err && err.code) || '';
+  if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return null;
+  if (code === 'auth/popup-blocked') return 'Your browser blocked the Google window. Try the email link instead.';
+  if (code === 'auth/invalid-email') return 'That email doesn\'t look right.';
+  if (code === 'auth/invalid-action-code' || code === 'auth/expired-action-code') return 'That sign-in link has expired or was already used. Send yourself a new one.';
+  return 'Something went wrong signing in. Please try again.';
+}
+
+if (LOGIN_ON) {
+  document.getElementById('signinLogo').src = STUDIO.logo;
+  showSignin('checking');
+
+  const start = () => {
+    const auth = window.marlayAuth;
+    if (auth.pendingEmailLink) {
+      const email = auth.storedEmail();
+      if (email) {
+        auth.finishEmailLink(email).catch(err => showSignin('start', { error: friendlyAuthError(err) }));
+      } else {
+        showSignin('confirm'); // the link was opened on a different device or browser
+      }
+    }
+  };
+  if (window.marlayAuth) start(); else window.addEventListener('marlay-auth-ready', start, { once: true });
+
+  window.addEventListener('marlay-auth', e => {
+    if (e.detail) { loadDancesSignedIn(); return; }
+    forgetSignedInData();
+    if (!(window.marlayAuth && window.marlayAuth.pendingEmailLink)) showSignin('start');
+  });
+
+  document.getElementById('signinGoogle').addEventListener('click', () => {
+    window.marlayAuth.signInWithGoogle().catch(err => {
+      const msg = friendlyAuthError(err);
+      if (msg) showSignin('start', { error: msg });
+    });
+  });
+  document.getElementById('signinEmailForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('signinEmail').value.trim();
+    try {
+      await window.marlayAuth.sendEmailLink(email);
+      document.getElementById('signinSentTo').textContent = email;
+      showSignin('sent');
+    } catch (err) {
+      showSignin('start', { error: friendlyAuthError(err) });
+    }
+  });
+  document.getElementById('signinConfirmForm').addEventListener('submit', e => {
+    e.preventDefault();
+    showSignin('checking');
+    window.marlayAuth.finishEmailLink(document.getElementById('signinConfirmEmail').value.trim())
+      .catch(err => showSignin('start', { error: friendlyAuthError(err) }));
+  });
+  signinEl.querySelector('[data-signin-back]').addEventListener('click', () => showSignin('start'));
+  document.querySelectorAll('[data-signin-signout]').forEach(btn => btn.addEventListener('click', () => {
+    setDrawer(false);
+    window.marlayAuth.signOut();
+  }));
+
+  const authScript = document.createElement('script');
+  authScript.type = 'module';
+  authScript.src = 'auth.js?v=' + ASSET_VERSION;
+  authScript.onerror = () => showSignin('start', { error: 'Couldn\'t load sign-in. Check your connection and refresh.' });
+  document.head.appendChild(authScript);
 }
 
 // ---------- Init ----------

@@ -51,6 +51,21 @@ const STUDIO = {
   // Apps Script web app (marlay/apps-script/Code.gs). Returns display names only.
   dancesFeedUrl: "https://script.google.com/macros/s/AKfycbyxeqhpq0YDmnZo0Y24ZAduFN-k_rnYmtoMrUWH_wkOxUDtRUakscBwoGIQTCWqFkjVyQ/exec",
 
+  // Parent login. Firebase Auth lives in the marlay-calendar Google Cloud project (personal
+  // Gmail). Like the calendar key, this web key is meant to be in page source; it's
+  // restricted to the sign-in APIs and to this site's referrers. Who gets in is decided by
+  // the sheet script's "Parents" tab, not here. `required: false` keeps the site open
+  // until launch; add ?login=1 to the URL to try the login before then.
+  auth: {
+    required: false,
+    firebase: {
+      apiKey: "AIzaSyBf8cV-7y0GsSgXkibEqrI5fXMMGBffJ80",
+      authDomain: "marlay-calendar.firebaseapp.com",
+      projectId: "marlay-calendar",
+      appId: "1:940664518510:web:408a61e7172b6063e3b37f"
+    }
+  },
+
   rehearsalCalendar: {
     id: "910dc55878656b0b832ca864e5e613c6d7389270d15e4d1c956eaa9185a4dc42@group.calendar.google.com",
     timezone: "America/New_York",
