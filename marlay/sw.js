@@ -4,7 +4,7 @@
 //
 // Bump CACHE_VERSION whenever the PRECACHE list changes (files added, removed, or
 // renamed) — the activate step deletes every cache that doesn't match it.
-const CACHE_VERSION = 'marlay-v12';
+const CACHE_VERSION = 'marlay-v13';
 
 const PRECACHE = [
   'index.html',
@@ -17,7 +17,8 @@ const PRECACHE = [
   'assets/icon-512.png',
   'assets/apple-touch-icon.png',
   'assets/tate-logo-full.png',
-  'assets/hero-bg.jpg',
+  'assets/team-2026-27.jpg',
+  'assets/team-nationals-2026.jpg',
   'assets/dancer-white.png',
   'assets/dancer-mark.png'
 ];
