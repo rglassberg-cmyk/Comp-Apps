@@ -68,7 +68,11 @@ function createParentForm() {
     .setHelpText('Only the first name (and last initial if needed) shows on the site.');
   form.addTextItem().setTitle('Your name').setRequired(true);
   form.addTextItem().setTitle('Your email').setRequired(true)
-    .setHelpText('We\'ll use this to set up your login for the app.')
+    .setHelpText('We\'ll use this to set up your login for the app. A Google or Gmail address ' +
+      'is easiest, but any email works.')
+    .setValidation(FormApp.createTextValidation().requireTextIsEmail().build());
+  form.addTextItem().setTitle('Second parent or guardian email (optional)')
+    .setHelpText('Add one if another parent should be able to log in too.')
     .setValidation(FormApp.createTextValidation().requireTextIsEmail().build());
   form.addParagraphTextItem().setTitle('Tell us about your dancer!').setRequired(true)
     .setHelpText('A few sentences: how long they\'ve been dancing, a favorite style or dance, ' +
