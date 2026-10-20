@@ -60,3 +60,12 @@
   `STUDIO.auth.required: true` in config.js. Until then, `?login=1` tries it out.
 - If gcloud errors with "Unable to read file .../adc.token", another session left
   `auth/access_token_file` set; prefix commands with `CLOUDSDK_AUTH_ACCESS_TOKEN_FILE=""`.
+- 2026-10-19: Firebase Auth turned on (Google + email link), github.io added to authorized
+  domains, script deployed as version @2 (login code in, LOGIN_REQUIRED still false).
+- 2026-10-19 key exposure: a diff of the pushed Code.js printed the Firebase browser key
+  ("Marlay sign-in (GitHub Pages)", marlay-calendar, personal Gmail) in a Claude session's
+  terminal output. That key is already public in config.js and is referrer- and
+  API-restricted, so it was not rotated. To rotate: Cloud console → APIs & Services →
+  Credentials → that key → Rotate key, then update config.js and re-push the script.
+  The clasp push also swaps the key into Code.gs's header comment; the key is only needed on
+  the FIREBASE_WEB_KEY line.
