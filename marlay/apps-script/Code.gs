@@ -35,10 +35,10 @@ function onRosterEdit(e) {}
 
 // Parent login. The site signs people in with Firebase (Google or an emailed link) and
 // POSTs the resulting ID token here; doPost checks it with Firebase and looks the email up
-// in the "Parents" tab (Email, Dancers, Role). Until launch, LOGIN_REQUIRED stays false
-// and the plain GET keeps serving the open feed the current site uses. At launch: set it
-// to true, push, and deploy a new version, and set STUDIO.auth.required in the site config.
-const LOGIN_REQUIRED = false;
+// in the "Parents" tab (Email, Dancers, Role: Parent, Dancer or Staff). LOGIN_REQUIRED has
+// been on since 2026-10-21, so a plain GET returns nothing. Turning it off (push and deploy
+// a new version) reopens the feed; set STUDIO.auth.required in the site config to match.
+const LOGIN_REQUIRED = true;
 // The site's Firebase web key (also in the site's public config.js). It's restricted to the
 // sign-in APIs and to the site's referrers, so the lookup below sends the site as Referer.
 const FIREBASE_WEB_KEY = '__FIREBASE_WEB_KEY__';

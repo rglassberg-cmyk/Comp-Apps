@@ -54,10 +54,10 @@ const STUDIO = {
   // Parent login. Firebase Auth lives in the marlay-calendar Google Cloud project (personal
   // Gmail). Like the calendar key, this web key is meant to be in page source; it's
   // restricted to the sign-in APIs and to this site's referrers. Who gets in is decided by
-  // the sheet script's "Parents" tab, not here. `required: false` keeps the site open
-  // until launch; add ?login=1 to the URL to try the login before then.
+  // the sheet script's "Parents" tab, not here. `required: true` (on since 2026-10-21)
+  // makes everyone sign in; false would reopen the site (and the script's LOGIN_REQUIRED too).
   auth: {
-    required: false,
+    required: true,
     firebase: {
       apiKey: "AIzaSyBf8cV-7y0GsSgXkibEqrI5fXMMGBffJ80",
       authDomain: "marlay-calendar.firebaseapp.com",
