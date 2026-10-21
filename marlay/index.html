@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261021a">
+<link rel="stylesheet" href="styles.css?v=20261021b">
 </head>
 <body>
 
@@ -237,11 +237,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261021a"></script>
-<script src="data/season.js?v=20261021a"></script>
-<script src="data/dancers.js?v=20261021a"></script>
+<script src="data/config.js?v=20261021b"></script>
+<script src="data/season.js?v=20261021b"></script>
+<script src="data/dancers.js?v=20261021b"></script>
 <script>
-const ASSET_VERSION = '20261021a'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261021b'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -905,6 +905,7 @@ function danceCard(d, opts = {}) {
       <div class="comp-row-name">${esc(d.name)}</div>
       ${meta ? `<div class="comp-meta">${meta}</div>` : ''}
       ${who}
+      ${d.songArtist ? `<div class="dance-who">Song artist: ${esc(d.songArtist)}</div>` : ''}
       ${danceDetails(d)}
     </div>`;
 }
