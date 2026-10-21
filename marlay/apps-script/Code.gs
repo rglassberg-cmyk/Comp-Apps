@@ -224,6 +224,7 @@ function readDances(sheet, roster) {
         name: r['Dance Name'],
         ageGroup: r['Age Group'],
         genre: r['Genre and Group Size'],
+        songArtist: r['Song Artist'],
         groups: groups,
         dancers: dancers,
         unmatchedCount: unmatchedCount,
