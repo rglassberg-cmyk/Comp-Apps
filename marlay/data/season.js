@@ -18,6 +18,7 @@ const SEASON = [
   {
     slug: "tremaine-boston",
     name: "Tremaine",
+    whoNote: "No Petites or Minis at this one.",
     type: "convention", // "convention" | "competition" — convention rooms are also 1-1 with the hotel/venue here
     location: "Boston, MA",
     dateLabel: "Jan 8–10, 2027",
@@ -115,6 +116,7 @@ const SEASON = [
   {
     slug: "deviate-ac",
     name: "Deviate",
+    whoNote: "No Petites or Minis at this one.",
     type: "convention",
     location: "Atlantic City, NJ",
     dateLabel: "Apr 2–4, 2027",
