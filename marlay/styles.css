@@ -720,6 +720,47 @@ button.btn-outline:disabled:hover { background: none; }
 .about-photo img { display: block; width: 100%; height: auto; border-radius: 10px; }
 .about-photo figcaption { margin-top: 6px; font-size: 13px; color: var(--ink-soft); text-align: center; }
 
+/* ---------- Meet the Dancers ---------- */
+
+.home-tile-wide { grid-column: 1 / -1; }
+
+.team-group-photo { margin: 0 0 12px; }
+.team-group-photo img { display: block; width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+.team-group-photo figcaption { margin-top: 6px; font-size: 13px; color: var(--ink-soft); text-align: center; }
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.team-card {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 8px 8px 12px;
+  min-width: 0;
+}
+.team-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: var(--radius-sm);
+}
+.team-photo-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pink-tint-strong);
+  color: var(--pink);
+  font-size: 40px;
+  font-weight: 700;
+}
+.team-name { margin: 10px 4px 0; font-weight: 700; font-size: 16px; }
+.team-blurb { margin: 4px 4px 0; font-size: 13px; line-height: 1.45; color: var(--ink-soft); }
+
 /* ---------- Install banner ---------- */
 
 .install-banner {

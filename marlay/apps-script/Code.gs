@@ -11,11 +11,18 @@
  * keeps serving the old code until a new version is deployed to the existing deployment
  * (clasp deploy -i <deployment ID>, or Deploy → Manage deployments → New version).
  *
- * Privacy: the /exec URL is public, so this returns display names only (and, once
- * LOGIN_REQUIRED is on, nothing at all without a signed-in, listed parent). The Roster's
- * "Full name" column is never read, and any name in a Dancers cell that isn't on the
- * Roster is dropped (counted in `unmatchedCount`) rather than passed through, in case
- * someone types a full name by mistake.
+ * Privacy: the /exec URL is public, so this returns display names only (and, with
+ * LOGIN_REQUIRED on, nothing at all without a signed-in, listed parent). The Roster's
+ * "Full name" column is only used to match photo file names and is never sent, and any
+ * name in a Dancers cell that isn't on the Roster is dropped (counted in `unmatchedCount`)
+ * rather than passed through, in case someone types a full name by mistake.
+ *
+ * Meet the Dancers: blurbs (Roster "Blurb" column) and photos (the "Tate app photos" Drive
+ * folder, PHOTO_FOLDER_ID) go only to signed-in, listed families. A photo matches a dancer
+ * when its file name is their Roster full name ("Ava Khan.jpg"); a file with "group" in its
+ * name is a group photo for the groups it names ("Petite:Mini Group.jpg"). Photos are sent
+ * as small data URLs in a separate request ({token, want: 'photos'}) so the main feed stays
+ * fast.
  *
  * Dancers dropdown: the Dances tab's Dancers column is a multi-select chip dropdown
  * (Roster display names; "X group" options were dropped because a group pulls in dancers
@@ -27,7 +34,8 @@
  * (the Google Sheets connector honors both settings).
  */
 
-const GROUPS = ['Petite', 'Mini', 'Junior', 'Teen', 'Senior'];
+const GROUPS = ['Petite', 'Mini', 'Junior', 'Teen', 'Advanced'];
+const PHOTO_FOLDER_ID = '1V2TC9lKnnObgrwzgHbibXImePbYuw1-h';
 
 // An installable onEdit trigger from an earlier version still points here. It used to
 // rebuild the Dancers dropdown; it now does nothing (see the note above).
@@ -50,14 +58,18 @@ function doGet() {
 }
 
 function doPost(e) {
-  let token = '';
-  try { token = JSON.parse(e.postData.contents).token || ''; } catch (err) {}
+  let token = '', want = '';
+  try { const req = JSON.parse(e.postData.contents); token = req.token || ''; want = req.want || ''; } catch (err) {}
   const email = verifiedEmail(token);
   if (!email) return json({ authorized: false, reason: 'signin' });
   const entry = readParents(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Parents'))
     .find(p => p.email === email);
   if (!entry) return json({ authorized: false, reason: 'not-listed', email: email });
+  if (want === 'photos') return json(Object.assign({ authorized: true }, photos()));
   const body = feed();
+  const blurbs = new Map(readRoster(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'))
+    .map(d => [d.name, d.blurb]));
+  body.roster.forEach(d => { d.blurb = blurbs.get(d.name) || ''; });
   body.authorized = true;
   body.email = email;
   body.role = entry.role;
@@ -184,7 +196,78 @@ function readRows(sheet) {
 function readRoster(sheet) {
   return readRows(sheet)
     .filter(r => r['Display name'])
-    .map(r => ({ name: r['Display name'], group: r['Group'] }));
+    .map(r => ({ name: r['Display name'], group: r['Group'], fullName: r['Full name'], blurb: r['Blurb'] }));
+}
+
+// Photo file name or Roster full name → a comparable key ("Ava khan.jpg" → "ava khan").
+function nameKey(s) {
+  return String(s || '').replace(/\.[a-z0-9]+$/i, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+// Every image in the photo folder and its subfolders.
+function photoFiles() {
+  const out = [];
+  const walk = folder => {
+    const files = folder.getFiles();
+    while (files.hasNext()) {
+      const f = files.next();
+      if (/^image\//.test(f.getMimeType())) out.push(f);
+    }
+    const subs = folder.getFolders();
+    while (subs.hasNext()) walk(subs.next());
+  };
+  walk(DriveApp.getFolderById(PHOTO_FOLDER_ID));
+  return out;
+}
+
+// Dancer photos keyed by display name, plus group photos, as small JPEG data URLs.
+// Each resized image is cached (by file ID, last change and size) for six hours.
+function photos() {
+  const roster = readRoster(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Roster'));
+  const byKey = new Map(roster.map(d => [nameKey(d.fullName), d.name]));
+  const wanted = [];
+  photoFiles().forEach(f => {
+    const key = nameKey(f.getName());
+    if (/\bgroup\b/.test(key)) {
+      const words = { Advanced: 'advanced|adv|seniors?' }; // Tabitha's list says ADV
+      const groups = GROUPS.filter(g =>
+        new RegExp('\\b(' + (words[g] || g.toLowerCase() + 's?') + ')\\b').test(key));
+      if (groups.length) wanted.push({ file: f, size: 1000, groups: groups });
+    } else if (byKey.has(key)) {
+      wanted.push({ file: f, size: 480, dancer: byKey.get(key) });
+    }
+  });
+
+  const cache = CacheService.getScriptCache();
+  const cacheKey = w => 'ph:' + w.file.getId() + ':' + w.file.getLastUpdated().getTime() + ':' + w.size;
+  const hits = cache.getAll(wanted.map(cacheKey));
+  const misses = wanted.filter(w => !hits[cacheKey(w)]);
+  const token = ScriptApp.getOAuthToken();
+  const responses = UrlFetchApp.fetchAll(misses.map(w => ({
+    url: 'https://drive.google.com/thumbnail?sz=w' + w.size + '&id=' + w.file.getId(),
+    headers: { Authorization: 'Bearer ' + token },
+    muteHttpExceptions: true
+  })));
+  misses.forEach((w, i) => {
+    const res = responses[i];
+    const ok = res.getResponseCode() === 200 && /^image\//.test(res.getHeaders()['Content-Type'] || '');
+    const blob = ok ? res.getBlob() : w.file.getThumbnail();
+    if (!blob) return;
+    const url = 'data:' + (blob.getContentType() || 'image/jpeg') + ';base64,' + Utilities.base64Encode(blob.getBytes());
+    hits[cacheKey(w)] = url;
+    if (url.length < 95000) cache.put(cacheKey(w), url, 21600);
+  });
+
+  const dancers = {};
+  const groupPhotos = [];
+  wanted.forEach(w => {
+    const url = hits[cacheKey(w)];
+    if (!url) return;
+    if (w.dancer) dancers[w.dancer] = url;
+    else groupPhotos.push({ groups: w.groups, photo: url });
+  });
+  return { photos: dancers, groupPhotos: groupPhotos };
 }
 
 // Parents tab: one row per email. Dancers is a comma-separated list of Roster display

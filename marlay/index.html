@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261030a">
+<link rel="stylesheet" href="styles.css?v=20261030b">
 </head>
 <body>
 
@@ -68,6 +68,8 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
   </div>
+  <button class="drawer-link" data-drawer-view="team">Meet the Dancers</button>
+  <div class="drawer-divider"></div>
   <div id="drawerResources"></div>
   <div class="drawer-divider"></div>
   <button class="drawer-link" data-drawer-view="suggest">Suggest an Update</button>
@@ -119,6 +121,10 @@
       <button class="home-tile" onclick="showView('dances')">
         <div class="home-tile-title">Dances</div>
         <div class="home-tile-sub">Routines &amp; dancers</div>
+      </button>
+      <button class="home-tile home-tile-wide" onclick="showView('team')">
+        <div class="home-tile-title">Meet the Dancers</div>
+        <div class="home-tile-sub">Photos and a little about everyone</div>
       </button>
     </div>
   </section>
@@ -173,6 +179,15 @@
     <div class="comp-panel" data-dance-panel="dancers">
       <div id="dancerPicker"></div>
       <div id="dancerDances"></div>
+    </div>
+  </section>
+
+  <!-- MEET THE DANCERS (photos and blurbs come with the signed-in feed) -->
+  <section class="view" id="view-team">
+    <h2 class="view-title">Meet the Dancers</h2>
+    <p class="view-lede">This season's team, group by group.</p>
+    <div id="teamList">
+      <div class="card"><div class="skeleton skeleton-short"></div><div class="skeleton skeleton-long"></div></div>
     </div>
   </section>
 
@@ -237,11 +252,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261030a"></script>
-<script src="data/season.js?v=20261030a"></script>
-<script src="data/dancers.js?v=20261030a"></script>
+<script src="data/config.js?v=20261030b"></script>
+<script src="data/season.js?v=20261030b"></script>
+<script src="data/dancers.js?v=20261030b"></script>
 <script>
-const ASSET_VERSION = '20261030a'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261030b'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -286,6 +301,7 @@ document.getElementById('aboutCredit').appendChild(builtByLink());
 
 // ---------- Tab navigation ----------
 function showView(name) {
+  if (name === 'team') loadTeamPhotos();
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('#tabBar button').forEach(b => {
@@ -881,7 +897,7 @@ if ('serviceWorker' in navigator) {
 // textContent / esc(), never as raw HTML.
 const DANCES_CACHE_KEY = 'marlay-dances-feed';
 const SELECTED_DANCER_KEY = 'marlay-selected-dancer';
-const GROUP_ORDER = ['Senior', 'Teen', 'Junior', 'Mini', 'Petite'];
+const GROUP_ORDER = STUDIO.groups;
 let dancesFeed = null;
 
 function esc(s) {
@@ -978,6 +994,7 @@ function renderDancesFeed() {
   }
   renderDanceRoutines();
   renderDancerPicker();
+  renderTeam();
 }
 
 async function loadDances() {
@@ -991,6 +1008,68 @@ async function loadDances() {
     try { dancesFeed = JSON.parse(localStorage.getItem(DANCES_CACHE_KEY)); } catch (e) { dancesFeed = null; }
   }
   renderDancesFeed();
+}
+
+// ---------- Meet the Dancers ----------
+// Blurbs arrive with the signed-in feed (roster[].blurb). Photos are a second, heavier
+// request made the first time this page opens; the last copy is kept on the device so the
+// page fills in right away next time, then refreshes quietly.
+const TEAM_PHOTOS_KEY = 'marlay-team-photos';
+let teamPhotos = null;
+let teamPhotosLoading = false;
+let teamPhotosFresh = false; // fetched since this page load
+try { teamPhotos = JSON.parse(localStorage.getItem(TEAM_PHOTOS_KEY)); } catch (e) {}
+
+function renderTeam() {
+  const el = document.getElementById('teamList');
+  if (!dancesFeed) {
+    el.innerHTML = `<div class="card"><div class="coming-soon">Couldn't load the team right now. Check your connection and try again.</div></div>`;
+    return;
+  }
+  const photos = (teamPhotos && teamPhotos.photos) || {};
+  const groupPhotos = (teamPhotos && teamPhotos.groupPhotos) || [];
+  const shownGroupPhotos = new Set();
+  el.innerHTML = GROUP_ORDER.map(group => {
+    const dancers = dancesFeed.roster.filter(r => r.group === group);
+    if (!dancers.length) return '';
+    // A group photo goes above the first of its groups on the page ("Petite:Mini" sits above Mini).
+    const groupPhoto = groupPhotos.find(p => !shownGroupPhotos.has(p) && p.groups.includes(group));
+    if (groupPhoto) shownGroupPhotos.add(groupPhoto);
+    const caption = groupPhoto && GROUP_ORDER.filter(g => groupPhoto.groups.includes(g)).join(' & ');
+    return `<div class="card-label section-label">${esc(group)}</div>
+      ${groupPhoto ? `<figure class="team-group-photo"><img src="${groupPhoto.photo}" alt="${esc(caption)} group photo">${groupPhoto.groups.length > 1 ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>` : ''}
+      <div class="team-grid">${dancers.map(d => `
+        <div class="team-card">
+          ${photos[d.name]
+            ? `<img class="team-photo" src="${photos[d.name]}" alt="${esc(d.name)}" loading="lazy">`
+            : `<div class="team-photo team-photo-empty${teamPhotosLoading && !teamPhotos ? ' skeleton' : ''}" aria-hidden="true">${teamPhotosLoading && !teamPhotos ? '' : esc(d.name.charAt(0))}</div>`}
+          <div class="team-name">${esc(d.name)}</div>
+          ${d.blurb ? `<p class="team-blurb">${esc(d.blurb)}</p>` : ''}
+        </div>`).join('')}
+      </div>`;
+  }).join('');
+}
+
+async function loadTeamPhotos() {
+  const auth = window.marlayAuth;
+  if (teamPhotosLoading || teamPhotosFresh || !LOGIN_ON || !auth || !auth.user) return;
+  teamPhotosLoading = true;
+  if (dancesFeed) renderTeam();
+  try {
+    const res = await fetch(STUDIO.dancesFeedUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ token: await auth.token(), want: 'photos' })
+    });
+    const body = await res.json();
+    if (body.authorized) {
+      teamPhotos = { photos: body.photos || {}, groupPhotos: body.groupPhotos || [] };
+      teamPhotosFresh = true;
+      try { localStorage.setItem(TEAM_PHOTOS_KEY, JSON.stringify(teamPhotos)); } catch (e) {} // may be too big to keep; fine
+    }
+  } catch (err) {}
+  teamPhotosLoading = false;
+  if (dancesFeed) renderTeam();
 }
 
 // ---------- Parent login ----------
@@ -1011,7 +1090,9 @@ function showSignin(state, opts = {}) {
 
 function forgetSignedInData() {
   dancesFeed = null;
-  try { localStorage.removeItem(DANCES_CACHE_KEY); localStorage.removeItem(SELECTED_DANCER_KEY); } catch (e) {}
+  teamPhotos = null;
+  teamPhotosFresh = false;
+  try { [DANCES_CACHE_KEY, SELECTED_DANCER_KEY, TEAM_PHOTOS_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) {}
   document.getElementById('drawerAccount').hidden = true;
 }
 
