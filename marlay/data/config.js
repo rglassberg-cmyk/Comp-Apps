@@ -49,9 +49,10 @@ const STUDIO = {
   // since this is a static site; the restrictions are the real protection, not secrecy.
   // Dances and roster, read live from the private "Dances Info" Google Sheet through its
   // Apps Script web app (marlay/apps-script/Code.gs). Returns display names only.
-  // The studio's groups, oldest first, exactly as the Roster tab's Group column spells them.
-  // "By dancer" and Meet the Dancers list dancers in this order.
-  groups: ["Advanced", "Teen", "Junior", "Mini", "Petite"],
+  // The studio's groups, youngest first, exactly as the Roster tab's Group column spells
+  // them. "By dancer" and Meet the Dancers list groups in this order, with dancers
+  // alphabetical inside each group.
+  groups: ["Petite", "Mini", "Junior", "Teen", "Advanced"],
 
   dancesFeedUrl: "https://script.google.com/macros/s/AKfycbyxeqhpq0YDmnZo0Y24ZAduFN-k_rnYmtoMrUWH_wkOxUDtRUakscBwoGIQTCWqFkjVyQ/exec",
 

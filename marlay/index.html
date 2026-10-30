@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261030c">
+<link rel="stylesheet" href="styles.css?v=20261031a">
 </head>
 <body>
 
@@ -252,11 +252,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261030c"></script>
-<script src="data/season.js?v=20261030c"></script>
-<script src="data/dancers.js?v=20261030c"></script>
+<script src="data/config.js?v=20261031a"></script>
+<script src="data/season.js?v=20261031a"></script>
+<script src="data/dancers.js?v=20261031a"></script>
 <script>
-const ASSET_VERSION = '20261030c'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261031a'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -898,6 +898,9 @@ if ('serviceWorker' in navigator) {
 const DANCES_CACHE_KEY = 'marlay-dances-feed';
 const SELECTED_DANCER_KEY = 'marlay-selected-dancer';
 const GROUP_ORDER = STUDIO.groups;
+// A group's dancers in alphabetical order, so no one reads the order as favoritism.
+const dancersIn = group => dancesFeed.roster.filter(r => r.group === group)
+  .sort((a, b) => a.name.localeCompare(b.name));
 let dancesFeed = null;
 
 function esc(s) {
@@ -949,7 +952,7 @@ function renderDancerPicker() {
   if (!dancesFeed) { picker.innerHTML = ''; return; }
   const selected = getSelectedDancer();
   picker.innerHTML = GROUP_ORDER.map(group => {
-    const names = dancesFeed.roster.filter(r => r.group === group).map(r => r.name);
+    const names = dancersIn(group).map(r => r.name);
     if (!names.length) return '';
     return `<div class="card-label section-label">${esc(group)}</div>
       <div class="dancer-chips">${names.map(n => `<button class="comp-tab-btn${n === selected ? ' active' : ''}" data-dancer="${esc(n)}">${esc(n)}</button>`).join('')}</div>`;
@@ -1086,7 +1089,7 @@ function renderTeam() {
     ${open.photo ? `<figure class="team-group-photo"><img src="${open.photo}" alt="${esc(open.groups.join(' & '))} group photo"></figure>` : ''}
     ${open.groups.map(group => `
       ${open.groups.length > 1 ? `<div class="card-label section-label">${esc(group)}</div>` : ''}
-      <div class="team-grid">${dancesFeed.roster.filter(r => r.group === group).map(d => dancerCard(d, photos)).join('')}</div>
+      <div class="team-grid">${dancersIn(group).map(d => dancerCard(d, photos)).join('')}</div>
     `).join('')}`;
 }
 
