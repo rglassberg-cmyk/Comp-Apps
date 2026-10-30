@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261030b">
+<link rel="stylesheet" href="styles.css?v=20261030c">
 </head>
 <body>
 
@@ -185,7 +185,7 @@
   <!-- MEET THE DANCERS (photos and blurbs come with the signed-in feed) -->
   <section class="view" id="view-team">
     <h2 class="view-title">Meet the Dancers</h2>
-    <p class="view-lede">This season's team, group by group.</p>
+    <p class="view-lede">Tap a group to meet its dancers.</p>
     <div id="teamList">
       <div class="card"><div class="skeleton skeleton-short"></div><div class="skeleton skeleton-long"></div></div>
     </div>
@@ -252,11 +252,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261030b"></script>
-<script src="data/season.js?v=20261030b"></script>
-<script src="data/dancers.js?v=20261030b"></script>
+<script src="data/config.js?v=20261030c"></script>
+<script src="data/season.js?v=20261030c"></script>
+<script src="data/dancers.js?v=20261030c"></script>
 <script>
-const ASSET_VERSION = '20261030b'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261030c'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -301,7 +301,7 @@ document.getElementById('aboutCredit').appendChild(builtByLink());
 
 // ---------- Tab navigation ----------
 function showView(name) {
-  if (name === 'team') loadTeamPhotos();
+  if (name === 'team') { teamOpen = null; if (dancesFeed) renderTeam(); loadTeamPhotos(); }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('#tabBar button').forEach(b => {
@@ -1020,6 +1020,37 @@ let teamPhotosLoading = false;
 let teamPhotosFresh = false; // fetched since this page load
 try { teamPhotos = JSON.parse(localStorage.getItem(TEAM_PHOTOS_KEY)); } catch (e) {}
 
+// The page opens on one tile per group (a group photo that covers several groups, like
+// "Petite:Mini", makes one combined tile). Tapping a tile shows that group's dancers.
+let teamOpen = null; // the open tile's groups joined with "|", or null for the tiles
+
+function teamSections() {
+  const groupPhotos = (teamPhotos && teamPhotos.groupPhotos) || [];
+  const hasDancers = g => dancesFeed.roster.some(r => r.group === g);
+  const used = new Set();
+  const sections = [];
+  GROUP_ORDER.forEach(group => {
+    if (used.has(group) || !hasDancers(group)) return;
+    const gp = groupPhotos.find(p => p.groups.includes(group));
+    const groups = gp ? GROUP_ORDER.filter(g => gp.groups.includes(g) && hasDancers(g) && !used.has(g)) : [group];
+    groups.forEach(g => used.add(g));
+    sections.push({ key: groups.join('|'), groups, photo: gp ? gp.photo : '' });
+  });
+  return sections;
+}
+
+function dancerCard(d, photos) {
+  const waiting = teamPhotosLoading && !teamPhotos;
+  return `
+    <div class="team-card">
+      ${photos[d.name]
+        ? `<img class="team-photo" src="${photos[d.name]}" alt="${esc(d.name)}" loading="lazy">`
+        : `<div class="team-photo team-photo-empty${waiting ? ' skeleton' : ''}" aria-hidden="true">${waiting ? '' : esc(d.name.charAt(0))}</div>`}
+      <div class="team-name">${esc(d.name)}</div>
+      ${d.blurb ? `<p class="team-blurb">${esc(d.blurb)}</p>` : ''}
+    </div>`;
+}
+
 function renderTeam() {
   const el = document.getElementById('teamList');
   if (!dancesFeed) {
@@ -1027,28 +1058,46 @@ function renderTeam() {
     return;
   }
   const photos = (teamPhotos && teamPhotos.photos) || {};
-  const groupPhotos = (teamPhotos && teamPhotos.groupPhotos) || [];
-  const shownGroupPhotos = new Set();
-  el.innerHTML = GROUP_ORDER.map(group => {
-    const dancers = dancesFeed.roster.filter(r => r.group === group);
-    if (!dancers.length) return '';
-    // A group photo goes above the first of its groups on the page ("Petite:Mini" sits above Mini).
-    const groupPhoto = groupPhotos.find(p => !shownGroupPhotos.has(p) && p.groups.includes(group));
-    if (groupPhoto) shownGroupPhotos.add(groupPhoto);
-    const caption = groupPhoto && GROUP_ORDER.filter(g => groupPhoto.groups.includes(g)).join(' & ');
-    return `<div class="card-label section-label">${esc(group)}</div>
-      ${groupPhoto ? `<figure class="team-group-photo"><img src="${groupPhoto.photo}" alt="${esc(caption)} group photo">${groupPhoto.groups.length > 1 ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>` : ''}
-      <div class="team-grid">${dancers.map(d => `
-        <div class="team-card">
-          ${photos[d.name]
-            ? `<img class="team-photo" src="${photos[d.name]}" alt="${esc(d.name)}" loading="lazy">`
-            : `<div class="team-photo team-photo-empty${teamPhotosLoading && !teamPhotos ? ' skeleton' : ''}" aria-hidden="true">${teamPhotosLoading && !teamPhotos ? '' : esc(d.name.charAt(0))}</div>`}
-          <div class="team-name">${esc(d.name)}</div>
-          ${d.blurb ? `<p class="team-blurb">${esc(d.blurb)}</p>` : ''}
-        </div>`).join('')}
-      </div>`;
-  }).join('');
+  const sections = teamSections();
+  const open = sections.find(sec => sec.key === teamOpen);
+  const waiting = teamPhotosLoading && !teamPhotos;
+
+  if (!open) {
+    el.innerHTML = `<div class="team-tiles">${sections.map(sec => {
+      const count = dancesFeed.roster.filter(r => sec.groups.includes(r.group)).length;
+      const label = sec.groups.join(' & ');
+      return `
+        <button class="team-tile" data-team-open="${esc(sec.key)}">
+          ${sec.photo
+            ? `<img class="team-tile-photo" src="${sec.photo}" alt="${esc(label)} group photo">`
+            : `<div class="team-tile-photo team-tile-empty${waiting ? ' skeleton' : ''}">${waiting ? '' : 'Group photo coming soon'}</div>`}
+          <div class="team-tile-text">
+            <span class="team-tile-name">${esc(label)}</span>
+            <span class="team-tile-count">${count} dancer${count === 1 ? '' : 's'} &rsaquo;</span>
+          </div>
+        </button>`;
+    }).join('')}</div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <button class="back-link" data-team-back>&larr; All groups</button>
+    <div class="detail-header"><div class="detail-title">${esc(open.groups.join(' & '))}</div></div>
+    ${open.photo ? `<figure class="team-group-photo"><img src="${open.photo}" alt="${esc(open.groups.join(' & '))} group photo"></figure>` : ''}
+    ${open.groups.map(group => `
+      ${open.groups.length > 1 ? `<div class="card-label section-label">${esc(group)}</div>` : ''}
+      <div class="team-grid">${dancesFeed.roster.filter(r => r.group === group).map(d => dancerCard(d, photos)).join('')}</div>
+    `).join('')}`;
 }
+
+document.getElementById('teamList').addEventListener('click', e => {
+  const tile = e.target.closest('[data-team-open]');
+  if (tile) teamOpen = tile.dataset.teamOpen;
+  else if (e.target.closest('[data-team-back]')) teamOpen = null;
+  else return;
+  renderTeam();
+  window.scrollTo(0, 0);
+});
 
 async function loadTeamPhotos() {
   const auth = window.marlayAuth;
