@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261021b">
+<link rel="stylesheet" href="styles.css?v=20261030a">
 </head>
 <body>
 
@@ -237,11 +237,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261021b"></script>
-<script src="data/season.js?v=20261021b"></script>
-<script src="data/dancers.js?v=20261021b"></script>
+<script src="data/config.js?v=20261030a"></script>
+<script src="data/season.js?v=20261030a"></script>
+<script src="data/dancers.js?v=20261030a"></script>
 <script>
-const ASSET_VERSION = '20261021b'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261030a'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -354,6 +354,7 @@ function renderSeasonList() {
         <div class="comp-featured-name">${featured.name}${conventionTag(featured)}</div>
         <div class="comp-featured-date">${featured.dateLabel}</div>
         <div class="comp-featured-meta">${featured.venue ? featured.venue.name + ' · ' : ''}${featured.location}</div>
+        ${featured.whoNote ? `<div class="comp-featured-meta">${featured.whoNote}</div>` : ''}
       </div>
       <span class="comp-card-chevron">&rsaquo;</span>
     </button>` : '';
@@ -365,6 +366,7 @@ function renderSeasonList() {
           <div class="comp-row-main">
             <div class="comp-row-name">${comp.name}${conventionTag(comp)}</div>
             <div class="comp-meta">${comp.location} · ${comp.dateLabel}</div>
+            ${comp.whoNote ? `<div class="comp-meta">${comp.whoNote}</div>` : ''}
           </div>
           <span class="comp-card-chevron">&rsaquo;</span>
         </button>
@@ -485,6 +487,7 @@ function openComp(slug) {
     <div class="detail-header">
       <div class="detail-title">${comp.name}</div>
       <div class="detail-sub">${comp.dateLabel} · ${comp.location}</div>
+      ${comp.whoNote ? `<div class="detail-sub">${comp.whoNote}</div>` : ''}
     </div>
     <div class="comp-tabs" id="compTabs">
       <button class="comp-tab-btn active" data-comp-tab="weekend">Weekend Info</button>
