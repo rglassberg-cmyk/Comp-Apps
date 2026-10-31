@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261031a">
+<link rel="stylesheet" href="styles.css?v=20261031b">
 </head>
 <body>
 
@@ -252,11 +252,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261031a"></script>
-<script src="data/season.js?v=20261031a"></script>
-<script src="data/dancers.js?v=20261031a"></script>
+<script src="data/config.js?v=20261031b"></script>
+<script src="data/season.js?v=20261031b"></script>
+<script src="data/dancers.js?v=20261031b"></script>
 <script>
-const ASSET_VERSION = '20261031a'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261031b'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -723,8 +723,9 @@ async function computeWhatsNext() {
   try {
     const params = new URLSearchParams({
       key: STUDIO.rehearsalCalendar.apiKey,
-      timeMin: now.toISOString(),
-      maxResults: '10',
+      // From the start of today, so a weekend's earlier rehearsals stay listed
+      timeMin: todayStart.toISOString(),
+      maxResults: '50',
       singleEvents: 'true',
       orderBy: 'startTime'
     });
@@ -758,6 +759,12 @@ async function computeWhatsNext() {
     return;
   }
 
+  // Something that started before today and is still going (a week-long all-day
+  // event, a multi-day competition) counts as today, so it joins today's cluster
+  // instead of anchoring the card to a weekend that's already over.
+  candidates.forEach(c => {
+    if (c.date < todayStart) { c.ongoing = true; c.date = todayStart; }
+  });
   candidates.sort((a, b) => a.date - b.date);
   const next = candidates[0];
 
@@ -786,7 +793,7 @@ async function computeWhatsNext() {
   };
   const when = document.createElement('div');
   when.className = 'whats-next-when';
-  when.textContent = relativeDayLabel(next.date);
+  when.textContent = next.ongoing && cluster.length === 1 ? 'Happening now' : relativeDayLabel(next.date);
 
   if (cluster.length === 1) {
     const title = document.createElement('div');
@@ -804,7 +811,7 @@ async function computeWhatsNext() {
   }
 
   const multiDay = new Set(cluster.map(c => dayStart(c.date).getTime())).size > 1;
-  if (multiDay && when.textContent === 'This Friday') when.textContent = 'This weekend';
+  if (multiDay && windowStart.getTime() !== windowEnd.getTime()) when.textContent = 'This weekend';
   const anyTimeCell = multiDay || cluster.some(c => c.hasTime);
   const list = document.createElement('div');
   list.className = 'whats-next-list';
