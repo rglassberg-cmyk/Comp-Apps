@@ -910,3 +910,7 @@ body.locked > :not(.signin):not(script) { display: none !important; }
 .signin-error { margin: 14px 0 0; font-size: 14px; color: var(--pink-dark); }
 
 .drawer-account { padding: 10px 8px 0; font-size: 13px; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+/* Google's sign-in button (rendered by Google into this box) */
+.signin-google-gis { display: flex; justify-content: center; min-height: 44px; margin: 10px 0 0; }
+.signin-card .btn[hidden] { display: none; }

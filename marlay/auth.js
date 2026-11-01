@@ -9,7 +9,7 @@
 // whenever the signed-in user changes (detail: the user, or null).
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
-  getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
+  getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithCredential, signOut,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink,
   setPersistence, browserLocalPersistence
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
@@ -36,7 +36,11 @@ window.marlayAuth = {
   pendingEmailLink: isSignInWithEmailLink(auth, location.href),
   storedEmail,
   token: () => auth.currentUser ? auth.currentUser.getIdToken() : Promise.resolve(null),
+  // Fallback only: Firebase's popup goes through marlay-calendar.firebaseapp.com in a
+  // second tab, which loses its state on iPhones ("missing initial state"). The main
+  // button is Google's own (see index.html), which hands back an ID token on this page.
   signInWithGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()),
+  signInWithGoogleToken: idToken => signInWithCredential(auth, GoogleAuthProvider.credential(idToken)),
   sendEmailLink: async email => {
     await sendSignInLinkToEmail(auth, email, { url: returnUrl(), handleCodeInApp: true });
     storeEmail(email);

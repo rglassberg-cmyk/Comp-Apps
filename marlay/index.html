@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261031b">
+<link rel="stylesheet" href="styles.css?v=20261101a">
 </head>
 <body>
 
@@ -22,7 +22,8 @@
     <div data-signin-state="start">
       <h1 class="signin-title">Welcome, Tate families</h1>
       <p class="signin-text">Sign in with the email you gave on the parent form.</p>
-      <button class="btn signin-google" id="signinGoogle">Sign in with Google</button>
+      <div class="signin-google-gis" id="signinGoogleGis"></div>
+      <button class="btn signin-google" id="signinGoogle" hidden>Sign in with Google</button>
       <div class="signin-or"><span>or</span></div>
       <form id="signinEmailForm">
         <input class="signin-input" id="signinEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
@@ -252,11 +253,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261031b"></script>
-<script src="data/season.js?v=20261031b"></script>
-<script src="data/dancers.js?v=20261031b"></script>
+<script src="data/config.js?v=20261101a"></script>
+<script src="data/season.js?v=20261101a"></script>
+<script src="data/dancers.js?v=20261101a"></script>
 <script>
-const ASSET_VERSION = '20261031b'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261101a'; // keep in step with the ?v= on the files above
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -1247,6 +1248,35 @@ if (LOGIN_ON) {
     setDrawer(false);
     window.marlayAuth.signOut();
   }));
+
+  // Google's own button signs in on this page (no second tab through firebaseapp.com),
+  // then hands Firebase the Google ID token. If Google's script can't load, the old
+  // Firebase popup button comes back.
+  const gisFallback = () => { document.getElementById('signinGoogle').hidden = false; };
+  const gisScript = document.createElement('script');
+  gisScript.src = 'https://accounts.google.com/gsi/client';
+  gisScript.async = true;
+  gisScript.onerror = gisFallback;
+  gisScript.onload = () => {
+    try {
+      google.accounts.id.initialize({
+        client_id: STUDIO.auth.googleClientId,
+        ux_mode: 'popup',
+        callback: r => {
+          showSignin('checking');
+          window.marlayAuth.signInWithGoogleToken(r.credential).catch(err => {
+            gisFallback();
+            showSignin('start', { error: friendlyAuthError(err) || 'Something went wrong signing in. Please try again.' });
+          });
+        }
+      });
+      google.accounts.id.renderButton(document.getElementById('signinGoogleGis'), {
+        type: 'standard', theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with',
+        logo_alignment: 'center', width: Math.min(400, Math.max(200, window.innerWidth - 96))
+      });
+    } catch (e) { gisFallback(); }
+  };
+  document.head.appendChild(gisScript);
 
   const authScript = document.createElement('script');
   authScript.type = 'module';

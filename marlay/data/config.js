@@ -63,6 +63,10 @@ const STUDIO = {
   // makes everyone sign in; false would reopen the site (and the script's LOGIN_REQUIRED too).
   auth: {
     required: true,
+    // Google's own sign-in button (Google Identity Services). Public by design; it only
+    // works on the sites listed as "Authorized JavaScript origins" for this client in
+    // Google Cloud (marlay-calendar > APIs & Services > Credentials).
+    googleClientId: "940664518510-vvm04qnvq2lmc6a6g1a2u593336mhnmo.apps.googleusercontent.com",
     firebase: {
       apiKey: "AIzaSyBf8cV-7y0GsSgXkibEqrI5fXMMGBffJ80",
       authDomain: "marlay-calendar.firebaseapp.com",
