@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": "marlay",
+    "ignore": [
+      "apps-script/**",
+      "**/*.md",
+      "**/.DS_Store"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -5,6 +5,10 @@
 
 const STUDIO = {
   name: "Tate Academy",
+  // Where the app lives (Firebase Hosting in marlay-calendar, since 2026-11-02). Any
+  // other address (the old GitHub Pages link, firebaseapp.com) forwards here, so Google
+  // sign-in always runs on the same site as the app.
+  siteUrl: "https://marlay-calendar.web.app/",
   homeCity: "Teaneck, NJ",
   // Starting point for road-trip guides on each competition's Weekend Info view.
   homeAddress: "Tate Academy, Teaneck, NJ",
@@ -63,13 +67,11 @@ const STUDIO = {
   // makes everyone sign in; false would reopen the site (and the script's LOGIN_REQUIRED too).
   auth: {
     required: true,
-    // Google's own sign-in button (Google Identity Services). Public by design; it only
-    // works on the sites listed as "Authorized JavaScript origins" for this client in
-    // Google Cloud (marlay-calendar > APIs & Services > Credentials).
-    googleClientId: "940664518510-vvm04qnvq2lmc6a6g1a2u593336mhnmo.apps.googleusercontent.com",
     firebase: {
       apiKey: "AIzaSyBf8cV-7y0GsSgXkibEqrI5fXMMGBffJ80",
-      authDomain: "marlay-calendar.firebaseapp.com",
+      // Same address as siteUrl, so the Google sign-in handler (/__/auth/) is on this
+      // site and iPhone privacy rules can't cut it off.
+      authDomain: "marlay-calendar.web.app",
       projectId: "marlay-calendar",
       appId: "1:940664518510:web:408a61e7172b6063e3b37f"
     }
