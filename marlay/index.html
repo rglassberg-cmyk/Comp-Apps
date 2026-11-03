@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261102a">
+<link rel="stylesheet" href="styles.css?v=20261102b">
 </head>
 <body>
 
@@ -22,8 +22,7 @@
     <div data-signin-state="start">
       <h1 class="signin-title">Welcome, Tate families</h1>
       <p class="signin-text">Sign in with the email you gave on the parent form.</p>
-      <div class="signin-google-gis" id="signinGoogleGis"></div>
-      <button class="btn signin-google" id="signinGoogle" hidden>Sign in with Google</button>
+      <button class="btn signin-google" id="signinGoogle">Sign in with Google</button>
       <p class="signin-hint" id="signinGoogleHint">Trouble with Google? Use the email link below.</p>
       <div class="signin-or"><span>or</span></div>
       <form id="signinEmailForm">
@@ -254,11 +253,17 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261102a"></script>
-<script src="data/season.js?v=20261102a"></script>
-<script src="data/dancers.js?v=20261102a"></script>
+<script src="data/config.js?v=20261102b"></script>
+<script src="data/season.js?v=20261102b"></script>
+<script src="data/dancers.js?v=20261102b"></script>
 <script>
-const ASSET_VERSION = '20261102a'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261102b'; // keep in step with the ?v= on the files above
+// The app lives at STUDIO.siteUrl; any other address (the old GitHub Pages link,
+// firebaseapp.com) forwards there, keeping ?query and #hash. Local testing stays put.
+if (STUDIO.siteUrl && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+    && location.origin !== new URL(STUDIO.siteUrl).origin) {
+  location.replace(STUDIO.siteUrl + location.search + location.hash);
+}
 // ---------- Setup from config ----------
 document.title = STUDIO.name + ' | Marlay';
 document.getElementById('heroPhoto').src = STUDIO.heroPhoto.src;
@@ -1222,6 +1227,7 @@ if (LOGIN_ON) {
   });
 
   document.getElementById('signinGoogle').addEventListener('click', () => {
+    showSignin('checking'); // the page leaves for Google next
     window.marlayAuth.signInWithGoogle().catch(err => {
       const msg = friendlyAuthError(err);
       if (msg) showSignin('start', { error: msg });
@@ -1250,46 +1256,16 @@ if (LOGIN_ON) {
     window.marlayAuth.signOut();
   }));
 
-  // Google's own button signs in on this page (no second tab through firebaseapp.com),
-  // then hands Firebase the Google ID token. If Google's script can't load, the old
-  // Firebase popup button comes back.
-  // On iPhones and iPads the old popup fails ("missing initial state"), so there the
-  // fallback is the email link, not that button. In-app browsers (Instagram, Facebook,
-  // Android webviews) are refused by Google outright, so say so up front.
-  const ua = navigator.userAgent;
-  const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const inAppBrowser = /Instagram|FBAN|FBAV|FB_IAB|Line\/|; wv\)/.test(ua);
-  const googleHint = msg => { document.getElementById('signinGoogleHint').textContent = msg; };
-  if (inAppBrowser) googleHint('Google sign-in doesn\'t work inside this app. Open this page in Safari or Chrome, or use the email link below.');
-  const gisFallback = () => {
-    if (isIOS) googleHint('Google sign-in couldn\'t load here. Use the email link below.');
-    else document.getElementById('signinGoogle').hidden = false;
-  };
-  const gisScript = document.createElement('script');
-  gisScript.src = 'https://accounts.google.com/gsi/client';
-  gisScript.async = true;
-  gisScript.onerror = gisFallback;
-  gisScript.onload = () => {
-    try {
-      google.accounts.id.initialize({
-        client_id: STUDIO.auth.googleClientId,
-        ux_mode: 'popup',
-        callback: r => {
-          showSignin('checking');
-          window.marlayAuth.signInWithGoogleToken(r.credential).catch(err => {
-            gisFallback();
-            const msg = friendlyAuthError(err) || 'Something went wrong signing in.';
-            showSignin('start', { error: msg + ' Try the email link below.' + (err && err.code ? ' (' + err.code + ')' : '') });
-          });
-        }
-      });
-      google.accounts.id.renderButton(document.getElementById('signinGoogleGis'), {
-        type: 'standard', theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with',
-        logo_alignment: 'center', width: Math.min(400, Math.max(200, window.innerWidth - 96))
-      });
-    } catch (e) { gisFallback(); }
-  };
-  document.head.appendChild(gisScript);
+  // Google sign-in doesn't work inside in-app browsers (Instagram, Facebook, Android
+  // webviews); Google refuses them, so say so up front.
+  if (/Instagram|FBAN|FBAV|FB_IAB|Line\/|; wv\)/.test(navigator.userAgent)) {
+    document.getElementById('signinGoogleHint').textContent = 'Google sign-in doesn\'t work inside this app. Open this page in Safari or Chrome, or use the email link below.';
+  }
+  window.addEventListener('marlay-auth-error', e => {
+    const err = e.detail;
+    const msg = friendlyAuthError(err);
+    if (msg) showSignin('start', { error: msg + ' Try the email link below.' + (err && err.code ? ' (' + err.code + ')' : '') });
+  });
 
   const authScript = document.createElement('script');
   authScript.type = 'module';
