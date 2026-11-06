@@ -205,17 +205,21 @@ function nameKey(s) {
     .toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
-// Every image in the photo folder and its subfolders.
+// Every image in the photo folder and its subfolders. DriveApp still lists trashed
+// files in their old folder, so a photo deleted in Drive has to be skipped here.
 function photoFiles() {
   const out = [];
   const walk = folder => {
     const files = folder.getFiles();
     while (files.hasNext()) {
       const f = files.next();
-      if (/^image\//.test(f.getMimeType())) out.push(f);
+      if (!f.isTrashed() && /^image\//.test(f.getMimeType())) out.push(f);
     }
     const subs = folder.getFolders();
-    while (subs.hasNext()) walk(subs.next());
+    while (subs.hasNext()) {
+      const sub = subs.next();
+      if (!sub.isTrashed()) walk(sub);
+    }
   };
   walk(DriveApp.getFolderById(PHOTO_FOLDER_ID));
   return out;

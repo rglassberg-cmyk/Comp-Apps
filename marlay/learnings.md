@@ -69,3 +69,11 @@
   Credentials → that key → Rotate key, then update config.js and re-push the script.
   The clasp push also swaps the key into Code.gs's header comment; the key is only needed on
   the FIREBASE_WEB_KEY line.
+- 2026-11-06: DriveApp's `folder.getFiles()` still lists trashed files in their old folder,
+  so a photo Becca deleted in Drive kept showing (the old letterboxed Teen group photo won
+  over its cropped replacement). `photoFiles()` now skips trashed files and folders
+  (script version @7).
+- clasp push sends every .js/.gs file in the folder. Push from a fresh `clasp clone`
+  directory holding only appsscript.json and Code.js; a stray copy (main.gs) once went up
+  with it and redeclared every const. clasp also says "already up to date" without
+  deleting remote-only files, so check the live file list with a fresh clone after pushing.
