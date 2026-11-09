@@ -20,7 +20,8 @@
  * Meet the Dancers: blurbs (Roster "Blurb" column) and photos (the "Tate app photos" Drive
  * folder, PHOTO_FOLDER_ID) go only to signed-in, listed families. A photo matches a dancer
  * when its file name is their Roster full name ("Ava Khan.jpg"); a file with "group" in its
- * name is a group photo for the groups it names ("Petite:Mini Group.jpg"). Photos are sent
+ * name is a group photo for the groups it names ("Petite:Mini Group.jpg"; number several,
+ * "Senior group 1.jpg", "Senior group 2.jpg", and 1 goes on top). Photos are sent
  * as small data URLs in a separate request ({token, want: 'photos'}) so the main feed stays
  * fast.
  *
@@ -237,7 +238,7 @@ function photos() {
       const words = { Advanced: 'advanced|adv|seniors?' }; // Tabitha's list says ADV
       const groups = GROUPS.filter(g =>
         new RegExp('\\b(' + (words[g] || g.toLowerCase() + 's?') + ')\\b').test(key));
-      if (groups.length) wanted.push({ file: f, size: 1000, groups: groups });
+      if (groups.length) wanted.push({ file: f, size: 1000, groups: groups, key: key });
     } else if (byKey.has(key)) {
       wanted.push({ file: f, size: 480, dancer: byKey.get(key) });
     }
@@ -269,8 +270,12 @@ function photos() {
     const url = hits[cacheKey(w)];
     if (!url) return;
     if (w.dancer) dancers[w.dancer] = url;
-    else groupPhotos.push({ groups: w.groups, photo: url });
+    else groupPhotos.push({ groups: w.groups, photo: url, key: w.key });
   });
+  // A group can have several photos; sorted by file name, "… group 1" comes first and
+  // goes on top of the group's page, the rest go at the bottom.
+  groupPhotos.sort((a, b) => a.key.localeCompare(b.key, undefined, { numeric: true }));
+  groupPhotos.forEach(p => delete p.key);
   return { photos: dancers, groupPhotos: groupPhotos };
 }
 

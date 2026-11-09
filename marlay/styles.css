@@ -754,6 +754,7 @@ button.btn-outline:disabled:hover { background: none; }
 
 .team-group-photo { margin: 0 0 12px; }
 .team-group-photo img { display: block; width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+.team-group-photo-end { margin: 16px 0 0; }
 .team-group-photo figcaption { margin-top: 6px; font-size: 13px; color: var(--ink-soft); text-align: center; }
 
 .team-grid {

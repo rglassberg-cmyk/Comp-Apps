@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261106a">
+<link rel="stylesheet" href="styles.css?v=20261109a">
 </head>
 <body>
 
@@ -253,11 +253,11 @@
   <span id="footerText"></span>
 </footer>
 
-<script src="data/config.js?v=20261106a"></script>
-<script src="data/season.js?v=20261106a"></script>
-<script src="data/dancers.js?v=20261106a"></script>
+<script src="data/config.js?v=20261109a"></script>
+<script src="data/season.js?v=20261109a"></script>
+<script src="data/dancers.js?v=20261109a"></script>
 <script>
-const ASSET_VERSION = '20261106a'; // keep in step with the ?v= on the files above
+const ASSET_VERSION = '20261109a'; // keep in step with the ?v= on the files above
 // The app lives at STUDIO.siteUrl; any other address (the old GitHub Pages link,
 // firebaseapp.com) forwards there, keeping ?query and #hash. Local testing stays put.
 if (STUDIO.siteUrl && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)
@@ -1051,7 +1051,9 @@ function teamSections() {
     const gp = groupPhotos.find(p => p.groups.includes(group));
     const groups = gp ? GROUP_ORDER.filter(g => gp.groups.includes(g) && hasDancers(g) && !used.has(g)) : [group];
     groups.forEach(g => used.add(g));
-    sections.push({ key: groups.join('|'), groups, photo: gp ? gp.photo : '' });
+    // The first photo is the tile and the top of the page; any others go at the bottom.
+    const more = gp ? groupPhotos.filter(p => p !== gp && p.groups.join('|') === gp.groups.join('|')).map(p => p.photo) : [];
+    sections.push({ key: groups.join('|'), groups, photo: gp ? gp.photo : '', more });
   });
   return sections;
 }
@@ -1104,7 +1106,8 @@ function renderTeam() {
     ${open.groups.map(group => `
       ${open.groups.length > 1 ? `<div class="card-label section-label">${esc(group)}</div>` : ''}
       <div class="team-grid">${dancersIn(group).map(d => dancerCard(d, photos)).join('')}</div>
-    `).join('')}`;
+    `).join('')}
+    ${open.more.map(src => `<figure class="team-group-photo team-group-photo-end"><img src="${src}" alt="${esc(open.groups.join(' & '))} group photo" loading="lazy"></figure>`).join('')}`;
 }
 
 document.getElementById('teamList').addEventListener('click', e => {
